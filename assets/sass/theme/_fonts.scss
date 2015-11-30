@@ -2,6 +2,16 @@
 	FONTS
 ****************/
 
+body {
+	font-family: $source;
+	color: $black;
+}
 
+h1,
+h2,
+h3 {
+	font-family: $mont;
+	color: $black;
+}
 
 
