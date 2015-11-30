@@ -1,0 +1,46 @@
+/* ==========================================================================
+  	Kickstart, a base to start html project
+ 	Author: JR
+  	Version: 2
+  	Credits: 
+  		- Kaelig & his book CSS maintenables avec Sass et Compass
+  		- Cathy Dutton for her organization
+  			https://github.com/cathydutton/maze/blob/master/src/sass/style.scss
+
+
+
+
+/* BASE - Reset, mixins & variables
+==================================================== */
+
+	@import 'base/_reset.scss'; 
+	@import 'base/_variables.scss'; 
+	@import 'base/_mixins.scss';
+	
+
+/* VENDOR - Some things taken from Bootstrap, grid system and utilities
+============================================================================= */
+
+	@import 'vendor/_grid_system.scss';
+	@import 'vendor/_grid.scss'; 
+	@import 'vendor/_helpers.scss';
+
+
+/* OBJECTS - Repeating components
+==================================================== */
+
+	@import 'objects/_forms.scss'; 
+	@import 'objects/_buttons.scss'; 
+
+
+/* THEME - Main files for website
+==================================================== */
+
+	@import 'theme/_fonts.scss';
+	@import 'theme/_header.scss';
+	@import 'theme/_typo.scss';
+	@import 'theme/_footer.scss';
+	@import 'theme/_main.scss';
+	@import 'theme/_shame.scss';
+
+

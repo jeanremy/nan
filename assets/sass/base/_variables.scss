@@ -1,0 +1,25 @@
+/****************
+	VARIABLES  
+****************/
+
+// Colors
+$black: #333333;
+$primary: #00FFB7; // Gris mega foncé
+$secondary: #f7f7f7; // Blanc un peu cassé
+
+
+// Fonts
+$mont: 'Montserrat', sans-serif;
+$montreg: 400;
+$montbold: 700;
+$source: 'Source Sans Pro', sans-serif;
+
+:selection {
+  color: #fff;
+  background-color: $primary;
+}
+
+::-moz-selection {
+	color:#fff;
+	background-color: $primary;
+}

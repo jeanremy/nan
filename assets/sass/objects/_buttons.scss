@@ -1,0 +1,25 @@
+/****************
+	BUTTONS  
+****************/
+
+.btn {
+	font-weight: 700;
+	font-family: $source;
+	text-transform: uppercase;
+	background-color: $primary;
+	color: #fff;
+	font-size: 15px;
+}
+
+.btn--black {
+	@extend .btn;
+	background-color: #fff;
+	color: $primary;
+}
+
+.btn--big {
+	@extend .btn;
+	display: block;
+	font-size: 30px;
+	text-align: center;
+}

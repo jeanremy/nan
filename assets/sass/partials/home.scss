@@ -1,0 +1,36 @@
+@import '../base/_variables.scss'; 
+
+
+.home {
+	.content {
+		margin: 0 auto;
+		background: #eeeeee;
+		padding: 50px;
+		position: relative;
+		max-width: 420px;
+		.title {
+			position: absolute;
+			left: -45px;
+			top: -90px;
+			font-size: 110px;
+			font-family: $mont;
+			font-weight: $montbold;;
+		}
+
+		.desc {
+			padding-left: 100px;
+			position: relative;
+			&:before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 8px;
+				width: 80px;
+				height: 1px;
+				background-color: $black;
+			}
+		}
+		
+
+	}
+}

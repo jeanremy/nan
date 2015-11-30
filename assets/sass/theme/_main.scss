@@ -1,0 +1,53 @@
+/****************
+	MAIN
+****************/
+html, 
+body,
+#app,
+section {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.section {
+	padding: 30px;
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: -ms-flex;
+	display: -o-flex;
+	display: flex;
+	align-items: center;
+	.bar {
+		position: absolute;
+		background: $black;
+	}
+	.bar.top {
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 14px;
+		transform-origin: 0 0;
+	}
+	.bar.bottom {
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 14px;
+		transform-origin: 100% 0;
+	}
+	.bar.left {
+		bottom: 0;
+		top: 0;
+		left: 0;
+		width: 14px;
+		transform-origin: 0 100%;
+	}
+	.bar.right {
+		bottom: 0;
+		top: 0;
+		right: 0;
+		width: 14px;
+		transform-origin: 0 0;
+	}
+}

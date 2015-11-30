@@ -1,0 +1,29 @@
+/****************
+	HELPERS 
+****************/
+
+
+
+//Clearfix helpers - Use this way @extend %clearfix;
+%clearfix {
+	&:after {
+		content: "";
+		display: table;
+		clear: both;
+	}	
+}
+
+//Clearfix helpers
+.clearfix {
+	@extend %clearfix;
+}
+
+/* Sprite */
+/* .sprite {
+	background: url(../img/sprite.svg);IE 9+ & Android 3+
+	.no-svg & {
+		background: url(../img/sprite.png);
+	}
+}
+ */
+
