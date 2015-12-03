@@ -50,16 +50,15 @@
 	var bigwheel = __webpack_require__(/*! bigwheel */ 1);
 	
 	// create our framework instance
-	var framework = bigwheel( function(done) {
+	framework = bigwheel( function(done) {
 	    var routes = __webpack_require__(/*! ./routes.js */ 9);
-	    console.log(routes);
 	    return {
-	      routes: routes
+	    	overlap: false,
+	      	routes: routes
 	    }
 	});
 	
 	
-	// this will start bigwheel and it will start resolving routes
 	framework.init();
 
 
@@ -151,6 +150,8 @@
 				throw new Error('Your settings object must define routes');
 	
 			s.autoResize = s.autoResize === undefined ? true : s.autoResize;
+	
+			this.previousRoute = undefined;
 	
 			// setup the router
 			this.router = settings.router || router(settings.routes);
@@ -294,7 +295,9 @@
 	
 	bigwheel.prototype.show = function(info) {
 		var section = info.section;
-		var req = info.route;
+		var req = info.route || {};
+		req.previous = this.previousRoute;
+		req.framework = this;
 	
 		// this is the original router callback passed in
 		if(this.onRouteCallBack)
@@ -326,6 +329,8 @@
 			this.doShow(new section(), req);
 		}
 	
+		this.previousRoute = info.route;
+	
 	};
 	
 	bigwheel.prototype.doShow = function(section, req) {
@@ -343,9 +348,9 @@
 
 /***/ },
 /* 2 */
-/*!**************************!*\
-  !*** ./~/bw-vm/index.js ***!
-  \**************************/
+/*!*************************************!*\
+  !*** ./~/bigwheel/~/bw-vm/index.js ***!
+  \*************************************/
 /***/ function(module, exports) {
 
 	function ViewManager( settings ) {
@@ -545,9 +550,9 @@
 
 /***/ },
 /* 3 */
-/*!************************************!*\
-  !*** ./~/bw-viewmediator/index.js ***!
-  \************************************/
+/*!***********************************************!*\
+  !*** ./~/bigwheel/~/bw-viewmediator/index.js ***!
+  \***********************************************/
 /***/ function(module, exports) {
 
 	function mediator() {
@@ -631,9 +636,9 @@
 
 /***/ },
 /* 4 */
-/*!******************************!*\
-  !*** ./~/bw-router/index.js ***!
-  \******************************/
+/*!*****************************************!*\
+  !*** ./~/bigwheel/~/bw-router/index.js ***!
+  \*****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var on = __webpack_require__(/*! dom-event */ 5);
@@ -844,8 +849,18 @@
 	p.getSection = function(routeData) {
 	
 		if(routeData) {
-	
-			return this.s[ routeData.route ];
+			var hasWildcard = routeData.route && (routeData.route.match(/.*[\[\]@!$&:'()*+,;=].*/g) || routeData.route instanceof RegExp);
+			var sec = this.s[ routeData.route ];
+			if (hasWildcard && sec.duplicate===undefined) {
+				if (!sec.section) {
+					return {section: sec, duplicate: true};
+				} else {
+					sec.duplicate = true;
+					return sec;
+				}
+			}	else {
+				return sec;
+			}
 		} else {
 	
 			return null;
@@ -896,9 +911,9 @@
 
 /***/ },
 /* 5 */
-/*!******************************************!*\
-  !*** ./~/bw-router/~/dom-event/index.js ***!
-  \******************************************/
+/*!*****************************************************!*\
+  !*** ./~/bigwheel/~/bw-router/~/dom-event/index.js ***!
+  \*****************************************************/
 /***/ function(module, exports) {
 
 	module.exports = on;
@@ -920,9 +935,9 @@
 
 /***/ },
 /* 6 */
-/*!*********************************!*\
-  !*** ./~/routes/dist/routes.js ***!
-  \*********************************/
+/*!********************************************************!*\
+  !*** ./~/bigwheel/~/bw-router/~/routes/dist/routes.js ***!
+  \********************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var require;var require;!function(e){if(true)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.routes=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
@@ -1088,9 +1103,9 @@
 
 /***/ },
 /* 7 */
-/*!****************************!*\
-  !*** ./~/events/events.js ***!
-  \****************************/
+/*!********************************************************!*\
+  !*** (webpack)/~/node-libs-browser/~/events/events.js ***!
+  \********************************************************/
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -1176,18 +1191,11 @@
 	        break;
 	      // slower
 	      default:
-	        len = arguments.length;
-	        args = new Array(len - 1);
-	        for (i = 1; i < len; i++)
-	          args[i - 1] = arguments[i];
+	        args = Array.prototype.slice.call(arguments, 1);
 	        handler.apply(this, args);
 	    }
 	  } else if (isObject(handler)) {
-	    len = arguments.length;
-	    args = new Array(len - 1);
-	    for (i = 1; i < len; i++)
-	      args[i - 1] = arguments[i];
-	
+	    args = Array.prototype.slice.call(arguments, 1);
 	    listeners = handler.slice();
 	    len = listeners.length;
 	    for (i = 0; i < len; i++)
@@ -1225,7 +1233,6 @@
 	
 	  // Check for listener leak
 	  if (isObject(this._events[type]) && !this._events[type].warned) {
-	    var m;
 	    if (!isUndefined(this._maxListeners)) {
 	      m = this._maxListeners;
 	    } else {
@@ -1347,7 +1354,7 @@
 	
 	  if (isFunction(listeners)) {
 	    this.removeListener(type, listeners);
-	  } else {
+	  } else if (listeners) {
 	    // LIFO order
 	    while (listeners.length)
 	      this.removeListener(type, listeners[listeners.length - 1]);
@@ -1368,15 +1375,20 @@
 	  return ret;
 	};
 	
+	EventEmitter.prototype.listenerCount = function(type) {
+	  if (this._events) {
+	    var evlistener = this._events[type];
+	
+	    if (isFunction(evlistener))
+	      return 1;
+	    else if (evlistener)
+	      return evlistener.length;
+	  }
+	  return 0;
+	};
+	
 	EventEmitter.listenerCount = function(emitter, type) {
-	  var ret;
-	  if (!emitter._events || !emitter._events[type])
-	    ret = 0;
-	  else if (isFunction(emitter._events[type]))
-	    ret = 1;
-	  else
-	    ret = emitter._events[type].length;
-	  return ret;
+	  return emitter.listenerCount(type);
 	};
 	
 	function isFunction(arg) {
@@ -1398,9 +1410,9 @@
 
 /***/ },
 /* 8 */
-/*!******************************!*\
-  !*** ./~/dom-event/index.js ***!
-  \******************************/
+/*!*****************************************!*\
+  !*** ./~/bigwheel/~/dom-event/index.js ***!
+  \*****************************************/
 /***/ function(module, exports) {
 
 	module.exports = on;
@@ -1474,29 +1486,21 @@
 	
 	var Tween = __webpack_require__(/*! gsap */ 11),
 	    $ = __webpack_require__(/*! jquery */ 13),
-	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14);
+	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14),
+	    model = __webpack_require__(/*! ../models.js */ 29);
 	
 	Home.prototype = {
 	
 	    el: {},
 	
-	    section: {                    
-	        title: {
-	            label: 'NaN',
-	            abbr: 'Nantes - Angers - Nantes'
-	        },
-	        desc: '[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l\'IMIE d\'Angers.'
-	    },
-	
 	    init: function(req, done) {
 	
-	        // get model
 	        this.el = __webpack_require__(/*! ./../../partials/home.html */ 15);
 	        __webpack_require__(/*! ./../../sass/main.scss */ 19);
 	        __webpack_require__(/*! ./../../sass/partials/home.scss */ 23);
 	
 	        var app = document.getElementById('app');
-	        app.innerHTML = this.el(this.section);
+	        app.innerHTML = this.el(model[ req.route ]);
 	
 	        this.bars = document.querySelectorAll('.bar');
 	        this.text = document.querySelectorAll('.text');
@@ -1515,15 +1519,8 @@
 	        this.tl
 	            .add(this.tweens, '+=0', 'sequence')
 	            .add(this.texts, '+=0', 'start', 0.2);
-	
-	        app.onclick = function() {
-	          framework.go('contact');
-	        }
-	
-	        $('#app').one('mousewheel', function() {
-	            framework.go('/1560')
-	        });
 	        done();
+	
 	    },
 	
 	    // the resize function will be called imediately after init
@@ -1534,21 +1531,34 @@
 	    // in animateIn you'll animate in your hidden content that
 	    // was created in init
 	    animateIn: function(req, done) {
+	        var ok = function() {console.log('ok')};
+	        this.tl
+	                .add(ok)
+	                .add(done);
 	        this.tl.play();
-	        done();
+	        app.onclick = function() {
+	            framework.go('/1560');
+	        }
+	        
 	    },
 	
 	    // in animateOut you'll animate out your content that
 	    // was created in init
 	    animateOut: function(req, done) {
+	        var ok = function() {console.log('ok')};
+	        this.tl
+	                .eventCallback('onReverseComplete', ok)
+	                .eventCallback('onReverseComplete', done);
 	        this.tl.reverse();
-	        done();       
+	
+	
 	    },
 	
 	    // in destroy you'll clean up the content which was
 	    // created in init
 	    destroy: function(req, done) {
-	        this.el.parentNode.removeChild(Home.el);
+	        // var app = document.getElementById('app');
+	        // app.removeChild(app.firstChild);
 	        done();
 	    }
 	};
@@ -18602,7 +18612,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var H = __webpack_require__(/*! hogan.js */ 16);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"home section\">\r");t.b("\n" + i);t.b("	\r");t.b("\n" + i);t.b("	<div class=\"bar bottom\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar left\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar top\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	<div class=\"content text\">\r");t.b("\n" + i);t.b("		\r");t.b("\n" + i);t.b("		<header>\r");t.b("\n" + i);t.b("			<h1 class=\"title text\"><abbr title=\"");t.b(t.v(t.d("title.abbr",c,p,0)));t.b("\">");t.b(t.v(t.d("title.label",c,p,0)));t.b("</abbr></h1>\r");t.b("\n" + i);t.b("		</header>\r");t.b("\n" + i);t.b("		<div class=\"desc\">\r");t.b("\n" + i);t.b("			<p>");t.b(t.v(t.f("desc",c,p,0)));t.b("</p>\r");t.b("\n" + i);t.b("		</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"home section\">\r\n\t\r\n\t<div class=\"bar bottom\"></div>\r\n\t<div class=\"bar left\"></div>\r\n\t<div class=\"bar top\"></div>\r\n\t<div class=\"bar right\"></div>\r\n\r\n\t<div class=\"content text\">\r\n\t\t\r\n\t\t<header>\r\n\t\t\t<h1 class=\"title text\"><abbr title=\"{{title.abbr}}\">{{title.label}}</abbr></h1>\r\n\t\t</header>\r\n\t\t<div class=\"desc\">\r\n\t\t\t<p>{{desc}}</p>\r\n\t\t</div>\r\n\r\n\t</div>\r\n\r\n</section>", H);return T.render.apply(T, arguments); };
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"home section\">\r");t.b("\n" + i);t.b("	\r");t.b("\n" + i);t.b("	<div class=\"bar bottom\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar left\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar top\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	<div class=\"content text\">\r");t.b("\n" + i);t.b("		\r");t.b("\n" + i);t.b("		<header>\r");t.b("\n" + i);t.b("			<h1 class=\"title text\"><abbr title=\"");t.b(t.v(t.d("title.abbr",c,p,0)));t.b("\">");t.b(t.v(t.d("title.label",c,p,0)));t.b("</abbr></h1>\r");t.b("\n" + i);t.b("		</header>\r");t.b("\n" + i);t.b("		<div class=\"desc\">\r");t.b("\n" + i);t.b("			<p>");t.b(t.v(t.f("desc",c,p,0)));t.b("</p>\r");t.b("\n" + i);t.b("		</div>\r");t.b("\n" + i);t.b("		<a href=\"#!/1560\">Lien</a>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"home section\">\r\n\t\r\n\t<div class=\"bar bottom\"></div>\r\n\t<div class=\"bar left\"></div>\r\n\t<div class=\"bar top\"></div>\r\n\t<div class=\"bar right\"></div>\r\n\r\n\t<div class=\"content text\">\r\n\t\t\r\n\t\t<header>\r\n\t\t\t<h1 class=\"title text\"><abbr title=\"{{title.abbr}}\">{{title.label}}</abbr></h1>\r\n\t\t</header>\r\n\t\t<div class=\"desc\">\r\n\t\t\t<p>{{desc}}</p>\r\n\t\t</div>\r\n\t\t<a href=\"#!/1560\">Lien</a>\r\n\r\n\t</div>\r\n\r\n</section>", H);return T.render.apply(T, arguments); };
 
 /***/ },
 /* 16 */
@@ -19457,7 +19467,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/* ==========================================================================\r\n  \tKickstart, a base to start html project\r\n \tAuthor: JR\r\n  \tVersion: 2\r\n  \tCredits: \r\n  \t\t- Kaelig & his book CSS maintenables avec Sass et Compass\r\n  \t\t- Cathy Dutton for her organization\r\n  \t\t\thttps://github.com/cathydutton/maze/blob/master/src/sass/style.scss\r\n\r\n\r\n\r\n\r\n/* BASE - Reset, mixins & variables\r\n==================================================== */\n/****************\r\n    RESET  \r\n****************/\n/*Based on Eric Meyer's reste.css. \r\n  Originally @import compass/reset but copied to change it (ex line height on html)\r\n*/\nhtml, body, div, span, applet, object, iframe,\nh1, h2, h3, h4, h5, h6, p, blockquote, pre,\na, abbr, acronym, address, big, cite, code,\ndel, dfn, em, img, ins, kbd, q, s, samp,\nsmall, strike, strong, sub, sup, tt, var,\nb, u, i, center,\ndl, dt, dd, ol, ul, li,\nfieldset, form, label, legend,\ntable, caption, tbody, tfoot, thead, tr, th, td,\narticle, aside, canvas, details, embed,\nfigure, figcaption, footer, header, hgroup,\nmenu, nav, output, ruby, section, summary,\ntime, mark, audio, video {\n  margin: 0;\n  padding: 0;\n  border: 0;\n  font: inherit;\n  font-size: 100%;\n  vertical-align: baseline; }\n\nhtml {\n  line-height: 1.5; }\n\nol, ul {\n  list-style: none; }\n\ntable {\n  border-collapse: collapse;\n  border-spacing: 0; }\n\ncaption, th, td {\n  text-align: left;\n  font-weight: normal;\n  vertical-align: middle; }\n\nq, blockquote {\n  quotes: none; }\n\nq:before, q:after, blockquote:before, blockquote:after {\n  content: \"\";\n  content: none; }\n\na img {\n  border: none; }\n\narticle, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {\n  display: block; }\n\n*,\n*::before,\n*::after {\n  box-sizing: border-box; }\n\na {\n  text-decoration: none;\n  color: inherit; }\n\n/****************\r\n\tVARIABLES  \r\n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n/****************\r\n\tMIXINS\r\n****************/\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n/* VENDOR - Some things taken from Bootstrap, grid system and utilities\r\n============================================================================= */\n/********************************\r\n    GRID SYSTEM Bootstrap based\r\n********************************/\n/****************\r\n    GRID\r\n****************/\n.container {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left: 15px;\n  padding-right: 15px; }\n  .container:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n  @media (min-width: 768px) {\n    .container {\n      width: 750px; } }\n  @media (min-width: 992px) {\n    .container {\n      width: 970px; } }\n  @media (min-width: 1200px) {\n    .container {\n      width: 1170px; } }\n\n.container-fluid {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left: 15px;\n  padding-right: 15px; }\n  .container-fluid:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.row {\n  margin-left: -15px;\n  margin-right: -15px; }\n  .row:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {\n  position: relative;\n  min-height: 1px;\n  padding-left: 15px;\n  padding-right: 15px; }\n\n.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {\n  float: left; }\n\n.col-xs-1 {\n  width: 8.33333%; }\n\n.col-xs-2 {\n  width: 16.66667%; }\n\n.col-xs-3 {\n  width: 25%; }\n\n.col-xs-4 {\n  width: 33.33333%; }\n\n.col-xs-5 {\n  width: 41.66667%; }\n\n.col-xs-6 {\n  width: 50%; }\n\n.col-xs-7 {\n  width: 58.33333%; }\n\n.col-xs-8 {\n  width: 66.66667%; }\n\n.col-xs-9 {\n  width: 75%; }\n\n.col-xs-10 {\n  width: 83.33333%; }\n\n.col-xs-11 {\n  width: 91.66667%; }\n\n.col-xs-12 {\n  width: 100%; }\n\n.col-xs-pull-0 {\n  right: auto; }\n\n.col-xs-pull-1 {\n  right: 8.33333%; }\n\n.col-xs-pull-2 {\n  right: 16.66667%; }\n\n.col-xs-pull-3 {\n  right: 25%; }\n\n.col-xs-pull-4 {\n  right: 33.33333%; }\n\n.col-xs-pull-5 {\n  right: 41.66667%; }\n\n.col-xs-pull-6 {\n  right: 50%; }\n\n.col-xs-pull-7 {\n  right: 58.33333%; }\n\n.col-xs-pull-8 {\n  right: 66.66667%; }\n\n.col-xs-pull-9 {\n  right: 75%; }\n\n.col-xs-pull-10 {\n  right: 83.33333%; }\n\n.col-xs-pull-11 {\n  right: 91.66667%; }\n\n.col-xs-pull-12 {\n  right: 100%; }\n\n.col-xs-push-0 {\n  left: auto; }\n\n.col-xs-push-1 {\n  left: 8.33333%; }\n\n.col-xs-push-2 {\n  left: 16.66667%; }\n\n.col-xs-push-3 {\n  left: 25%; }\n\n.col-xs-push-4 {\n  left: 33.33333%; }\n\n.col-xs-push-5 {\n  left: 41.66667%; }\n\n.col-xs-push-6 {\n  left: 50%; }\n\n.col-xs-push-7 {\n  left: 58.33333%; }\n\n.col-xs-push-8 {\n  left: 66.66667%; }\n\n.col-xs-push-9 {\n  left: 75%; }\n\n.col-xs-push-10 {\n  left: 83.33333%; }\n\n.col-xs-push-11 {\n  left: 91.66667%; }\n\n.col-xs-push-12 {\n  left: 100%; }\n\n.col-xs-offset-0 {\n  margin-left: 0%; }\n\n.col-xs-offset-1 {\n  margin-left: 8.33333%; }\n\n.col-xs-offset-2 {\n  margin-left: 16.66667%; }\n\n.col-xs-offset-3 {\n  margin-left: 25%; }\n\n.col-xs-offset-4 {\n  margin-left: 33.33333%; }\n\n.col-xs-offset-5 {\n  margin-left: 41.66667%; }\n\n.col-xs-offset-6 {\n  margin-left: 50%; }\n\n.col-xs-offset-7 {\n  margin-left: 58.33333%; }\n\n.col-xs-offset-8 {\n  margin-left: 66.66667%; }\n\n.col-xs-offset-9 {\n  margin-left: 75%; }\n\n.col-xs-offset-10 {\n  margin-left: 83.33333%; }\n\n.col-xs-offset-11 {\n  margin-left: 91.66667%; }\n\n.col-xs-offset-12 {\n  margin-left: 100%; }\n\n@media (min-width: 768px) {\n  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {\n    float: left; }\n  .col-sm-1 {\n    width: 8.33333%; }\n  .col-sm-2 {\n    width: 16.66667%; }\n  .col-sm-3 {\n    width: 25%; }\n  .col-sm-4 {\n    width: 33.33333%; }\n  .col-sm-5 {\n    width: 41.66667%; }\n  .col-sm-6 {\n    width: 50%; }\n  .col-sm-7 {\n    width: 58.33333%; }\n  .col-sm-8 {\n    width: 66.66667%; }\n  .col-sm-9 {\n    width: 75%; }\n  .col-sm-10 {\n    width: 83.33333%; }\n  .col-sm-11 {\n    width: 91.66667%; }\n  .col-sm-12 {\n    width: 100%; }\n  .col-sm-pull-0 {\n    right: auto; }\n  .col-sm-pull-1 {\n    right: 8.33333%; }\n  .col-sm-pull-2 {\n    right: 16.66667%; }\n  .col-sm-pull-3 {\n    right: 25%; }\n  .col-sm-pull-4 {\n    right: 33.33333%; }\n  .col-sm-pull-5 {\n    right: 41.66667%; }\n  .col-sm-pull-6 {\n    right: 50%; }\n  .col-sm-pull-7 {\n    right: 58.33333%; }\n  .col-sm-pull-8 {\n    right: 66.66667%; }\n  .col-sm-pull-9 {\n    right: 75%; }\n  .col-sm-pull-10 {\n    right: 83.33333%; }\n  .col-sm-pull-11 {\n    right: 91.66667%; }\n  .col-sm-pull-12 {\n    right: 100%; }\n  .col-sm-push-0 {\n    left: auto; }\n  .col-sm-push-1 {\n    left: 8.33333%; }\n  .col-sm-push-2 {\n    left: 16.66667%; }\n  .col-sm-push-3 {\n    left: 25%; }\n  .col-sm-push-4 {\n    left: 33.33333%; }\n  .col-sm-push-5 {\n    left: 41.66667%; }\n  .col-sm-push-6 {\n    left: 50%; }\n  .col-sm-push-7 {\n    left: 58.33333%; }\n  .col-sm-push-8 {\n    left: 66.66667%; }\n  .col-sm-push-9 {\n    left: 75%; }\n  .col-sm-push-10 {\n    left: 83.33333%; }\n  .col-sm-push-11 {\n    left: 91.66667%; }\n  .col-sm-push-12 {\n    left: 100%; }\n  .col-sm-offset-0 {\n    margin-left: 0%; }\n  .col-sm-offset-1 {\n    margin-left: 8.33333%; }\n  .col-sm-offset-2 {\n    margin-left: 16.66667%; }\n  .col-sm-offset-3 {\n    margin-left: 25%; }\n  .col-sm-offset-4 {\n    margin-left: 33.33333%; }\n  .col-sm-offset-5 {\n    margin-left: 41.66667%; }\n  .col-sm-offset-6 {\n    margin-left: 50%; }\n  .col-sm-offset-7 {\n    margin-left: 58.33333%; }\n  .col-sm-offset-8 {\n    margin-left: 66.66667%; }\n  .col-sm-offset-9 {\n    margin-left: 75%; }\n  .col-sm-offset-10 {\n    margin-left: 83.33333%; }\n  .col-sm-offset-11 {\n    margin-left: 91.66667%; }\n  .col-sm-offset-12 {\n    margin-left: 100%; } }\n\n@media (min-width: 992px) {\n  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {\n    float: left; }\n  .col-md-1 {\n    width: 8.33333%; }\n  .col-md-2 {\n    width: 16.66667%; }\n  .col-md-3 {\n    width: 25%; }\n  .col-md-4 {\n    width: 33.33333%; }\n  .col-md-5 {\n    width: 41.66667%; }\n  .col-md-6 {\n    width: 50%; }\n  .col-md-7 {\n    width: 58.33333%; }\n  .col-md-8 {\n    width: 66.66667%; }\n  .col-md-9 {\n    width: 75%; }\n  .col-md-10 {\n    width: 83.33333%; }\n  .col-md-11 {\n    width: 91.66667%; }\n  .col-md-12 {\n    width: 100%; }\n  .col-md-pull-0 {\n    right: auto; }\n  .col-md-pull-1 {\n    right: 8.33333%; }\n  .col-md-pull-2 {\n    right: 16.66667%; }\n  .col-md-pull-3 {\n    right: 25%; }\n  .col-md-pull-4 {\n    right: 33.33333%; }\n  .col-md-pull-5 {\n    right: 41.66667%; }\n  .col-md-pull-6 {\n    right: 50%; }\n  .col-md-pull-7 {\n    right: 58.33333%; }\n  .col-md-pull-8 {\n    right: 66.66667%; }\n  .col-md-pull-9 {\n    right: 75%; }\n  .col-md-pull-10 {\n    right: 83.33333%; }\n  .col-md-pull-11 {\n    right: 91.66667%; }\n  .col-md-pull-12 {\n    right: 100%; }\n  .col-md-push-0 {\n    left: auto; }\n  .col-md-push-1 {\n    left: 8.33333%; }\n  .col-md-push-2 {\n    left: 16.66667%; }\n  .col-md-push-3 {\n    left: 25%; }\n  .col-md-push-4 {\n    left: 33.33333%; }\n  .col-md-push-5 {\n    left: 41.66667%; }\n  .col-md-push-6 {\n    left: 50%; }\n  .col-md-push-7 {\n    left: 58.33333%; }\n  .col-md-push-8 {\n    left: 66.66667%; }\n  .col-md-push-9 {\n    left: 75%; }\n  .col-md-push-10 {\n    left: 83.33333%; }\n  .col-md-push-11 {\n    left: 91.66667%; }\n  .col-md-push-12 {\n    left: 100%; }\n  .col-md-offset-0 {\n    margin-left: 0%; }\n  .col-md-offset-1 {\n    margin-left: 8.33333%; }\n  .col-md-offset-2 {\n    margin-left: 16.66667%; }\n  .col-md-offset-3 {\n    margin-left: 25%; }\n  .col-md-offset-4 {\n    margin-left: 33.33333%; }\n  .col-md-offset-5 {\n    margin-left: 41.66667%; }\n  .col-md-offset-6 {\n    margin-left: 50%; }\n  .col-md-offset-7 {\n    margin-left: 58.33333%; }\n  .col-md-offset-8 {\n    margin-left: 66.66667%; }\n  .col-md-offset-9 {\n    margin-left: 75%; }\n  .col-md-offset-10 {\n    margin-left: 83.33333%; }\n  .col-md-offset-11 {\n    margin-left: 91.66667%; }\n  .col-md-offset-12 {\n    margin-left: 100%; } }\n\n@media (min-width: 1200px) {\n  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {\n    float: left; }\n  .col-lg-1 {\n    width: 8.33333%; }\n  .col-lg-2 {\n    width: 16.66667%; }\n  .col-lg-3 {\n    width: 25%; }\n  .col-lg-4 {\n    width: 33.33333%; }\n  .col-lg-5 {\n    width: 41.66667%; }\n  .col-lg-6 {\n    width: 50%; }\n  .col-lg-7 {\n    width: 58.33333%; }\n  .col-lg-8 {\n    width: 66.66667%; }\n  .col-lg-9 {\n    width: 75%; }\n  .col-lg-10 {\n    width: 83.33333%; }\n  .col-lg-11 {\n    width: 91.66667%; }\n  .col-lg-12 {\n    width: 100%; }\n  .col-lg-pull-0 {\n    right: auto; }\n  .col-lg-pull-1 {\n    right: 8.33333%; }\n  .col-lg-pull-2 {\n    right: 16.66667%; }\n  .col-lg-pull-3 {\n    right: 25%; }\n  .col-lg-pull-4 {\n    right: 33.33333%; }\n  .col-lg-pull-5 {\n    right: 41.66667%; }\n  .col-lg-pull-6 {\n    right: 50%; }\n  .col-lg-pull-7 {\n    right: 58.33333%; }\n  .col-lg-pull-8 {\n    right: 66.66667%; }\n  .col-lg-pull-9 {\n    right: 75%; }\n  .col-lg-pull-10 {\n    right: 83.33333%; }\n  .col-lg-pull-11 {\n    right: 91.66667%; }\n  .col-lg-pull-12 {\n    right: 100%; }\n  .col-lg-push-0 {\n    left: auto; }\n  .col-lg-push-1 {\n    left: 8.33333%; }\n  .col-lg-push-2 {\n    left: 16.66667%; }\n  .col-lg-push-3 {\n    left: 25%; }\n  .col-lg-push-4 {\n    left: 33.33333%; }\n  .col-lg-push-5 {\n    left: 41.66667%; }\n  .col-lg-push-6 {\n    left: 50%; }\n  .col-lg-push-7 {\n    left: 58.33333%; }\n  .col-lg-push-8 {\n    left: 66.66667%; }\n  .col-lg-push-9 {\n    left: 75%; }\n  .col-lg-push-10 {\n    left: 83.33333%; }\n  .col-lg-push-11 {\n    left: 91.66667%; }\n  .col-lg-push-12 {\n    left: 100%; }\n  .col-lg-offset-0 {\n    margin-left: 0%; }\n  .col-lg-offset-1 {\n    margin-left: 8.33333%; }\n  .col-lg-offset-2 {\n    margin-left: 16.66667%; }\n  .col-lg-offset-3 {\n    margin-left: 25%; }\n  .col-lg-offset-4 {\n    margin-left: 33.33333%; }\n  .col-lg-offset-5 {\n    margin-left: 41.66667%; }\n  .col-lg-offset-6 {\n    margin-left: 50%; }\n  .col-lg-offset-7 {\n    margin-left: 58.33333%; }\n  .col-lg-offset-8 {\n    margin-left: 66.66667%; }\n  .col-lg-offset-9 {\n    margin-left: 75%; }\n  .col-lg-offset-10 {\n    margin-left: 83.33333%; }\n  .col-lg-offset-11 {\n    margin-left: 91.66667%; }\n  .col-lg-offset-12 {\n    margin-left: 100%; } }\n\n/****************\r\n\tHELPERS \r\n****************/\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n/* Sprite */\n/* .sprite {\r\n\tbackground: url(../img/sprite.svg);IE 9+ & Android 3+\r\n\t.no-svg & {\r\n\t\tbackground: url(../img/sprite.png);\r\n\t}\r\n}\r\n */\n/* OBJECTS - Repeating components\r\n==================================================== */\n/****************\r\n\tFORMS\r\n****************/\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  margin: -1px;\n  padding: 0;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0; }\n\ninput[type=\"text\"],\ninput[type=\"email\"],\ninput[type=\"submit\"],\ninput[type=\"radio\"],\nselect,\ntextarea,\ninput[type=\"checkbox\"] {\n  -webkit-appearance: none; }\n\n/****************\r\n\tBUTTONS  \r\n****************/\n.btn, .btn--black, .btn--big {\n  font-weight: 700;\n  font-family: \"Source Sans Pro\", sans-serif;\n  text-transform: uppercase;\n  background-color: #00FFB7;\n  color: #fff;\n  font-size: 15px; }\n\n.btn--black {\n  background-color: #fff;\n  color: #00FFB7; }\n\n.btn--big {\n  display: block;\n  font-size: 30px;\n  text-align: center; }\n\n/* THEME - Main files for website\r\n==================================================== */\n/****************\n\tFONTS\n****************/\nbody {\n  font-family: \"Source Sans Pro\", sans-serif;\n  color: #333333; }\n\nh1,\nh2,\nh3 {\n  font-family: \"Montserrat\", sans-serif;\n  color: #333333; }\n\n/****************\r\n\tHEADER\r\n****************/\n/****************\r\n\tTYPO\r\n****************/\nhtml {\n  font-size: 100%; }\n\n/****************\r\n\tFOOTER\r\n****************/\n/****************\r\n\tMAIN\r\n****************/\nhtml,\nbody,\n#app,\nsection {\n  width: 100%;\n  height: 100%;\n  position: relative; }\n\n.section {\n  padding: 30px;\n  display: -webkit-flex;\n  display: -moz-flex;\n  display: -ms-flex;\n  display: -o-flex;\n  display: flex;\n  align-items: center; }\n  .section .bar {\n    position: absolute;\n    background: #333333; }\n  .section .bar.top {\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 14px;\n    transform-origin: 0 0; }\n  .section .bar.bottom {\n    bottom: 0;\n    left: 0;\n    right: 0;\n    height: 14px;\n    transform-origin: 100% 0; }\n  .section .bar.left {\n    bottom: 0;\n    top: 0;\n    left: 0;\n    width: 14px;\n    transform-origin: 0 100%; }\n  .section .bar.right {\n    bottom: 0;\n    top: 0;\n    right: 0;\n    width: 14px;\n    transform-origin: 0 0; }\n\n/****************\r\n\tSHAME\r\n****************/\n", ""]);
+	exports.push([module.id, "/* ==========================================================================\n  \tKickstart, a base to start html project\n \tAuthor: JR\n  \tVersion: 2\n  \tCredits: \n  \t\t- Kaelig & his book CSS maintenables avec Sass et Compass\n  \t\t- Cathy Dutton for her organization\n  \t\t\thttps://github.com/cathydutton/maze/blob/master/src/sass/style.scss\n\n\n\n\n/* BASE - Reset, mixins & variables\n==================================================== */\n/****************\n    RESET  \n****************/\n/*Based on Eric Meyer's reste.css. \n  Originally @import compass/reset but copied to change it (ex line height on html)\n*/\nhtml, body, div, span, applet, object, iframe,\nh1, h2, h3, h4, h5, h6, p, blockquote, pre,\na, abbr, acronym, address, big, cite, code,\ndel, dfn, em, img, ins, kbd, q, s, samp,\nsmall, strike, strong, sub, sup, tt, var,\nb, u, i, center,\ndl, dt, dd, ol, ul, li,\nfieldset, form, label, legend,\ntable, caption, tbody, tfoot, thead, tr, th, td,\narticle, aside, canvas, details, embed,\nfigure, figcaption, footer, header, hgroup,\nmenu, nav, output, ruby, section, summary,\ntime, mark, audio, video {\n  margin: 0;\n  padding: 0;\n  border: 0;\n  font: inherit;\n  font-size: 100%;\n  vertical-align: baseline; }\n\nhtml {\n  line-height: 1.5; }\n\nol, ul {\n  list-style: none; }\n\ntable {\n  border-collapse: collapse;\n  border-spacing: 0; }\n\ncaption, th, td {\n  text-align: left;\n  font-weight: normal;\n  vertical-align: middle; }\n\nq, blockquote {\n  quotes: none; }\n\nq:before, q:after, blockquote:before, blockquote:after {\n  content: \"\";\n  content: none; }\n\na img {\n  border: none; }\n\narticle, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {\n  display: block; }\n\n*,\n*::before,\n*::after {\n  box-sizing: border-box; }\n\na {\n  text-decoration: none;\n  color: inherit; }\n\n/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n/****************\n\tMIXINS\n****************/\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n/* VENDOR - Some things taken from Bootstrap, grid system and utilities\n============================================================================= */\n/********************************\n    GRID SYSTEM Bootstrap based\n********************************/\n/****************\n    GRID\n****************/\n.container {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left: 15px;\n  padding-right: 15px; }\n  .container:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n  @media (min-width: 768px) {\n    .container {\n      width: 750px; } }\n  @media (min-width: 992px) {\n    .container {\n      width: 970px; } }\n  @media (min-width: 1200px) {\n    .container {\n      width: 1170px; } }\n\n.container-fluid {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left: 15px;\n  padding-right: 15px; }\n  .container-fluid:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.row {\n  margin-left: -15px;\n  margin-right: -15px; }\n  .row:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {\n  position: relative;\n  min-height: 1px;\n  padding-left: 15px;\n  padding-right: 15px; }\n\n.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {\n  float: left; }\n\n.col-xs-1 {\n  width: 8.33333%; }\n\n.col-xs-2 {\n  width: 16.66667%; }\n\n.col-xs-3 {\n  width: 25%; }\n\n.col-xs-4 {\n  width: 33.33333%; }\n\n.col-xs-5 {\n  width: 41.66667%; }\n\n.col-xs-6 {\n  width: 50%; }\n\n.col-xs-7 {\n  width: 58.33333%; }\n\n.col-xs-8 {\n  width: 66.66667%; }\n\n.col-xs-9 {\n  width: 75%; }\n\n.col-xs-10 {\n  width: 83.33333%; }\n\n.col-xs-11 {\n  width: 91.66667%; }\n\n.col-xs-12 {\n  width: 100%; }\n\n.col-xs-pull-0 {\n  right: auto; }\n\n.col-xs-pull-1 {\n  right: 8.33333%; }\n\n.col-xs-pull-2 {\n  right: 16.66667%; }\n\n.col-xs-pull-3 {\n  right: 25%; }\n\n.col-xs-pull-4 {\n  right: 33.33333%; }\n\n.col-xs-pull-5 {\n  right: 41.66667%; }\n\n.col-xs-pull-6 {\n  right: 50%; }\n\n.col-xs-pull-7 {\n  right: 58.33333%; }\n\n.col-xs-pull-8 {\n  right: 66.66667%; }\n\n.col-xs-pull-9 {\n  right: 75%; }\n\n.col-xs-pull-10 {\n  right: 83.33333%; }\n\n.col-xs-pull-11 {\n  right: 91.66667%; }\n\n.col-xs-pull-12 {\n  right: 100%; }\n\n.col-xs-push-0 {\n  left: auto; }\n\n.col-xs-push-1 {\n  left: 8.33333%; }\n\n.col-xs-push-2 {\n  left: 16.66667%; }\n\n.col-xs-push-3 {\n  left: 25%; }\n\n.col-xs-push-4 {\n  left: 33.33333%; }\n\n.col-xs-push-5 {\n  left: 41.66667%; }\n\n.col-xs-push-6 {\n  left: 50%; }\n\n.col-xs-push-7 {\n  left: 58.33333%; }\n\n.col-xs-push-8 {\n  left: 66.66667%; }\n\n.col-xs-push-9 {\n  left: 75%; }\n\n.col-xs-push-10 {\n  left: 83.33333%; }\n\n.col-xs-push-11 {\n  left: 91.66667%; }\n\n.col-xs-push-12 {\n  left: 100%; }\n\n.col-xs-offset-0 {\n  margin-left: 0%; }\n\n.col-xs-offset-1 {\n  margin-left: 8.33333%; }\n\n.col-xs-offset-2 {\n  margin-left: 16.66667%; }\n\n.col-xs-offset-3 {\n  margin-left: 25%; }\n\n.col-xs-offset-4 {\n  margin-left: 33.33333%; }\n\n.col-xs-offset-5 {\n  margin-left: 41.66667%; }\n\n.col-xs-offset-6 {\n  margin-left: 50%; }\n\n.col-xs-offset-7 {\n  margin-left: 58.33333%; }\n\n.col-xs-offset-8 {\n  margin-left: 66.66667%; }\n\n.col-xs-offset-9 {\n  margin-left: 75%; }\n\n.col-xs-offset-10 {\n  margin-left: 83.33333%; }\n\n.col-xs-offset-11 {\n  margin-left: 91.66667%; }\n\n.col-xs-offset-12 {\n  margin-left: 100%; }\n\n@media (min-width: 768px) {\n  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {\n    float: left; }\n  .col-sm-1 {\n    width: 8.33333%; }\n  .col-sm-2 {\n    width: 16.66667%; }\n  .col-sm-3 {\n    width: 25%; }\n  .col-sm-4 {\n    width: 33.33333%; }\n  .col-sm-5 {\n    width: 41.66667%; }\n  .col-sm-6 {\n    width: 50%; }\n  .col-sm-7 {\n    width: 58.33333%; }\n  .col-sm-8 {\n    width: 66.66667%; }\n  .col-sm-9 {\n    width: 75%; }\n  .col-sm-10 {\n    width: 83.33333%; }\n  .col-sm-11 {\n    width: 91.66667%; }\n  .col-sm-12 {\n    width: 100%; }\n  .col-sm-pull-0 {\n    right: auto; }\n  .col-sm-pull-1 {\n    right: 8.33333%; }\n  .col-sm-pull-2 {\n    right: 16.66667%; }\n  .col-sm-pull-3 {\n    right: 25%; }\n  .col-sm-pull-4 {\n    right: 33.33333%; }\n  .col-sm-pull-5 {\n    right: 41.66667%; }\n  .col-sm-pull-6 {\n    right: 50%; }\n  .col-sm-pull-7 {\n    right: 58.33333%; }\n  .col-sm-pull-8 {\n    right: 66.66667%; }\n  .col-sm-pull-9 {\n    right: 75%; }\n  .col-sm-pull-10 {\n    right: 83.33333%; }\n  .col-sm-pull-11 {\n    right: 91.66667%; }\n  .col-sm-pull-12 {\n    right: 100%; }\n  .col-sm-push-0 {\n    left: auto; }\n  .col-sm-push-1 {\n    left: 8.33333%; }\n  .col-sm-push-2 {\n    left: 16.66667%; }\n  .col-sm-push-3 {\n    left: 25%; }\n  .col-sm-push-4 {\n    left: 33.33333%; }\n  .col-sm-push-5 {\n    left: 41.66667%; }\n  .col-sm-push-6 {\n    left: 50%; }\n  .col-sm-push-7 {\n    left: 58.33333%; }\n  .col-sm-push-8 {\n    left: 66.66667%; }\n  .col-sm-push-9 {\n    left: 75%; }\n  .col-sm-push-10 {\n    left: 83.33333%; }\n  .col-sm-push-11 {\n    left: 91.66667%; }\n  .col-sm-push-12 {\n    left: 100%; }\n  .col-sm-offset-0 {\n    margin-left: 0%; }\n  .col-sm-offset-1 {\n    margin-left: 8.33333%; }\n  .col-sm-offset-2 {\n    margin-left: 16.66667%; }\n  .col-sm-offset-3 {\n    margin-left: 25%; }\n  .col-sm-offset-4 {\n    margin-left: 33.33333%; }\n  .col-sm-offset-5 {\n    margin-left: 41.66667%; }\n  .col-sm-offset-6 {\n    margin-left: 50%; }\n  .col-sm-offset-7 {\n    margin-left: 58.33333%; }\n  .col-sm-offset-8 {\n    margin-left: 66.66667%; }\n  .col-sm-offset-9 {\n    margin-left: 75%; }\n  .col-sm-offset-10 {\n    margin-left: 83.33333%; }\n  .col-sm-offset-11 {\n    margin-left: 91.66667%; }\n  .col-sm-offset-12 {\n    margin-left: 100%; } }\n\n@media (min-width: 992px) {\n  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {\n    float: left; }\n  .col-md-1 {\n    width: 8.33333%; }\n  .col-md-2 {\n    width: 16.66667%; }\n  .col-md-3 {\n    width: 25%; }\n  .col-md-4 {\n    width: 33.33333%; }\n  .col-md-5 {\n    width: 41.66667%; }\n  .col-md-6 {\n    width: 50%; }\n  .col-md-7 {\n    width: 58.33333%; }\n  .col-md-8 {\n    width: 66.66667%; }\n  .col-md-9 {\n    width: 75%; }\n  .col-md-10 {\n    width: 83.33333%; }\n  .col-md-11 {\n    width: 91.66667%; }\n  .col-md-12 {\n    width: 100%; }\n  .col-md-pull-0 {\n    right: auto; }\n  .col-md-pull-1 {\n    right: 8.33333%; }\n  .col-md-pull-2 {\n    right: 16.66667%; }\n  .col-md-pull-3 {\n    right: 25%; }\n  .col-md-pull-4 {\n    right: 33.33333%; }\n  .col-md-pull-5 {\n    right: 41.66667%; }\n  .col-md-pull-6 {\n    right: 50%; }\n  .col-md-pull-7 {\n    right: 58.33333%; }\n  .col-md-pull-8 {\n    right: 66.66667%; }\n  .col-md-pull-9 {\n    right: 75%; }\n  .col-md-pull-10 {\n    right: 83.33333%; }\n  .col-md-pull-11 {\n    right: 91.66667%; }\n  .col-md-pull-12 {\n    right: 100%; }\n  .col-md-push-0 {\n    left: auto; }\n  .col-md-push-1 {\n    left: 8.33333%; }\n  .col-md-push-2 {\n    left: 16.66667%; }\n  .col-md-push-3 {\n    left: 25%; }\n  .col-md-push-4 {\n    left: 33.33333%; }\n  .col-md-push-5 {\n    left: 41.66667%; }\n  .col-md-push-6 {\n    left: 50%; }\n  .col-md-push-7 {\n    left: 58.33333%; }\n  .col-md-push-8 {\n    left: 66.66667%; }\n  .col-md-push-9 {\n    left: 75%; }\n  .col-md-push-10 {\n    left: 83.33333%; }\n  .col-md-push-11 {\n    left: 91.66667%; }\n  .col-md-push-12 {\n    left: 100%; }\n  .col-md-offset-0 {\n    margin-left: 0%; }\n  .col-md-offset-1 {\n    margin-left: 8.33333%; }\n  .col-md-offset-2 {\n    margin-left: 16.66667%; }\n  .col-md-offset-3 {\n    margin-left: 25%; }\n  .col-md-offset-4 {\n    margin-left: 33.33333%; }\n  .col-md-offset-5 {\n    margin-left: 41.66667%; }\n  .col-md-offset-6 {\n    margin-left: 50%; }\n  .col-md-offset-7 {\n    margin-left: 58.33333%; }\n  .col-md-offset-8 {\n    margin-left: 66.66667%; }\n  .col-md-offset-9 {\n    margin-left: 75%; }\n  .col-md-offset-10 {\n    margin-left: 83.33333%; }\n  .col-md-offset-11 {\n    margin-left: 91.66667%; }\n  .col-md-offset-12 {\n    margin-left: 100%; } }\n\n@media (min-width: 1200px) {\n  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {\n    float: left; }\n  .col-lg-1 {\n    width: 8.33333%; }\n  .col-lg-2 {\n    width: 16.66667%; }\n  .col-lg-3 {\n    width: 25%; }\n  .col-lg-4 {\n    width: 33.33333%; }\n  .col-lg-5 {\n    width: 41.66667%; }\n  .col-lg-6 {\n    width: 50%; }\n  .col-lg-7 {\n    width: 58.33333%; }\n  .col-lg-8 {\n    width: 66.66667%; }\n  .col-lg-9 {\n    width: 75%; }\n  .col-lg-10 {\n    width: 83.33333%; }\n  .col-lg-11 {\n    width: 91.66667%; }\n  .col-lg-12 {\n    width: 100%; }\n  .col-lg-pull-0 {\n    right: auto; }\n  .col-lg-pull-1 {\n    right: 8.33333%; }\n  .col-lg-pull-2 {\n    right: 16.66667%; }\n  .col-lg-pull-3 {\n    right: 25%; }\n  .col-lg-pull-4 {\n    right: 33.33333%; }\n  .col-lg-pull-5 {\n    right: 41.66667%; }\n  .col-lg-pull-6 {\n    right: 50%; }\n  .col-lg-pull-7 {\n    right: 58.33333%; }\n  .col-lg-pull-8 {\n    right: 66.66667%; }\n  .col-lg-pull-9 {\n    right: 75%; }\n  .col-lg-pull-10 {\n    right: 83.33333%; }\n  .col-lg-pull-11 {\n    right: 91.66667%; }\n  .col-lg-pull-12 {\n    right: 100%; }\n  .col-lg-push-0 {\n    left: auto; }\n  .col-lg-push-1 {\n    left: 8.33333%; }\n  .col-lg-push-2 {\n    left: 16.66667%; }\n  .col-lg-push-3 {\n    left: 25%; }\n  .col-lg-push-4 {\n    left: 33.33333%; }\n  .col-lg-push-5 {\n    left: 41.66667%; }\n  .col-lg-push-6 {\n    left: 50%; }\n  .col-lg-push-7 {\n    left: 58.33333%; }\n  .col-lg-push-8 {\n    left: 66.66667%; }\n  .col-lg-push-9 {\n    left: 75%; }\n  .col-lg-push-10 {\n    left: 83.33333%; }\n  .col-lg-push-11 {\n    left: 91.66667%; }\n  .col-lg-push-12 {\n    left: 100%; }\n  .col-lg-offset-0 {\n    margin-left: 0%; }\n  .col-lg-offset-1 {\n    margin-left: 8.33333%; }\n  .col-lg-offset-2 {\n    margin-left: 16.66667%; }\n  .col-lg-offset-3 {\n    margin-left: 25%; }\n  .col-lg-offset-4 {\n    margin-left: 33.33333%; }\n  .col-lg-offset-5 {\n    margin-left: 41.66667%; }\n  .col-lg-offset-6 {\n    margin-left: 50%; }\n  .col-lg-offset-7 {\n    margin-left: 58.33333%; }\n  .col-lg-offset-8 {\n    margin-left: 66.66667%; }\n  .col-lg-offset-9 {\n    margin-left: 75%; }\n  .col-lg-offset-10 {\n    margin-left: 83.33333%; }\n  .col-lg-offset-11 {\n    margin-left: 91.66667%; }\n  .col-lg-offset-12 {\n    margin-left: 100%; } }\n\n/****************\n\tHELPERS \n****************/\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n/* Sprite */\n/* .sprite {\n\tbackground: url(../img/sprite.svg);IE 9+ & Android 3+\n\t.no-svg & {\n\t\tbackground: url(../img/sprite.png);\n\t}\n}\n */\n/* OBJECTS - Repeating components\n==================================================== */\n/****************\n\tFORMS\n****************/\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  margin: -1px;\n  padding: 0;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0; }\n\ninput[type=\"text\"],\ninput[type=\"email\"],\ninput[type=\"submit\"],\ninput[type=\"radio\"],\nselect,\ntextarea,\ninput[type=\"checkbox\"] {\n  -webkit-appearance: none; }\n\n/****************\n\tBUTTONS  \n****************/\n.btn, .btn--black, .btn--big {\n  font-weight: 700;\n  font-family: \"Source Sans Pro\", sans-serif;\n  text-transform: uppercase;\n  background-color: #00FFB7;\n  color: #fff;\n  font-size: 15px; }\n\n.btn--black {\n  background-color: #fff;\n  color: #00FFB7; }\n\n.btn--big {\n  display: block;\n  font-size: 30px;\n  text-align: center; }\n\n/* THEME - Main files for website\n==================================================== */\n/****************\n\tFONTS\n****************/\nbody {\n  font-family: \"Source Sans Pro\", sans-serif;\n  color: #333333; }\n\nh1,\nh2,\nh3 {\n  font-family: \"Montserrat\", sans-serif;\n  color: #333333; }\n\n/****************\n\tHEADER\n****************/\n/****************\n\tTYPO\n****************/\nhtml {\n  font-size: 100%; }\n\n/****************\n\tFOOTER\n****************/\n/****************\n\tMAIN\n****************/\nhtml,\nbody,\n#app,\nsection {\n  width: 100%;\n  height: 100%;\n  position: relative; }\n\n.section {\n  display: -webkit-flex;\n  display: -moz-flex;\n  display: -ms-flex;\n  display: -o-flex;\n  display: flex;\n  align-items: center; }\n  .section .bar {\n    position: absolute;\n    background: #333333; }\n  .section .bar.top {\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 14px;\n    transform-origin: 0 0; }\n  .section .bar.bottom {\n    bottom: 0;\n    left: 0;\n    right: 0;\n    height: 14px;\n    transform-origin: 100% 0; }\n  .section .bar.left {\n    bottom: 0;\n    top: 0;\n    left: 0;\n    width: 14px;\n    transform-origin: 0 100%; }\n  .section .bar.right {\n    bottom: 0;\n    top: 0;\n    right: 0;\n    width: 14px;\n    transform-origin: 0 0; }\n\n/****************\n\tSHAME\n****************/\n", ""]);
 	
 	// exports
 
@@ -19819,7 +19829,7 @@
 	
 	
 	// module
-	exports.push([module.id, "/****************\r\n\tVARIABLES  \r\n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n.home .content {\n  margin: 0 auto;\n  background: #eeeeee;\n  padding: 50px;\n  position: relative;\n  max-width: 400px; }\n  .home .content .title {\n    position: absolute;\n    left: -45px;\n    top: -90px;\n    font-size: 110px;\n    font-family: \"Montserrat\", sans-serif;\n    font-weight: 700; }\n  .home .content .desc {\n    padding-left: 100px;\n    position: relative; }\n    .home .content .desc:before {\n      content: \"\";\n      position: absolute;\n      left: 0;\n      top: 8px;\n      width: 80px;\n      height: 1px;\n      background-color: #333333; }\n", ""]);
+	exports.push([module.id, "/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n.home {\n  padding: 30px; }\n  .home .content {\n    margin: 0 auto;\n    background: #eeeeee;\n    padding: 50px;\n    position: relative;\n    max-width: 400px; }\n    .home .content .title {\n      position: absolute;\n      left: -45px;\n      top: -90px;\n      font-size: 110px;\n      font-family: \"Montserrat\", sans-serif;\n      font-weight: 700; }\n    .home .content .desc {\n      padding-left: 100px;\n      position: relative; }\n      .home .content .desc:before {\n        content: \"\";\n        position: absolute;\n        left: 0;\n        top: 8px;\n        width: 80px;\n        height: 1px;\n        background-color: #333333; }\n", ""]);
 	
 	// exports
 
@@ -19833,7 +19843,8 @@
 
 	var Tween = __webpack_require__(/*! gsap */ 11),
 	    $ = __webpack_require__(/*! jquery */ 13),
-	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14);
+	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14),
+	    model = __webpack_require__(/*! ../models.js */ 29);
 	
 	module.exports = Number;
 	
@@ -19842,22 +19853,20 @@
 	Number.prototype = {
 	
 	    el: {},
-	    section: {                    
-	        title: {
-	            number: '1560',
-	            desc: 'kilometres'
-	        },
-	        desc: 'Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo, et par tous les temps.',
-	        illu : 'faire require(du svg)'
-	    },
+	
 	
 	    init: function(req, done) {
 	
 	        this.el = __webpack_require__(/*! ./../../partials/number.html */ 26);
 	        __webpack_require__(/*! ./../../sass/main.scss */ 19);
-	        app.innerHTML = this.el(this.section);
+	        __webpack_require__(/*! ./../../sass/partials/number.scss */ 27);
+	        var app = document.getElementById('app');
+	        var bar = document.createElement('div');
+	        bar.id = "bar--transition";
+	        app.appendChild(bar);
+	
 	        app.onclick = function() {
-	          framework.go('/');
+	          window.framework.go('/');
 	        }
 	        done();
 	    },
@@ -19866,8 +19875,14 @@
 	    },
 	
 	    animateIn: function(req, done) {
-	   
-	        done();
+	        var barTransition = document.getElementById('bar--transition');
+	        var tl = new TimelineMax({paused: true});
+	        var height = window.outerHeight;
+	
+	        tl.add(Tween.to(barTransition, 0.6, {height: height}));
+	        tl.add(done);
+	
+	        tl.play();
 	    },
 	
 	    animateOut: function(req, done) {
@@ -19889,7 +19904,79 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var H = __webpack_require__(/*! hogan.js */ 16);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"number section\">\r");t.b("\n" + i);t.b("	\r");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	<div class=\"content text left\">\r");t.b("\n" + i);t.b("		\r");t.b("\n" + i);t.b("		<header>\r");t.b("\n" + i);t.b("			<h1 class=\"title text\">");t.b(t.v(t.d("title.number",c,p,0)));t.b(" <span>");t.b(t.v(t.d("title.desc",c,p,0)));t.b("</span></h1>\r");t.b("\n" + i);t.b("		</header>\r");t.b("\n" + i);t.b("		<div class=\"desc\">\r");t.b("\n" + i);t.b("			");t.b(t.v(t.f("desc",c,p,0)));t.b("\r");t.b("\n" + i);t.b("		</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	<div class=\"right\">	\r");t.b("\n" + i);t.b("		");t.b(t.v(t.f("illu",c,p,0)));t.b("\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"number section\">\r\n\t\r\n\t<div class=\"bar right\"></div>\r\n\r\n\t<div class=\"content text left\">\r\n\t\t\r\n\t\t<header>\r\n\t\t\t<h1 class=\"title text\">{{title.number}} <span>{{title.desc}}</span></h1>\r\n\t\t</header>\r\n\t\t<div class=\"desc\">\r\n\t\t\t{{desc}}\r\n\t\t</div>\r\n\r\n\t</div>\r\n\r\n\t<div class=\"right\">\t\r\n\t\t{{illu}}\r\n\t</div>\r\n\r\n</section>", H);return T.render.apply(T, arguments); };
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"number section\">");t.b("\n" + i);t.b("	");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half left\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			<header class=\"header\">");t.b("\n" + i);t.b("				<h1 class=\"title text\">");t.b(t.v(t.d("title.number",c,p,0)));t.b(" <span>");t.b(t.v(t.d("title.desc",c,p,0)));t.b("</span></h1>");t.b("\n" + i);t.b("			</header>");t.b("\n" + i);t.b("			<div class=\"desc\">");t.b("\n" + i);t.b("				");t.b(t.v(t.f("desc",c,p,0)));t.b("\n" + i);t.b("			</div>");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n" + i);t.b("		");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half right\">	");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"number section\">\n\t\n\t<div class=\"bar right\"></div>\n\n\t<div class=\"half left\">\n\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t<header class=\"header\">\n\t\t\t\t<h1 class=\"title text\">{{title.number}} <span>{{title.desc}}</span></h1>\n\t\t\t</header>\n\t\t\t<div class=\"desc\">\n\t\t\t\t{{desc}}\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\n\n\t</div>\n\n\t<div class=\"half right\">\t\n\t\t\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t</div>\n\n\n\t</div>\n\n</section>", H);return T.render.apply(T, arguments); };
+
+/***/ },
+/* 27 */
+/*!******************************************!*\
+  !*** ./assets/sass/partials/number.scss ***!
+  \******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./number.scss */ 28);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 22)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./number.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./number.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 28 */
+/*!*************************************************************************!*\
+  !*** ./~/css-loader!./~/sass-loader!./assets/sass/partials/number.scss ***!
+  \*************************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 21)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n#bar--transition {\n  position: absolute;\n  background: #333333;\n  bottom: 0;\n  right: 0;\n  left: 50%;\n  height: 14px;\n  transform-origin: 100% 100%; }\n\n.number .half {\n  width: 50%;\n  float: left;\n  height: 100%;\n  line-height: 100%;\n  padding: 45px;\n  text-align: center;\n  display: -webkit-flex;\n  display: -moz-flex;\n  display: -ms-flex;\n  display: -o-flex;\n  display: flex;\n  align-items: center; }\n  .number .half .header,\n  .number .half .desc {\n    display: block;\n    vertical-align: middle;\n    line-height: 1.5em;\n    text-align: left; }\n\n.number .half.right {\n  background: #333333; }\n\n.number .title span {\n  display: block;\n  color: #dedede; }\n\n.number .desc {\n  padding-left: 100px;\n  position: relative; }\n  .number .desc:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 8px;\n    width: 80px;\n    height: 1px;\n    background-color: #333333; }\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 29 */
+/*!*****************************!*\
+  !*** ./assets/js/models.js ***!
+  \*****************************/
+/***/ function(module, exports) {
+
+	module.exports = {
+	    "/": {
+	        "title": {
+	            "label": 'NaN',
+	            "abbr": 'Nantes - Angers - Nantes'
+	        },
+	        "desc": '[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l\'IMIE d\'Angers.'
+	    },
+	
+	    "/1560": {
+	        "title": {
+	            "number": '1560',
+	            "desc": 'kilometres'
+	        },
+	        "desc": 'Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.',
+	        "illu" : 'faire require(du svg)'
+	    }
+	};
 
 /***/ }
 /******/ ]);

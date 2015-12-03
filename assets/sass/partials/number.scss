@@ -1,0 +1,69 @@
+@import '../base/_variables.scss'; 
+
+#bar--transition {
+	position: absolute;
+	background: $black;
+	bottom: 0;
+	right: 0;
+	left: 50%;
+	height: 14px;
+	transform-origin: 100% 100%;
+}
+
+.number {
+
+
+	.half {
+		width: 50%;
+		float: left;
+		height: 100%;
+		line-height: 100%;
+		padding: 45px;
+		text-align: center;
+		display: -webkit-flex;
+		display: -moz-flex;
+		display: -ms-flex;
+		display: -o-flex;
+		display: flex;
+		align-items: center;
+
+		.header,
+		.desc {
+			display: block;
+			vertical-align: middle;
+			line-height: 1.5em;
+			text-align: left;
+		}
+
+	}
+	.half.right {
+		background: $black;	
+	}
+
+	.title {
+
+		span {
+			display: block;
+			color: #dedede;
+		}
+	}
+	.content {
+		
+	}
+
+	.desc {
+		padding-left: 100px;
+		position: relative;
+		&:before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 8px;
+			width: 80px;
+			height: 1px;
+			background-color: $black;
+		}
+	}
+}
+
+
