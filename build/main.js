@@ -1470,7 +1470,7 @@
 
 	module.exports = {
 	    '/': __webpack_require__(/*! ./sections/Home */ 10),
-	    '/1560': __webpack_require__(/*! ./sections/Number */ 25)
+	    '/1560': __webpack_require__(/*! ./sections/Number */ 26)
 	};
 
 /***/ },
@@ -1487,7 +1487,7 @@
 	var Tween = __webpack_require__(/*! gsap */ 11),
 	    $ = __webpack_require__(/*! jquery */ 13),
 	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14),
-	    model = __webpack_require__(/*! ../models.js */ 29);
+	    model = __webpack_require__(/*! ../models.js */ 15);
 	
 	Home.prototype = {
 	
@@ -1495,9 +1495,9 @@
 	
 	    init: function(req, done) {
 	
-	        this.el = __webpack_require__(/*! ./../../partials/home.html */ 15);
-	        __webpack_require__(/*! ./../../sass/main.scss */ 19);
-	        __webpack_require__(/*! ./../../sass/partials/home.scss */ 23);
+	        this.el = __webpack_require__(/*! ./../../partials/home.html */ 16);
+	        __webpack_require__(/*! ./../../sass/main.scss */ 20);
+	        __webpack_require__(/*! ./../../sass/partials/home.scss */ 24);
 	
 	        var app = document.getElementById('app');
 	        app.innerHTML = this.el(model[ req.route ]);
@@ -18606,16 +18606,42 @@
 
 /***/ },
 /* 15 */
+/*!*****************************!*\
+  !*** ./assets/js/models.js ***!
+  \*****************************/
+/***/ function(module, exports) {
+
+	module.exports = {
+	    "/": {
+	        "title": {
+	            "label": 'NaN',
+	            "abbr": 'Nantes - Angers - Nantes'
+	        },
+	        "desc": '[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l\'IMIE d\'Angers.'
+	    },
+	
+	    "/1560": {
+	        "title": {
+	            "number": '1560',
+	            "desc": 'kilometres'
+	        },
+	        "desc": 'Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.',
+	        "illu" : 'faire require(du svg)'
+	    }
+	};
+
+/***/ },
+/* 16 */
 /*!***********************************!*\
   !*** ./assets/partials/home.html ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var H = __webpack_require__(/*! hogan.js */ 16);
+	var H = __webpack_require__(/*! hogan.js */ 17);
 	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"home section\">\r");t.b("\n" + i);t.b("	\r");t.b("\n" + i);t.b("	<div class=\"bar bottom\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar left\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar top\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	<div class=\"content text\">\r");t.b("\n" + i);t.b("		\r");t.b("\n" + i);t.b("		<header>\r");t.b("\n" + i);t.b("			<h1 class=\"title text\"><abbr title=\"");t.b(t.v(t.d("title.abbr",c,p,0)));t.b("\">");t.b(t.v(t.d("title.label",c,p,0)));t.b("</abbr></h1>\r");t.b("\n" + i);t.b("		</header>\r");t.b("\n" + i);t.b("		<div class=\"desc\">\r");t.b("\n" + i);t.b("			<p>");t.b(t.v(t.f("desc",c,p,0)));t.b("</p>\r");t.b("\n" + i);t.b("		</div>\r");t.b("\n" + i);t.b("		<a href=\"#!/1560\">Lien</a>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"home section\">\r\n\t\r\n\t<div class=\"bar bottom\"></div>\r\n\t<div class=\"bar left\"></div>\r\n\t<div class=\"bar top\"></div>\r\n\t<div class=\"bar right\"></div>\r\n\r\n\t<div class=\"content text\">\r\n\t\t\r\n\t\t<header>\r\n\t\t\t<h1 class=\"title text\"><abbr title=\"{{title.abbr}}\">{{title.label}}</abbr></h1>\r\n\t\t</header>\r\n\t\t<div class=\"desc\">\r\n\t\t\t<p>{{desc}}</p>\r\n\t\t</div>\r\n\t\t<a href=\"#!/1560\">Lien</a>\r\n\r\n\t</div>\r\n\r\n</section>", H);return T.render.apply(T, arguments); };
 
 /***/ },
-/* 16 */
+/* 17 */
 /*!*********************************!*\
   !*** ./~/hogan.js/lib/hogan.js ***!
   \*********************************/
@@ -18638,14 +18664,14 @@
 	
 	// This file is for use with Node.js. See dist/ for browser files.
 	
-	var Hogan = __webpack_require__(/*! ./compiler */ 17);
-	Hogan.Template = __webpack_require__(/*! ./template */ 18).Template;
+	var Hogan = __webpack_require__(/*! ./compiler */ 18);
+	Hogan.Template = __webpack_require__(/*! ./template */ 19).Template;
 	Hogan.template = Hogan.Template;
 	module.exports = Hogan;
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /*!************************************!*\
   !*** ./~/hogan.js/lib/compiler.js ***!
   \************************************/
@@ -19077,7 +19103,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /*!************************************!*\
   !*** ./~/hogan.js/lib/template.js ***!
   \************************************/
@@ -19427,7 +19453,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /*!*******************************!*\
   !*** ./assets/sass/main.scss ***!
   \*******************************/
@@ -19436,10 +19462,10 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./../../~/sass-loader!./main.scss */ 20);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./../../~/sass-loader!./main.scss */ 21);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 22)(content, {});
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 23)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19456,13 +19482,13 @@
 	}
 
 /***/ },
-/* 20 */
+/* 21 */
 /*!**************************************************************!*\
   !*** ./~/css-loader!./~/sass-loader!./assets/sass/main.scss ***!
   \**************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 21)();
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 22)();
 	// imports
 	
 	
@@ -19473,7 +19499,7 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /*!**************************************!*\
   !*** ./~/css-loader/lib/css-base.js ***!
   \**************************************/
@@ -19532,7 +19558,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /*!*************************************!*\
   !*** ./~/style-loader/addStyles.js ***!
   \*************************************/
@@ -19789,7 +19815,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /*!****************************************!*\
   !*** ./assets/sass/partials/home.scss ***!
   \****************************************/
@@ -19798,10 +19824,10 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./home.scss */ 24);
+	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./home.scss */ 25);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 22)(content, {});
+	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 23)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19818,13 +19844,13 @@
 	}
 
 /***/ },
-/* 24 */
+/* 25 */
 /*!***********************************************************************!*\
   !*** ./~/css-loader!./~/sass-loader!./assets/sass/partials/home.scss ***!
   \***********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 21)();
+	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 22)();
 	// imports
 	
 	
@@ -19835,7 +19861,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /*!**************************************!*\
   !*** ./assets/js/sections/Number.js ***!
   \**************************************/
@@ -19844,7 +19870,7 @@
 	var Tween = __webpack_require__(/*! gsap */ 11),
 	    $ = __webpack_require__(/*! jquery */ 13),
 	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14),
-	    model = __webpack_require__(/*! ../models.js */ 29);
+	    model = __webpack_require__(/*! ../models.js */ 15);
 	
 	module.exports = Number;
 	
@@ -19857,13 +19883,20 @@
 	
 	    init: function(req, done) {
 	
-	        this.el = __webpack_require__(/*! ./../../partials/number.html */ 26);
-	        __webpack_require__(/*! ./../../sass/main.scss */ 19);
-	        __webpack_require__(/*! ./../../sass/partials/number.scss */ 27);
-	        var app = document.getElementById('app');
-	        var bar = document.createElement('div');
+	        // On importe le template et les styles
+	        this.el = __webpack_require__(/*! ./../../partials/number.html */ 27);
+	        __webpack_require__(/*! ./../../sass/main.scss */ 20);
+	        __webpack_require__(/*! ./../../sass/partials/number.scss */ 28);
+	
+	        var app = document.getElementById('app'),
+	            bar = document.createElement('div');
 	        bar.id = "bar--transition";
-	        app.appendChild(bar);
+	
+	        // On ajoute la barre de transition et son animation qu'on lancera ensuite
+	        var height = window.outerHeight;
+	        this.tl = new TimelineMax({paused: true});
+	        this.tl.add(Tween.to(bar, 0.6, {height: height}));
+	        document.body.insertBefore(bar, app);
 	
 	        app.onclick = function() {
 	          window.framework.go('/');
@@ -19875,19 +19908,20 @@
 	    },
 	
 	    animateIn: function(req, done) {
-	        var barTransition = document.getElementById('bar--transition');
-	        var tl = new TimelineMax({paused: true});
-	        var height = window.outerHeight;
 	
-	        tl.add(Tween.to(barTransition, 0.6, {height: height}));
-	        tl.add(done);
+	        // on insère le contenu après la fin du animateOut 
+	        // de la section précédente (overlap false dans framework)
+	        var app = document.getElementById('app');
+	        app.innerHTML = this.el(model[ req.route ]);   
+	        
+	        // On lance la timeline avec son callback
+	        this.tl.add(done);
 	
-	        tl.play();
+	        this.tl.play();
 	    },
-	
 	    animateOut: function(req, done) {
-	      
-	        done();       
+	        this.tl.eventCallback('onReverseComplete', done);
+	        this.tl.reverse();
 	    },
 	
 	    destroy: function(req, done) {
@@ -19897,17 +19931,17 @@
 	}
 
 /***/ },
-/* 26 */
+/* 27 */
 /*!*************************************!*\
   !*** ./assets/partials/number.html ***!
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var H = __webpack_require__(/*! hogan.js */ 16);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"number section\">");t.b("\n" + i);t.b("	");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half left\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			<header class=\"header\">");t.b("\n" + i);t.b("				<h1 class=\"title text\">");t.b(t.v(t.d("title.number",c,p,0)));t.b(" <span>");t.b(t.v(t.d("title.desc",c,p,0)));t.b("</span></h1>");t.b("\n" + i);t.b("			</header>");t.b("\n" + i);t.b("			<div class=\"desc\">");t.b("\n" + i);t.b("				");t.b(t.v(t.f("desc",c,p,0)));t.b("\n" + i);t.b("			</div>");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n" + i);t.b("		");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half right\">	");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"number section\">\n\t\n\t<div class=\"bar right\"></div>\n\n\t<div class=\"half left\">\n\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t<header class=\"header\">\n\t\t\t\t<h1 class=\"title text\">{{title.number}} <span>{{title.desc}}</span></h1>\n\t\t\t</header>\n\t\t\t<div class=\"desc\">\n\t\t\t\t{{desc}}\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\n\n\t</div>\n\n\t<div class=\"half right\">\t\n\t\t\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t</div>\n\n\n\t</div>\n\n</section>", H);return T.render.apply(T, arguments); };
+	var H = __webpack_require__(/*! hogan.js */ 17);
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"number section\">");t.b("\n" + i);t.b("	");t.b("\n" + i);t.b("	<div class=\"half left\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			<header class=\"header\">");t.b("\n" + i);t.b("				<h1 class=\"title text\">");t.b(t.v(t.d("title.number",c,p,0)));t.b(" <span>");t.b(t.v(t.d("title.desc",c,p,0)));t.b("</span></h1>");t.b("\n" + i);t.b("			</header>");t.b("\n" + i);t.b("			<div class=\"desc\">");t.b("\n" + i);t.b("				");t.b(t.v(t.f("desc",c,p,0)));t.b("\n" + i);t.b("			</div>");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n" + i);t.b("		");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half right\">	");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"number section\">\n\t\n\t<div class=\"half left\">\n\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t<header class=\"header\">\n\t\t\t\t<h1 class=\"title text\">{{title.number}} <span>{{title.desc}}</span></h1>\n\t\t\t</header>\n\t\t\t<div class=\"desc\">\n\t\t\t\t{{desc}}\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\t\t\n\n\t</div>\n\n\t<div class=\"half right\">\t\n\t\t\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t</div>\n\n\n\t</div>\n\n</section>", H);return T.render.apply(T, arguments); };
 
 /***/ },
-/* 27 */
+/* 28 */
 /*!******************************************!*\
   !*** ./assets/sass/partials/number.scss ***!
   \******************************************/
@@ -19916,10 +19950,10 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./number.scss */ 28);
+	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./number.scss */ 29);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 22)(content, {});
+	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 23)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19936,47 +19970,21 @@
 	}
 
 /***/ },
-/* 28 */
+/* 29 */
 /*!*************************************************************************!*\
   !*** ./~/css-loader!./~/sass-loader!./assets/sass/partials/number.scss ***!
   \*************************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 21)();
+	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 22)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n#bar--transition {\n  position: absolute;\n  background: #333333;\n  bottom: 0;\n  right: 0;\n  left: 50%;\n  height: 14px;\n  transform-origin: 100% 100%; }\n\n.number .half {\n  width: 50%;\n  float: left;\n  height: 100%;\n  line-height: 100%;\n  padding: 45px;\n  text-align: center;\n  display: -webkit-flex;\n  display: -moz-flex;\n  display: -ms-flex;\n  display: -o-flex;\n  display: flex;\n  align-items: center; }\n  .number .half .header,\n  .number .half .desc {\n    display: block;\n    vertical-align: middle;\n    line-height: 1.5em;\n    text-align: left; }\n\n.number .half.right {\n  background: #333333; }\n\n.number .title span {\n  display: block;\n  color: #dedede; }\n\n.number .desc {\n  padding-left: 100px;\n  position: relative; }\n  .number .desc:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 8px;\n    width: 80px;\n    height: 1px;\n    background-color: #333333; }\n", ""]);
+	exports.push([module.id, "/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #00FFB7; }\n\n#bar--transition {\n  position: absolute;\n  background: #333333;\n  bottom: 0;\n  right: 0;\n  left: 50%;\n  height: 14px;\n  transform-origin: 100% 100%; }\n\n.number .half {\n  width: 50%;\n  float: left;\n  height: 100%;\n  line-height: 100%;\n  padding: 45px;\n  text-align: center;\n  display: -webkit-flex;\n  display: -moz-flex;\n  display: -ms-flex;\n  display: -o-flex;\n  display: flex;\n  align-items: center; }\n  .number .half .header,\n  .number .half .desc {\n    display: block;\n    vertical-align: middle;\n    line-height: 1.5em;\n    text-align: left; }\n\n.number .title span {\n  display: block;\n  color: #dedede; }\n\n.number .desc {\n  padding-left: 100px;\n  position: relative; }\n  .number .desc:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 8px;\n    width: 80px;\n    height: 1px;\n    background-color: #333333; }\n", ""]);
 	
 	// exports
 
-
-/***/ },
-/* 29 */
-/*!*****************************!*\
-  !*** ./assets/js/models.js ***!
-  \*****************************/
-/***/ function(module, exports) {
-
-	module.exports = {
-	    "/": {
-	        "title": {
-	            "label": 'NaN',
-	            "abbr": 'Nantes - Angers - Nantes'
-	        },
-	        "desc": '[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l\'IMIE d\'Angers.'
-	    },
-	
-	    "/1560": {
-	        "title": {
-	            "number": '1560',
-	            "desc": 'kilometres'
-	        },
-	        "desc": 'Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.',
-	        "illu" : 'faire require(du svg)'
-	    }
-	};
 
 /***/ }
 /******/ ]);
