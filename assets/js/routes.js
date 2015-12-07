@@ -1,4 +1,5 @@
 module.exports = {
     '/': require('./sections/Home'),
-    '/1560': require('./sections/Number')
+    '/1560': require('./sections/Number'),
+    '/240': require('./sections/Number')
 };

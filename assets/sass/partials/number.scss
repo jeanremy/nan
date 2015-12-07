@@ -26,29 +26,33 @@
 		display: -o-flex;
 		display: flex;
 		align-items: center;
-
-		.header,
-		.desc {
-			display: block;
-			vertical-align: middle;
-			line-height: 1.5em;
-			text-align: left;
-		}
-
+		justify-content: center;
+		position: relative;
+		overflow: hidden;
 	}
-	.half.right {
-		//background: $black;	
+
+	.header,
+	.desc {
+		display: block;
+		line-height: 1.5em;
+		text-align: left;
+		max-width: 320px;
+		padding: 0 15px;
+		margin: 0 auto;	
 	}
 
 	.title {
 
+		font-size: 110px;
+		line-height: 1.1em;
+		font-weight: $montbold;
+		margin-bottom: 50px;
 		span {
 			display: block;
-			color: #dedede;
+			color: $secondary;
+			font-size: 35px;
+			line-height: 1.1em;
 		}
-	}
-	.content {
-		
 	}
 
 	.desc {
@@ -57,12 +61,23 @@
 		&:before {
 			content: "";
 			position: absolute;
-			left: 0;
+			left: 15px;
 			top: 8px;
-			width: 80px;
+			width: 65px;
 			height: 1px;
-			background-color: $black;
+			background-color: $grey3;
 		}
+	}
+
+	.pager {
+		font-size: 463px;
+		line-height: .5em;
+		position: absolute;
+		bottom: -27px;
+		right: -66px;
+		z-index: -1;
+		color: $grey4;
+		font-family: $mont;
 	}
 }
 

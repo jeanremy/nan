@@ -12,7 +12,18 @@ module.exports = {
             "number": '1560',
             "desc": 'kilometres'
         },
-        "desc": 'Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.',
-        "illu" : 'faire require(du svg)'
+        "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.",
+        "illu": "number01.svg",
+        "pager": "01"
+    },
+
+    "/240": {
+        "title": {
+            "number": "240",
+            "desc": "trains"
+        },
+        "desc": "TGV ou TER, au choix. Et pas beaucoup de retards.",
+        "illu": "number01.svg",
+        "pager": "02"
     }
 };

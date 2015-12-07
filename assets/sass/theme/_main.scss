@@ -10,6 +10,10 @@ section {
 	position: relative;
 }
 
+.box {
+	overflow: hidden;
+}
+
 .section {
 	display: -webkit-flex;
 	display: -moz-flex;
