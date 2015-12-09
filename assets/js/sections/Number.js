@@ -12,7 +12,6 @@ Number.prototype = {
 
     el: {},
 
-
     init: function(req, done) {
 
         // On importe le template et les styles
@@ -33,9 +32,11 @@ Number.prototype = {
             ease: Power3.easeIn
         }));
         document.body.insertBefore(bar, app);
-
+        window.addEventListener("mousewheel", function() {console.log('wheeeeel');}, false);
         app.onclick = function() {
-          window.framework.go('/240');
+            var mod = model[ req.route ];
+            console.log(req);   
+          window.framework.go(mod.next);
         }
         done();
     },
