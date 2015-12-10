@@ -6,45 +6,46 @@ var Tween = require('gsap'),
 
 module.exports = Number;
 
-function Number() {}
+function Number() {
+
+    var _this = this;
+    this.addMouseWheelHandler = function() {
+        console.log('listener added');
+        window.addEventListener("mousewheel", _this.MouseWheelHandler, false);
+        window.addEventListener("DOMMouseScroll", _this.MouseWheelHandler, false);
+    };
+
+    this.removeMouseWheelHandler = function() {
+        console.log('listener removed');
+
+      window.removeEventListener("mousewheel", _this.MouseWheelHandler, false);
+      window.removeEventListener("DOMMouseScroll", _this.MouseWheelHandler, false);
+    };
+
+    this.MouseWheelHandler = function(e) {
+        var e = window.event || e; // old IE support
+        this.delta = e.wheelDelta || -e.detail;
+        // scroll down
+        if(this.delta < 0) {
+            console.log('down');
+            window.framework.go(model[_this.req.route].next);
+        }
+        //scrollUp
+        else {
+            console.log('up');
+            window.framework.go(model[_this.req.route].prev);
+        }
+        window.removeEventListener("mousewheel", _this.MouseWheelHandler, false);
+        window.removeEventListener("DOMMouseScroll", _this.MouseWheelHandler, false);
+
+        return false;
+    };
+
+}
 
 Number.prototype = {
 
     el: {},
-
-    delta: 0,
-
-    MouseWheelHandler: function(e) {
-        
-      this.removeMouseWheelHandler(); // NOT WORKING
-
-      // cross-browser wheel delta
-      var e = window.event || e; // old IE support
-      this.delta = e.wheelDelta || -e.detail;
-      // scroll down
-      if(this.delta < 0) {
-        console.log('down');
-
-      }
-      //scrollUp
-      else {
-
-      }
-
-
-      return false;
-    },
-
-    addMouseWheelHandler: function() {
-      window.addEventListener("mousewheel", this.MouseWheelHandler, false);
-      window.addEventListener("DOMMouseScroll", this.MouseWheelHandler, false);
-    },
-
-    removeMouseWheelHandler: function() {
-      window.removeEventListener("mousewheel", this.MouseWheelHandler, false);
-      window.removeEventListener("DOMMouseScroll", this.MouseWheelHandler, false);
-    },
-
 
     init: function(req, done) {
 
@@ -52,7 +53,7 @@ Number.prototype = {
         this.el = require('./../../partials/number.html');
         require('./../../sass/main.scss');
         require('./../../sass/partials/number.scss');
-
+        this.req = req;
 
         var app = document.getElementById('app'),
             bar = document.createElement('div');
@@ -67,16 +68,8 @@ Number.prototype = {
         }));
         document.body.insertBefore(bar, app);
         
-        /* Listeners */
-        this.addMouseWheelHandler();
-        //this.removeMouseWheelHandler;
-
-
-
         app.onclick = function() {
-            var mod = model[ req.route ];
-            console.log(req);   
-          window.framework.go(mod.next);
+            window.framework.go(model[ req.route ].next);
         }
         done();
     },
@@ -91,7 +84,6 @@ Number.prototype = {
         // -Gérer le mousewheel
         // -Gérer les chemins next/prev
         // -Faire un rAF au lieu de animate pour svg > fait en css, à vpoir, amélioration
-        // -Faire toutes mes routes
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
@@ -134,6 +126,7 @@ Number.prototype = {
         // On lance la timeline avec son callback
         this.tl.add(tweens);
         this.tl.add(animsvg.drawSVGPaths);
+        this.tl.add(this.addMouseWheelHandler);
         this.tl.add(done);
 
         this.tl.play();
