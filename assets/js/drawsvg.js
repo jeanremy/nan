@@ -1,8 +1,5 @@
 module.exports = {
 
-	init: (function() {console.log(this);})(),
-
-
 	hideSVGPaths: function() {
 		var paths = document.querySelectorAll('path');
 

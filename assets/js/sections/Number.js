@@ -12,6 +12,40 @@ Number.prototype = {
 
     el: {},
 
+    delta: 0,
+
+    MouseWheelHandler: function(e) {
+        
+      this.removeMouseWheelHandler(); // NOT WORKING
+
+      // cross-browser wheel delta
+      var e = window.event || e; // old IE support
+      this.delta = e.wheelDelta || -e.detail;
+      // scroll down
+      if(this.delta < 0) {
+        console.log('down');
+
+      }
+      //scrollUp
+      else {
+
+      }
+
+
+      return false;
+    },
+
+    addMouseWheelHandler: function() {
+      window.addEventListener("mousewheel", this.MouseWheelHandler, false);
+      window.addEventListener("DOMMouseScroll", this.MouseWheelHandler, false);
+    },
+
+    removeMouseWheelHandler: function() {
+      window.removeEventListener("mousewheel", this.MouseWheelHandler, false);
+      window.removeEventListener("DOMMouseScroll", this.MouseWheelHandler, false);
+    },
+
+
     init: function(req, done) {
 
         // On importe le template et les styles
@@ -32,7 +66,13 @@ Number.prototype = {
             ease: Power3.easeIn
         }));
         document.body.insertBefore(bar, app);
-        window.addEventListener("mousewheel", function() {console.log('wheeeeel');}, false);
+        
+        /* Listeners */
+        this.addMouseWheelHandler();
+        //this.removeMouseWheelHandler;
+
+
+
         app.onclick = function() {
             var mod = model[ req.route ];
             console.log(req);   
