@@ -9,20 +9,21 @@ module.exports = Number;
 function Number() {
 
     var _this = this;
-    this.addMouseWheelHandler = function() {
+    this.addListeners = function() {
         console.log('listener added');
-        window.addEventListener("mousewheel", _this.MouseWheelHandler, false);
-        window.addEventListener("DOMMouseScroll", _this.MouseWheelHandler, false);
+        window.addEventListener("keydown", _this.KeyPressListener, false);
+        window.addEventListener("mousewheel", _this.MouseWheelListener, false);
+        window.addEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
     };
 
-    this.removeMouseWheelHandler = function() {
+    this.removeListeners = function() {
         console.log('listener removed');
 
-      window.removeEventListener("mousewheel", _this.MouseWheelHandler, false);
-      window.removeEventListener("DOMMouseScroll", _this.MouseWheelHandler, false);
+      window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
+      window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
     };
 
-    this.MouseWheelHandler = function(e) {
+    this.MouseWheelListener = function(e) {
         var e = window.event || e; // old IE support
         this.delta = e.wheelDelta || -e.detail;
         // scroll down
@@ -35,10 +36,24 @@ function Number() {
             console.log('up');
             window.framework.go(model[_this.req.route].prev);
         }
-        window.removeEventListener("mousewheel", _this.MouseWheelHandler, false);
-        window.removeEventListener("DOMMouseScroll", _this.MouseWheelHandler, false);
+        window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
+        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
 
         return false;
+    };
+
+    this.KeyPressListener = function(e) {
+        console.log(e.keyCode);
+        // scroll down
+        if(e.keyCode == '40') {
+            window.framework.go(model[_this.req.route].next);
+        }
+        //scrollUp
+        else if(e.keyCode == '38') {
+            window.framework.go(model[_this.req.route].prev);
+        }
+        else {return false;}
+        window.removeEventListener("mkeydown", _this.KeyPressListener, false);
     };
 
 }
@@ -81,9 +96,9 @@ Number.prototype = {
 
         // TODO:
         // -gérer les transitions en fonction de req
-        // -Gérer le mousewheel
-        // -Gérer les chemins next/prev
         // -Faire un rAF au lieu de animate pour svg > fait en css, à vpoir, amélioration
+        // -Faire menu
+        // -Voir pour mutualiser les listeners sur les différenst objets
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
@@ -126,7 +141,7 @@ Number.prototype = {
         // On lance la timeline avec son callback
         this.tl.add(tweens);
         this.tl.add(animsvg.drawSVGPaths);
-        this.tl.add(this.addMouseWheelHandler);
+        this.tl.add(this.addListeners);
         this.tl.add(done);
 
         this.tl.play();
