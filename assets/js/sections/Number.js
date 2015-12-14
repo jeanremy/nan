@@ -1,7 +1,6 @@
 var Tween = require('gsap'),
     $ = require("jquery"),
     mousewheel = require('jquery-mousewheel'),
-    animsvg = require('../drawsvg'),
     model = require('../models.js');
 
 module.exports = Number;
@@ -9,19 +8,7 @@ module.exports = Number;
 function Number() {
 
     var _this = this;
-    this.addListeners = function() {
-        console.log('listener added');
-        window.addEventListener("keydown", _this.KeyPressListener, false);
-        window.addEventListener("mousewheel", _this.MouseWheelListener, false);
-        window.addEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
-    };
-
-    this.removeListeners = function() {
-        console.log('listener removed');
-
-      window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
-      window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
-    };
+   
 
     this.MouseWheelListener = function(e) {
         var e = window.event || e; // old IE support
@@ -62,6 +49,18 @@ Number.prototype = {
 
     el: {},
 
+    addListeners: function() {
+        window.addEventListener("keydown", this.KeyPressListener, false);
+        window.addEventListener("mousewheel", this.MouseWheelListener, false);
+        window.addEventListener("DOMMouseScroll", this.MouseWheelListener, false);
+    },
+
+    removeListeners: function() {
+        window.addEventListener("keydown", this.KeyPressListener, false);
+        window.removeEventListener("mousewheel", this.MouseWheelListener, false);
+        window.removeEventListener("DOMMouseScroll", this.MouseWheelListener, false);
+    },
+
     init: function(req, done) {
 
         // On importe le template et les styles
@@ -96,9 +95,10 @@ Number.prototype = {
 
         // TODO:
         // -gérer les transitions en fonction de req
-        // -Faire un rAF au lieu de animate pour svg > fait en css, à vpoir, amélioration
-        // -Faire menu
+        // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
+        // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
         // -Voir pour mutualiser les listeners sur les différenst objets
+        // -Prévoir une anim différente pour chaque svg
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
@@ -111,16 +111,14 @@ Number.prototype = {
         var illu = require('../../svg/'+model[ req.route ].illu);
         var halfRight = document.querySelector('.right');
         halfRight.innerHTML = illu();
+        var anims = model[ req.route ].anim;
 
-        var paths = halfRight.querySelectorAll('path');
-        animsvg.hideSVGPaths();
 
         var tweens = new Array();  
-
         tweens.push(Tween.fromTo(pager, 0.5, {opacity: 0}, {opacity: 1}));
         tweens.push(Tween.fromTo(title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
         tweens.push(Tween.fromTo(text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
-        //tweens.push(Tween.to(paths, 1, {drawSVG: "0%"}, {drawSVG: "100%"}));
+        
 
          // for(var x = 0; x<paths.length;x++){
          //    var path = paths[x];
@@ -139,8 +137,9 @@ Number.prototype = {
          //    );
          // }
         // On lance la timeline avec son callback
+        this.tl.add(anims);
         this.tl.add(tweens);
-        this.tl.add(animsvg.drawSVGPaths);
+        //this.tl.add(animsvg.drawSVGPaths);
         this.tl.add(this.addListeners);
         this.tl.add(done);
 

@@ -1,3 +1,6 @@
+var Tween = require('gsap'),
+    animsvg = require('./drawsvg');
+
 module.exports = {
     "/": {
         "title": {
@@ -14,7 +17,18 @@ module.exports = {
             "desc": 'kilometres'
         },
         "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.",
-        "illu": "number01.svg",
+        "illu": "bike.svg",
+        anim: function() {
+            var paths = document.querySelectorAll('path'),
+                tweens = new Array(),
+                tl = new TimelineMax; 
+
+            animsvg.hideSVGPaths();
+
+            tweens.push(Tween.to(paths, 1, {drawSVG: "0%"}, {drawSVG: "100%"}));
+            tl.add(tweens);
+            return tl;
+        },
         "pager": "01",
         "prev": "/",
         "next": "/240"
@@ -26,7 +40,7 @@ module.exports = {
             "desc": "trains"
         },
         "desc": "TGV ou TER, au choix. Et pas beaucoup de retards.",
-        "illu": "number01.svg",
+        "illu": "bike.svg",
         "pager": "02",
         "prev": "/1560",
         "next": "/120"
@@ -38,7 +52,18 @@ module.exports = {
             "desc": "thés"
         },
         "desc": "Soit 60 € pour du Lipton Citron, quand même.",
-        "illu": "number01.svg",
+        "illu": "cafe.svg",
+        anim: function() {
+            var ellipses = document.querySelectorAll('ellipse');
+            console.log(ellipses);
+            var tweens = new Array,
+                tl= new TimelineMax;
+            for (var i = 0; i < ellipses.length; i++) {
+                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)'}));
+            };
+            tl.add(tweens, '+=0', 'start', .1);
+            return tl;
+        },
         "pager": "03",
         "prev": "/240",
         "next": "/6"
@@ -50,7 +75,7 @@ module.exports = {
             "desc": "langages"
         },
         "desc": "Java, PHP, MySQL, HTML, CSS, JavaScript. Et un peu de Photoshop.",
-        "illu": "number01.svg",
+        "illu": "bike.svg",
         "pager": "04",
         "prev": "/120",
         "next": "/2",
@@ -62,7 +87,7 @@ module.exports = {
             "desc": "ans"
         },
         "desc": "Deux années en contrat de professionnalisation chez Fly Designers.",
-        "illu": "number01.svg",
+        "illu": "bike.svg",
         "pager": "05",
         "prev": "/6",
         "next": "/1"
@@ -74,7 +99,7 @@ module.exports = {
             "desc": "titre"
         },
         "desc": "de Concepteur - Développeur Informatique.",
-        "illu": "number01.svg",
+        "illu": "bike.svg",
         "pager": "06",
         "prev": "/2",
         "next": "/merci"
