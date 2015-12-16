@@ -1,15 +1,23 @@
 module.exports = {
 
-	hideSVGPaths: function() {
-		var paths = document.querySelectorAll('path');
+	hideSVG: function() {
 
-	    Array.prototype.forEach.call(paths, function(el, i) {	        
-	    	//get the total length
-	        var totalLength = el.getTotalLength();
+		var elements = document.querySelectorAll('ellipse, path, rect, line, text');
 
-	        //set PATHs to invisible
-	        el.style.strokeDashoffset = totalLength;
-	        el.style.strokeDasharray = totalLength + ' ' + totalLength;
+	    Array.prototype.forEach.call(elements, function(el, i) {	        
+	    	el.style.opacity = 0;
+	    	// //get the total length
+	     //    var totalLength = el.getTotalLength();
+
+	     //    //set PATHs to invisible
+	     //    el.style.strokeDashoffset = totalLength;
+	     //    el.style.strokeDasharray = totalLength + ' ' + totalLength;
+	    });
+	},
+
+	showSVG: function(el) {
+		Array.prototype.forEach.call(el, function(el, i) {	        
+	    	el.style.opacity = 1;
 	    });
 	},
 

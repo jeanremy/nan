@@ -13,7 +13,7 @@ Home.prototype = {
 
     init: function(req, done) {
 
-        this.el = require('./../../partials/home.html');
+        this.el = require('./../../templates/home.html');
         require('./../../sass/main.scss');
         require('./../../sass/partials/home.scss');
 

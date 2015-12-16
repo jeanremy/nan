@@ -1,6 +1,7 @@
 var Tween = require('gsap'),
     $ = require("jquery"),
     mousewheel = require('jquery-mousewheel'),
+    animsvg = require('../drawsvg');
     model = require('../models.js');
 
 module.exports = Number;
@@ -14,13 +15,13 @@ function Number() {
         var e = window.event || e; // old IE support
         this.delta = e.wheelDelta || -e.detail;
         // scroll down
-        if(this.delta < 0) {
-            console.log('down');
+        if(this.delta < 0) { 
+            console.log('u');
             window.framework.go(model[_this.req.route].next);
         }
         //scrollUp
         else {
-            console.log('up');
+            console.log('u');
             window.framework.go(model[_this.req.route].prev);
         }
         window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
@@ -43,28 +44,28 @@ function Number() {
         window.removeEventListener("mkeydown", _this.KeyPressListener, false);
     };
 
+    this.addListeners = function() {
+        window.addEventListener("keydown", _this.KeyPressListener, false);
+        window.addEventListener("mousewheel", _this.MouseWheelListener, false);
+        window.addEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
+    };
+
+    this.removeListeners = function() {
+        window.addEventListener("keydown", _this.KeyPressListener, false);
+        window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
+        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
+    };
 }
 
 Number.prototype = {
 
     el: {},
 
-    addListeners: function() {
-        window.addEventListener("keydown", this.KeyPressListener, false);
-        window.addEventListener("mousewheel", this.MouseWheelListener, false);
-        window.addEventListener("DOMMouseScroll", this.MouseWheelListener, false);
-    },
-
-    removeListeners: function() {
-        window.addEventListener("keydown", this.KeyPressListener, false);
-        window.removeEventListener("mousewheel", this.MouseWheelListener, false);
-        window.removeEventListener("DOMMouseScroll", this.MouseWheelListener, false);
-    },
 
     init: function(req, done) {
 
         // On importe le template et les styles
-        this.el = require('./../../partials/number.html');
+        this.el = require('./../../templates/number.html');
         require('./../../sass/main.scss');
         require('./../../sass/partials/number.scss');
         this.req = req;
@@ -82,9 +83,6 @@ Number.prototype = {
         }));
         document.body.insertBefore(bar, app);
         
-        app.onclick = function() {
-            window.framework.go(model[ req.route ].next);
-        }
         done();
     },
 
@@ -98,7 +96,6 @@ Number.prototype = {
         // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
         // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
         // -Voir pour mutualiser les listeners sur les différenst objets
-        // -Prévoir une anim différente pour chaque svg
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
@@ -109,10 +106,14 @@ Number.prototype = {
         var title = document.querySelector('.title');
         var text = document.querySelector('.desc');
         var illu = require('../../svg/'+model[ req.route ].illu);
+        var renderedSVG = illu();
+        //animsvg.hideSVG(renderedSVG);
         var halfRight = document.querySelector('.right');
-        halfRight.innerHTML = illu();
+        halfRight.innerHTML = renderedSVG;
+
         var anims = model[ req.route ].anim;
 
+        animsvg.hideSVG();
 
         var tweens = new Array();  
         tweens.push(Tween.fromTo(pager, 0.5, {opacity: 0}, {opacity: 1}));
@@ -137,11 +138,14 @@ Number.prototype = {
          //    );
          // }
         // On lance la timeline avec son callback
-        this.tl.add(anims);
+        if(anims) {
+            this.tl.add(anims);
+        }
         this.tl.add(tweens);
         //this.tl.add(animsvg.drawSVGPaths);
         this.tl.add(this.addListeners);
         this.tl.add(done);
+
 
         this.tl.play();
     },

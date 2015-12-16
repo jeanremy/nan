@@ -31,7 +31,21 @@
 				background-color: $black;
 			}
 		}
-		
-
+	}
+	.scroll {
+		position: absolute;
+		bottom: 14px;
+		left: 50%;
+		transform: translateX(-50%);
+		text-align: center;
+		color: $black;
+		text-transform: uppercase;
+		&:after {
+			content: "";
+			display: inline-block;
+			width: 1px;
+			height: 35px;
+			background-color: $black;
+		}
 	}
 }

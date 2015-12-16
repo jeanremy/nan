@@ -40,8 +40,19 @@ module.exports = {
             "desc": "trains"
         },
         "desc": "TGV ou TER, au choix. Et pas beaucoup de retards.",
-        "illu": "bike.svg",
+        "illu": "train.svg",
         "pager": "02",
+        anim: function() {
+            var ellipses = document.querySelectorAll('ellipse, path, rect, line, text');
+            animsvg.hideSVG();
+            var tweens = new Array,
+                tl= new TimelineMax;
+            for (var i = 0; i < ellipses.length; i++) {
+                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
+            };
+            tl.add(tweens, '+=0', 'start', .1);
+            return tl;
+        },
         "prev": "/1560",
         "next": "/120"
     },
@@ -55,11 +66,11 @@ module.exports = {
         "illu": "cafe.svg",
         anim: function() {
             var ellipses = document.querySelectorAll('ellipse');
-            console.log(ellipses);
+            animsvg.hideSVG();
             var tweens = new Array,
                 tl= new TimelineMax;
             for (var i = 0; i < ellipses.length; i++) {
-                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)'}));
+                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
             };
             tl.add(tweens, '+=0', 'start', .1);
             return tl;
@@ -75,7 +86,18 @@ module.exports = {
             "desc": "langages"
         },
         "desc": "Java, PHP, MySQL, HTML, CSS, JavaScript. Et un peu de Photoshop.",
-        "illu": "bike.svg",
+        "illu": "key.svg",
+        anim: function() {
+            var paths = document.querySelectorAll('path');
+            animsvg.hideSVG();
+            var tweens = new Array,
+                tl= new TimelineMax;
+            for (var i = 0; i < paths.length; i++) {
+                tweens.push(Tween.fromTo(paths[i], 0.3, {opacity: 0}, {opacity:1}));
+            };
+            tl.add(tweens, '+=0');
+            return tl;
+        },
         "pager": "04",
         "prev": "/120",
         "next": "/2",
