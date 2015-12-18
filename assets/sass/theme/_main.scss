@@ -54,3 +54,15 @@ section {
 		transform-origin: 0 0;
 	}
 }
+
+
+#bar--transition {
+	position: absolute;
+	background: $black;
+	bottom: 0;
+	right: 0;
+	left: 50%;
+	height: 0;
+	-webkit-transform-origin: 100% 100%;
+	        transform-origin: 100% 100%;
+}

@@ -49,10 +49,12 @@ Home.prototype = {
     // in animateIn you'll animate in your hidden content that
     // was created in init
     animateIn: function(req, done) {
-        var ok = function() {console.log('ok')};
-        this.tl
-                .add(ok)
-                .add(done);
+        var bar = document.getElementById('bar--transition');
+        this.tl.add(Tween.to(bar, 0.6, {
+            height: '14px',
+            ease: Power3.easeIn
+        }));
+        this.tl.add(done);
         this.tl.play();
         app.onclick = function() {
             framework.go('/1560');
@@ -63,11 +65,20 @@ Home.prototype = {
     // in animateOut you'll animate out your content that
     // was created in init
     animateOut: function(req, done) {
-        var ok = function() {console.log('ok')};
-        this.tl
-                .eventCallback('onReverseComplete', ok)
-                .eventCallback('onReverseComplete', done);
+        this.tl.eventCallback('onReverseComplete', buildBar);
+        function buildBar() {
+            var bar = document.getElementById('bar--transition');
+            var height = window.outerHeight;
+            var tl = new TimelineMax();
+            tl.add(Tween.to(bar, 0.6, {
+                height: height,
+                ease: Power3.easeIn
+            }));
+            tl.add(done);
+
+        }
         this.tl.reverse();
+
 
 
     },

@@ -16,12 +16,10 @@ function Number() {
         this.delta = e.wheelDelta || -e.detail;
         // scroll down
         if(this.delta < 0) { 
-            console.log('u');
             window.framework.go(model[_this.req.route].next);
         }
         //scrollUp
         else {
-            console.log('u');
             window.framework.go(model[_this.req.route].prev);
         }
         window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
@@ -31,7 +29,6 @@ function Number() {
     };
 
     this.KeyPressListener = function(e) {
-        console.log(e.keyCode);
         // scroll down
         if(e.keyCode == '40') {
             window.framework.go(model[_this.req.route].next);
@@ -55,6 +52,11 @@ function Number() {
         window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
         window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
     };
+
+    this.reverseAnims = function() {
+        console.log(_this);
+        _this.anims.reverse();
+    };
 }
 
 Number.prototype = {
@@ -65,23 +67,17 @@ Number.prototype = {
     init: function(req, done) {
 
         // On importe le template et les styles
-        this.el = require('./../../templates/number.html');
+        var raw = require('./../../templates/number.html');
+        this.el = raw(model[ req.route ]);
+
         require('./../../sass/main.scss');
         require('./../../sass/partials/number.scss');
+
         this.req = req;
 
-        var app = document.getElementById('app'),
-            bar = document.createElement('div');
-        bar.id = "bar--transition";
-
         // On ajoute la barre de transition et son animation qu'on lancera ensuite
-        var height = window.outerHeight;
+
         this.tl = new TimelineMax({paused: true});
-        this.tl.add(Tween.to(bar, 0.6, {
-            height: height,
-            ease: Power3.easeIn
-        }));
-        document.body.insertBefore(bar, app);
         
         done();
     },
@@ -96,11 +92,12 @@ Number.prototype = {
         // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
         // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
         // -Voir pour mutualiser les listeners sur les différenst objets
+        // -mettre un curseur différents sur partie haut/basse et click
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
         var app = document.getElementById('app');
-        app.innerHTML = this.el(model[ req.route ]); 
+        app.innerHTML = this.el; 
 
         var pager = document.querySelector('.pager');
         var title = document.querySelector('.title');
@@ -111,7 +108,7 @@ Number.prototype = {
         var halfRight = document.querySelector('.right');
         halfRight.innerHTML = renderedSVG;
 
-        var anims = model[ req.route ].anim;
+        this.anims = model[ req.route ].anim;
 
         animsvg.hideSVG();
 
@@ -138,20 +135,26 @@ Number.prototype = {
          //    );
          // }
         // On lance la timeline avec son callback
-        if(anims) {
-            this.tl.add(anims);
-        }
         this.tl.add(tweens);
-        //this.tl.add(animsvg.drawSVGPaths);
         this.tl.add(this.addListeners);
-        this.tl.add(done);
+        var inTl = this.tl;
+        if(this.anims) {
+            inTl.add(this.anims);
+        }
+        //inTl.add(animsvg.drawSVGPaths);
+        inTl.add(done);
 
-
-        this.tl.play();
+        inTl.play();
     },
     animateOut: function(req, done) {
         console.log(req);
-        this.tl.eventCallback('onReverseComplete', done);
+        // doublement des tl
+        outTl = new TimelineMax({paused: true});
+        outTl.add(this.anims);
+        outTl.reverse();
+        //outTl.add(this.reverseAnims);
+        this.tl
+                .eventCallback('onReverseComplete', done);
         this.tl.reverse();
     },
 
@@ -159,4 +162,5 @@ Number.prototype = {
         //  el.parentNode.removeChild(el);
         done();
     }
+
 }
