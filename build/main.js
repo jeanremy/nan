@@ -1511,22 +1511,32 @@
 	
 	        this.bars = document.querySelectorAll('.bar');
 	        this.text = document.querySelectorAll('.text');
+	        this.scroll = document.querySelector('.scroll');
 	        this.tweens = new Array();
 	        this.texts = new Array();
 	        this.tl = new TimelineMax({paused: true});
 	
-	        this.tweens.push(Tween.fromTo(this.bars[0], 0.5, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
-	        this.tweens.push(Tween.fromTo(this.bars[1], 0.5, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
-	        this.tweens.push(Tween.fromTo(this.bars[2], 0.5, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
-	        this.tweens.push(Tween.fromTo(this.bars[3], 0.5, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
+	        this.tweens.push(Tween.fromTo(this.bars[0], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
+	        this.tweens.push(Tween.fromTo(this.bars[1], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
+	        this.tweens.push(Tween.fromTo(this.bars[2], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
+	        this.tweens.push(Tween.fromTo(this.bars[3], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
+	        //this.tweens.push();
 	        
 	        this.texts.push(Tween.fromTo(this.text[0], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
 	        this.texts.push(Tween.fromTo(this.text[1], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
+	        this.texts.push(Tween.fromTo(this.scroll, 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
 	
 	        this.tl
 	            .add(this.tweens, '+=0', 'sequence')
-	            .add(this.texts, '+=0', 'start', 0.2);
-	        done();
+	            .add(this.texts, '+=0', 'start', 0.2)
+	            .add(done)
+	            .add(callback);
+	        function callback() {
+	            var barTransition = document.getElementById('bar--transition');
+	            Tween.to(barTransition, 0.5, {height: "14px"})
+	        }
+	
+	        this.tl.play();
 	
 	    },
 	
@@ -1538,11 +1548,6 @@
 	    // in animateIn you'll animate in your hidden content that
 	    // was created in init
 	    animateIn: function(req, done) {
-	        var bar = document.getElementById('bar--transition');
-	        this.tl.add(Tween.to(bar, 0.6, {
-	            height: '14px',
-	            ease: Power3.easeIn
-	        }));
 	        this.tl.add(done);
 	        this.tl.play();
 	        app.onclick = function() {
@@ -20148,10 +20153,6 @@
 	        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
 	    };
 	
-	    this.reverseAnims = function() {
-	        console.log(_this);
-	        _this.anims.reverse();
-	    };
 	}
 	
 	Number.prototype = {
@@ -20165,14 +20166,10 @@
 	        var raw = __webpack_require__(/*! ./../../templates/number.html */ 28);
 	        this.el = raw(model[ req.route ]);
 	
-	        __webpack_require__(/*! ./../../sass/main.scss */ 21);
-	        __webpack_require__(/*! ./../../sass/partials/number.scss */ 29);
-	
 	        this.req = req;
 	
-	        // On ajoute la barre de transition et son animation qu'on lancera ensuite
-	
-	        this.tl = new TimelineMax({paused: true});
+	        __webpack_require__(/*! ./../../sass/main.scss */ 21);
+	        __webpack_require__(/*! ./../../sass/partials/number.scss */ 29);
 	        
 	        done();
 	    },
@@ -20191,26 +20188,29 @@
 	
 	        // on insère le contenu après la fin du animateOut 
 	        // de la section précédente (overlap false dans framework)
-	        var app = document.getElementById('app');
-	        app.innerHTML = this.el; 
+	        this.app = document.getElementById('app');
+	        this.app.innerHTML = this.el; 
 	
-	        var pager = document.querySelector('.pager');
-	        var title = document.querySelector('.title');
-	        var text = document.querySelector('.desc');
-	        var illu = __webpack_require__(/*! ../../svg */ 31)("./"+model[ req.route ].illu);
-	        var renderedSVG = illu();
-	        //animsvg.hideSVG(renderedSVG);
-	        var halfRight = document.querySelector('.right');
-	        halfRight.innerHTML = renderedSVG;
+	        this.pager = document.querySelector('.pager');
+	        this.title = document.querySelector('.title');
+	        this.text = document.querySelector('.desc');
+	        this.illu = __webpack_require__(/*! ../../svg */ 31)("./"+model[ req.route ].illu);
+	        this.svg = this.illu();
+	        this.halfRight = document.querySelector('.right');
+	        this.halfRight.innerHTML = this.svg;
+	        this.barTransition = document.getElementById('bar--transition');
 	
 	        this.anims = model[ req.route ].anim;
 	
 	        animsvg.hideSVG();
 	
 	        var tweens = new Array();  
-	        tweens.push(Tween.fromTo(pager, 0.5, {opacity: 0}, {opacity: 1}));
-	        tweens.push(Tween.fromTo(title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
-	        tweens.push(Tween.fromTo(text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+	        tweens.push(Tween.fromTo(this.pager, 0.5, {opacity: 0}, {opacity: 1}));
+	        tweens.push(Tween.fromTo(this.title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+	        tweens.push(Tween.fromTo(this.text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+	        if(this.anims) {
+	            tweens.push(this.anims);
+	        }
 	        
 	
 	         // for(var x = 0; x<paths.length;x++){
@@ -20230,27 +20230,30 @@
 	         //    );
 	         // }
 	        // On lance la timeline avec son callback
-	        this.tl.add(tweens);
-	        this.tl.add(this.addListeners);
+	        tlIn = new TimelineMax({paused: true});
+	        tlIn.add(Tween.to(this.barTransition, 0.6, {height: window.outerHeight, ease: Power3.easeIn}));
+	        tlIn.add(tweens);
 	        var inTl = this.tl;
-	        if(this.anims) {
-	            inTl.add(this.anims);
-	        }
-	        //inTl.add(animsvg.drawSVGPaths);
-	        inTl.add(done);
+	        tlIn.add(done);
+	        tlIn.add(this.addListeners);
 	
-	        inTl.play();
+	        tlIn.play();
 	    },
 	    animateOut: function(req, done) {
-	        console.log(req);
-	        // doublement des tl
-	        outTl = new TimelineMax({paused: true});
-	        outTl.add(this.anims);
-	        outTl.reverse();
-	        //outTl.add(this.reverseAnims);
-	        this.tl
-	                .eventCallback('onReverseComplete', done);
-	        this.tl.reverse();
+	        var tweens = new Array();  
+	        tweens.push(Tween.to(this.pager, 0.5, {opacity: 0}));
+	        tweens.push(Tween.to(this.title, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
+	        tweens.push(Tween.to(this.text, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
+	        
+	        tlOut = new TimelineMax({paused: true});
+	
+	        tlOut.add(tweens);
+	        tlOut.add(this.addListeners);
+	        if(this.anims) {
+	            tlOut.add(this.anims);
+	        }
+	        tlOut.add(done);
+	        tlOut.play();
 	    },
 	
 	    destroy: function(req, done) {

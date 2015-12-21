@@ -53,10 +53,6 @@ function Number() {
         window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
     };
 
-    this.reverseAnims = function() {
-        console.log(_this);
-        _this.anims.reverse();
-    };
 }
 
 Number.prototype = {
@@ -70,14 +66,10 @@ Number.prototype = {
         var raw = require('./../../templates/number.html');
         this.el = raw(model[ req.route ]);
 
-        require('./../../sass/main.scss');
-        require('./../../sass/partials/number.scss');
-
         this.req = req;
 
-        // On ajoute la barre de transition et son animation qu'on lancera ensuite
-
-        this.tl = new TimelineMax({paused: true});
+        require('./../../sass/main.scss');
+        require('./../../sass/partials/number.scss');
         
         done();
     },
@@ -96,26 +88,29 @@ Number.prototype = {
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
-        var app = document.getElementById('app');
-        app.innerHTML = this.el; 
+        this.app = document.getElementById('app');
+        this.app.innerHTML = this.el; 
 
-        var pager = document.querySelector('.pager');
-        var title = document.querySelector('.title');
-        var text = document.querySelector('.desc');
-        var illu = require('../../svg/'+model[ req.route ].illu);
-        var renderedSVG = illu();
-        //animsvg.hideSVG(renderedSVG);
-        var halfRight = document.querySelector('.right');
-        halfRight.innerHTML = renderedSVG;
+        this.pager = document.querySelector('.pager');
+        this.title = document.querySelector('.title');
+        this.text = document.querySelector('.desc');
+        this.illu = require('../../svg/'+model[ req.route ].illu);
+        this.svg = this.illu();
+        this.halfRight = document.querySelector('.right');
+        this.halfRight.innerHTML = this.svg;
+        this.barTransition = document.getElementById('bar--transition');
 
         this.anims = model[ req.route ].anim;
 
         animsvg.hideSVG();
 
         var tweens = new Array();  
-        tweens.push(Tween.fromTo(pager, 0.5, {opacity: 0}, {opacity: 1}));
-        tweens.push(Tween.fromTo(title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
-        tweens.push(Tween.fromTo(text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+        tweens.push(Tween.fromTo(this.pager, 0.5, {opacity: 0}, {opacity: 1}));
+        tweens.push(Tween.fromTo(this.title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+        tweens.push(Tween.fromTo(this.text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+        if(this.anims) {
+            tweens.push(this.anims);
+        }
         
 
          // for(var x = 0; x<paths.length;x++){
@@ -135,27 +130,30 @@ Number.prototype = {
          //    );
          // }
         // On lance la timeline avec son callback
-        this.tl.add(tweens);
-        this.tl.add(this.addListeners);
+        tlIn = new TimelineMax({paused: true});
+        tlIn.add(Tween.to(this.barTransition, 0.6, {height: window.outerHeight, ease: Power3.easeIn}));
+        tlIn.add(tweens);
         var inTl = this.tl;
-        if(this.anims) {
-            inTl.add(this.anims);
-        }
-        //inTl.add(animsvg.drawSVGPaths);
-        inTl.add(done);
+        tlIn.add(done);
+        tlIn.add(this.addListeners);
 
-        inTl.play();
+        tlIn.play();
     },
     animateOut: function(req, done) {
-        console.log(req);
-        // doublement des tl
-        outTl = new TimelineMax({paused: true});
-        outTl.add(this.anims);
-        outTl.reverse();
-        //outTl.add(this.reverseAnims);
-        this.tl
-                .eventCallback('onReverseComplete', done);
-        this.tl.reverse();
+        var tweens = new Array();  
+        tweens.push(Tween.to(this.pager, 0.5, {opacity: 0}));
+        tweens.push(Tween.to(this.title, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
+        tweens.push(Tween.to(this.text, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
+        
+        tlOut = new TimelineMax({paused: true});
+
+        tlOut.add(tweens);
+        tlOut.add(this.addListeners);
+        if(this.anims) {
+            tlOut.add(this.anims);
+        }
+        tlOut.add(done);
+        tlOut.play();
     },
 
     destroy: function(req, done) {

@@ -22,22 +22,32 @@ Home.prototype = {
 
         this.bars = document.querySelectorAll('.bar');
         this.text = document.querySelectorAll('.text');
+        this.scroll = document.querySelector('.scroll');
         this.tweens = new Array();
         this.texts = new Array();
         this.tl = new TimelineMax({paused: true});
 
-        this.tweens.push(Tween.fromTo(this.bars[0], 0.5, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
-        this.tweens.push(Tween.fromTo(this.bars[1], 0.5, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
-        this.tweens.push(Tween.fromTo(this.bars[2], 0.5, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
-        this.tweens.push(Tween.fromTo(this.bars[3], 0.5, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
+        this.tweens.push(Tween.fromTo(this.bars[0], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
+        this.tweens.push(Tween.fromTo(this.bars[1], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
+        this.tweens.push(Tween.fromTo(this.bars[2], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
+        this.tweens.push(Tween.fromTo(this.bars[3], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
+        //this.tweens.push();
         
         this.texts.push(Tween.fromTo(this.text[0], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
         this.texts.push(Tween.fromTo(this.text[1], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
+        this.texts.push(Tween.fromTo(this.scroll, 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
 
         this.tl
             .add(this.tweens, '+=0', 'sequence')
-            .add(this.texts, '+=0', 'start', 0.2);
-        done();
+            .add(this.texts, '+=0', 'start', 0.2)
+            .add(done)
+            .add(callback);
+        function callback() {
+            var barTransition = document.getElementById('bar--transition');
+            Tween.to(barTransition, 0.5, {height: "14px"})
+        }
+
+        this.tl.play();
 
     },
 
@@ -49,11 +59,6 @@ Home.prototype = {
     // in animateIn you'll animate in your hidden content that
     // was created in init
     animateIn: function(req, done) {
-        var bar = document.getElementById('bar--transition');
-        this.tl.add(Tween.to(bar, 0.6, {
-            height: '14px',
-            ease: Power3.easeIn
-        }));
         this.tl.add(done);
         this.tl.play();
         app.onclick = function() {
