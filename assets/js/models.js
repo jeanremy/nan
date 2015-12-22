@@ -21,7 +21,7 @@ module.exports = {
         anim: function() {
             var paths = document.querySelectorAll('path'),
                 tweens = new Array(),
-                tl = new TimelineMax; 
+                tl = new TimelineMax(); 
 
             animsvg.hideSVGPaths();
 
@@ -46,11 +46,12 @@ module.exports = {
             var ellipses = document.querySelectorAll('ellipse, path, rect, line, text');
             animsvg.hideSVG();
             var tweens = new Array,
-                tl= new TimelineMax;
+                tl= new TimelineMax();
             for (var i = 0; i < ellipses.length; i++) {
                 tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
             };
             tl.add(tweens, '+=0', 'start', .1);
+            tl.add(function() {console.log('end of anim tl');})
             return tl;
         },
         "prev": "/1560",
@@ -65,14 +66,16 @@ module.exports = {
         "desc": "Soit 60 € pour du Lipton Citron, quand même.",
         "illu": "cafe.svg",
         anim: function() {
+
             var ellipses = document.querySelectorAll('ellipse');
-            animsvg.hideSVG();
             var tweens = new Array,
-                tl= new TimelineMax;
+                tl= new TimelineMax();
             for (var i = 0; i < ellipses.length; i++) {
+                //tweens.push(animsvg.hideSVG);
                 tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
             };
             tl.add(tweens, '+=0', 'start', .1);
+            tl.add(function() {console.log('end of anim tl');})
             return tl;
         },
         "pager": "03",
@@ -96,6 +99,7 @@ module.exports = {
                 tweens.push(Tween.fromTo(paths[i], 0.3, {opacity: 0}, {opacity:1}));
             };
             tl.add(tweens, '+=0');
+            tl.add(function() {console.log('end of anim tl');})
             return tl;
         },
         "pager": "04",

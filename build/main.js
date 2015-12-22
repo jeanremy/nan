@@ -1,83 +1,77 @@
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/*!***************************!*\
-  !*** ./assets/js/main.js ***!
-  \***************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var bigwheel = __webpack_require__(/*! bigwheel */ 1);
-	
-	
+	var bigwheel = __webpack_require__(1);
+
+
 	// create our framework instance
 	framework = bigwheel( function(done) {
-	    var routes = __webpack_require__(/*! ./routes.js */ 9);
+	    var routes = __webpack_require__(9);
 	    return {
 	    	overlap: false,
 	      	routes: routes
 	    }
 	});
-	
-	
+
+
 	framework.init();
 
 
 /***/ },
 /* 1 */
-/*!*****************************!*\
-  !*** ./~/bigwheel/index.js ***!
-  \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** @module bigwheel */
-	
-	var vm = __webpack_require__(/*! bw-vm */ 2);
-	var viewmediator = __webpack_require__(/*! bw-viewmediator */ 3);
-	var router = __webpack_require__(/*! bw-router */ 4);
-	var on = __webpack_require__(/*! dom-event */ 8);
-	var EventEmitter = __webpack_require__(/*! events */ 7).EventEmitter;
-	
+
+	var vm = __webpack_require__(2);
+	var viewmediator = __webpack_require__(3);
+	var router = __webpack_require__(4);
+	var on = __webpack_require__(8);
+	var EventEmitter = __webpack_require__(7).EventEmitter;
+
 	/**
 	 * When instantiating bigwheel you must pass in a setup function.
 	 *
@@ -123,58 +117,58 @@
 	 * initialize bigwheel.
 	 */
 	function bigwheel(settingsFunc) {
-	
+
 		if(!(this instanceof bigwheel))
 			return new bigwheel(settingsFunc);
-	
+
 		this.settingsFunc = settingsFunc;
 		EventEmitter.call(this);
-	
+
 	}
-	
+
 	bigwheel.prototype = Object.create(EventEmitter.prototype);
-	
+
 	/**
 	 * init must be called to start the framework. This was done to allow for
 	 * a developer to have full control of when bigwheel starts doing it's thing.
 	 */
 	bigwheel.prototype.init = function() {
-	
+
 		var onSettingComplete = function(settings) {
-	
+
 			var s = this.s = settings;
-	
+
 			if(s === undefined)
 				throw new Error('Your settings function must return a settings Object');
-	
+
 			if(s.routes === undefined)
 				throw new Error('Your settings object must define routes');
-	
+
 			s.autoResize = s.autoResize === undefined ? true : s.autoResize;
-	
+
 			this.previousRoute = undefined;
-	
+
 			// setup the router
 			this.router = settings.router || router(settings.routes);
 			this.router.on('route', this.show.bind(this));
-	
+
 			// Re-dispatch routes
 			this.router.on('route',this.emit.bind(this,'route'));
 			this.router.on('sub_create',this.emit.bind(this,'sub_create'));
 			this.router.on('sub_destroy',this.emit.bind(this,'sub_destroy'));
-	
+
 			// handle adding and removing sub routers to the global
 			// object for easier retrieval
 			this.subFrameworks = {};
-	
+
 			// setup the view manager
 			this.vm = vm(this.s);
-	
+
 			// check if 
 			if(s.autoResize && global.innerWidth !== undefined && global.innerHeight !== undefined) {
-	
+
 				on(global, 'resize', this.onResize.bind(this));
-	
+
 				this.onResize();
 			}
 			
@@ -185,10 +179,10 @@
 			else
 				this.router.init();
 		}.bind(this);
-	
-	
+
+
 		var rVal = this.settingsFunc(onSettingComplete);
-	
+
 		// check if promises are used instead
 		// it might be good to remove this since theres no
 		// need for promises in this case
@@ -197,57 +191,57 @@
 		// check if just an object was returned which has .routes
 		else if(rVal && rVal.routes)
 			onSettingComplete(rVal);
-	
+
 		return this;
 	};
-	
-	
-	
+
+
+
 	bigwheel.prototype.sub = function(name, routes) {
-	
+
 		var subFrameworks = this.subFrameworks;
 		var sub;
 		var settings;
-	
+
 		// if there's a subframework with this same name just return it
 		if(subFrameworks[ name ]) {
-	
+
 			sub = subFrameworks[ name ];
 		// otherwise if we have routes then create a new one
 		} else if(routes) {
-	
+
 			// if there is already a subframework with this name just return it
 			settings = {
 				routes: routes
 			};
-	
+
 			settings.router = this.router.sub(routes);
-	
+
 			sub = new bigwheel(function() {
 				return settings;
 			});
-	
+
 			// if a name was passed save it for later reference
 			if(name) {
 				subFrameworks[ name ] = sub;
-	
+
 				// if a sub router gets destroyed we should check if its
 				// for this sub framework and destroy it
 				this.router.on('sub_destroy', function(info) {
-	
+
 					if(info.router === settings.router) {
 						subFrameworks[ name ].destroy();
 						delete subFrameworks[ name ];
 					}				
 				});
 			}
-	
+
 			sub.init();
 		}
-	
+
 		return sub;
 	};
-	
+
 	/**
 	 * go can be called to go to another section.
 	 * 
@@ -259,24 +253,24 @@
 	 * ```
 	 */
 	bigwheel.prototype.go = function(to) {
-	
+
 		this.router.go(to);
-	
+
 		return this;
 	};
-	
+
 	/**
 	 * Destroys bighweel
 	 */
 	bigwheel.prototype.destroy = function() {
-	
+
 		this.router.removeAllListeners('sub_destroy');
 		this.router.removeAllListeners('sub_create');
 		this.router.removeAllListeners('route');
 		this.router.destroy();
-	
+
 	};
-	
+
 	/**
 	 * Resize can be called at any time. The values passed in for
 	 * width and height will be passed to the currently instantiated
@@ -290,136 +284,133 @@
 	 * @param  {Number} h height value you'd like to pass to the sections
 	 */
 	bigwheel.prototype.resize = function(w, h) {
-	
+
 		this.vm.resize(w, h);
 	};
-	
+
 	bigwheel.prototype.show = function(info) {
 		var section = info.section;
 		var req = info.route || {};
 		req.previous = this.previousRoute;
 		req.framework = this;
-	
+
 		// this is the original router callback passed in
 		if(this.onRouteCallBack)
 			this.onRouteCallBack(section, req);
-	
-	
+
+
 		// check if section is an array or function or object
 		if(Array.isArray(section)) {
-	
+
 			var sections = [];
-	
+
 			for(var i = 0, len = section.length; i < len; i++) {
-	
+
 				if(typeof section[ i ] == 'object') {
-	
+
 					sections[ i ] = section[ i ];
 				} else if(typeof section[ i ] == 'function') {
-	
+
 					sections[ i ] = new section[ i ]();
 				}	
 			}
-	
+
 			this.doShow(viewmediator.apply(undefined, sections), req);
 		} else if(typeof section == 'object') {
-	
+
 			this.doShow(section, req);
 		} else if(typeof section == 'function') {
-	
+
 			this.doShow(new section(), req);
 		}
-	
+
 		this.previousRoute = info.route;
-	
+
 	};
-	
+
 	bigwheel.prototype.doShow = function(section, req) {
-	
+
 		this.vm.show(section, req);
 	};
-	
+
 	bigwheel.prototype.onResize = function() {
-	
+
 		this.resize(global.innerWidth, global.innerHeight);
 	};
-	
+
 	module.exports = bigwheel;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 2 */
-/*!*************************************!*\
-  !*** ./~/bigwheel/~/bw-vm/index.js ***!
-  \*************************************/
 /***/ function(module, exports) {
 
 	function ViewManager( settings ) {
-	
+
 	  if( !( this instanceof ViewManager ) ) {
 	    return new ViewManager( settings );
 	  }
-	
+
 	  var s = this.s = settings || {};
-	
+
 	  s.overlap = s.overlap === undefined ? true : s.overlap;
 	  s.width = s.width || 980;
 	  s.height = s.height || 570;
-	
+
 	  this.cContent = null;
 	  this.nContent = null;
 	}
-	
+
 	var p = ViewManager.prototype = {
-	
+
 	  show: function( content, data, onComplete ) {
-	
+
 	    // check if data was passed in
 	    if( onComplete === undefined &&
 	      typeof data == 'function' ) {
-	
+
 	      onComplete = data;
 	      data = null;
 	    }
-	
+
 	    this.data = data;
-	
+
 	    if( content != this.nContent && content != this.cContent ) {
-	
+
 	      if( this.nContent && this.nContent.destroy )
 	        this.nContent.destroy(this.data, function() { });
-	
+
 	      this.nContent = content;
-	
+
 	      if( content.init ) {
-	
+
 	        content.init( this.data, this.swap.bind( this, this.nContent, onComplete ) ); 
 	      } else {
-	
+
 	        this.swap( this.nContent, onComplete );
 	      }
 	    }
 	  },
-	
+
 	  clear: function( onComplete ) {
-	
+
 	    if( this.nContent && this.nContent.destroy ) {
 	      this.nContent.destroy( this.data, function() { } );
 	    }
-	
+
 	    if( this.cContent ) {
-	
+
 	      var onOldOut = function( oldContent ) {
-	
+
 	        if( oldContent.destroy ) {
 	          oldContent.destroy( this.data , function() { } );
 	        }
-	
+
 	        if( onComplete ) {
 	          onComplete( oldContent );
 	        }
 	      }.bind( this, this.cContent );
-	
+
 	      // now take out countent
 	      if( this.cContent.animateOut ) {
 	        this.cContent.animateOut( this.data , onOldOut );
@@ -428,59 +419,59 @@
 	      }
 	    }
 	  },
-	
+
 	  resize: function( width, height ) {
-	
+
 	    var s = this.s;
-	
+
 	    s.width = width;
 	    s.height = height;
-	
+
 	    if( this.cContent && this.cContent.resize )
 	      this.cContent.resize( width, height );
 	  },
-	
+
 	  swap: function( newContent, onComplete ) {
-	
+
 	    if( newContent == this.nContent ) {
-	
+
 	      var s = this.s;
 	      var oldContent = this.cContent;
 	      var onOldOut;
-	
+
 	      var onNewIn = function() {
-	
+
 	        if( s.onEndAniIn ) {
 	          s.onEndAniIn( newContent, oldContent );
 	        }
-	
+
 	        if( onComplete ) {
 	          onComplete( newContent, oldContent );
 	        }
 	      };
-	
+
 	      var bringInNewContent = function() {
-	
+
 	        if( s.onStartAniIn ) {
 	          s.onStartAniIn( newContent, this.cContent );
 	        }
-	
+
 	        this.cContent = newContent;
 	        this.nContent = null;
-	
+
 	        if( newContent.animateIn ) {
 	          newContent.animateIn( this.data, onNewIn );  
 	        } else {
 	          onNewIn();
 	        }
 	      }.bind( this );
-	
+
 	      var takeOutOldContent = function() {
-	
+
 	        if( s.onStartAniOut ) {
 	          s.onStartAniOut( newContent, oldContent );
 	        }
-	
+
 	        // if there's an animateOut function execute it on oldContent
 	        if( oldContent.animateOut ) {
 	          oldContent.animateOut( this.data, onOldOut );
@@ -488,239 +479,233 @@
 	          onOldOut();
 	        }
 	      }.bind( this );
-	
+
 	      var destroyOldContent = function() {
-	
+
 	        if( s.onEndAniOut ) {
 	          s.onEndAniOut( newContent, oldContent );
 	        }
-	
+
 	        if( oldContent.destroy ) {
 	          oldContent.destroy( this.data, function() { } );
 	        }
 	      }.bind( this );
-	
-	
+
+
 	      // resize the newContent if it has a resize method
 	      if( newContent.resize ) {
 	        newContent.resize( s.width, s.height );
 	      }
-	
+
 	      // check if there's content on screen already
 	      if( this.cContent ) {
-	
+
 	        if( s.overlap ) {
-	
+
 	          onOldOut = destroyOldContent;
 	        } else {
-	
+
 	          onOldOut = function() {
-	
+
 	            destroyOldContent();
 	            bringInNewContent();
 	          }.bind(this);
 	        }
-	
+
 	        // call the callback to notify that we've started animating out
 	        takeOutOldContent();
-	
+
 	        if( s.overlap ) {
-	
+
 	          bringInNewContent();
 	        }
 	      // else we don't have current content just bring in the new
 	      } else {
-	
+
 	        bringInNewContent();
 	      }
 	    }
 	  }
 	};
-	
+
 	Object.defineProperty(p, 'overlap', {
 	  get: function() {
 	    return this.s.overlap;
 	  },
-	
+
 	  set: function(value) {
 	    this.s.overlap = value;
 	  }
 	});
-	
+
 	module.exports = ViewManager;
 
 /***/ },
 /* 3 */
-/*!***********************************************!*\
-  !*** ./~/bigwheel/~/bw-viewmediator/index.js ***!
-  \***********************************************/
 /***/ function(module, exports) {
 
 	function mediator() {
-	
+
 	  if(!( this instanceof mediator )) {
-	
+
 	    var rVal = Object.create(mediator.prototype);
 	    mediator.apply(rVal, arguments);
 	    return rVal;
 	  }
-	
+
 	  this.items = Array.prototype.slice.call(arguments);
 	}
-	
+
 	mediator.prototype = {
-	
+
 	  init: function(data, done) {
 	    this.callAll('init', data, done);
 	  },
-	
+
 	  resize: function(w, h) {
-	
+
 	    for(var i = 0, len = this.items.length; i < len; i++) {
-	
+
 	      if(typeof this.items[ i ].resize === 'function') {
 	        this.items[ i ].resize(w, h);
 	      }
 	    }
 	  },
-	
+
 	  animateIn: function(data, done) {
 	    this.callAll('animateIn', data, done);    
 	  },
-	
+
 	  animateOut: function(data, done) {
 	    this.callAll('animateOut', data, done);
 	  },
-	
+
 	  destroy: function(data, done) {
 	    this.callAll('destroy', data, done);
 	  },
-	
+
 	  callAll: function(func, data, done) {
-	
+
 	    var numCalled = 0;
 	    var numToCall = 0;
 	    var i;
 	    var len;
-	
+
 	    this.items.forEach(function(section) {
-	
+
 	      if(typeof section[ func ] === 'function') {
 	        numToCall++;
 	      }
 	    });
-	
+
 	    // if there are no functions to call simply just return
 	    if(numToCall === 0) {
-	
+
 	      done();
 	    } else {
-	
+
 	      this.items.forEach(function(section) {
-	
+
 	        if(typeof section[ func ] === 'function') {
 	          section[ func ].call(section, data, onSectionDone);
 	        }
 	      });
 	    }
-	
+
 	    function onSectionDone() {
-	
+
 	      if(++numCalled === numToCall) {
 	        done();
 	      }
 	    }
 	  }
 	};
-	
+
 	module.exports = mediator;
 
 /***/ },
 /* 4 */
-/*!*****************************************!*\
-  !*** ./~/bigwheel/~/bw-router/index.js ***!
-  \*****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {var on = __webpack_require__(/*! dom-event */ 5);
+	/* WEBPACK VAR INJECTION */(function(global) {var on = __webpack_require__(5);
 	var off = on.off;
-	var routes = __webpack_require__(/*! routes */ 6);
-	var EventEmitter = __webpack_require__(/*! events */ 7).EventEmitter;
+	var routes = __webpack_require__(6);
+	var EventEmitter = __webpack_require__(7).EventEmitter;
 	var noop = function() {};
-	
+
 	function router(settings) {
-	
+
 		if( !( this instanceof router ) ) {
-	
+
 			return new router(settings);
 		}
-	
+
 		var s = this.s = settings || {};
-	
+
 		s.postHash = s.postHash || '!';
-	
+
 		this.lastRoute = null;
 		this.childRouter = null;
 		this.childFullRoute = null;
 		this.childBaseRoute = null;
 		this.router = routes();
-	
+
 		EventEmitter.call(this);
 	}
-	
+
 	var p = router.prototype = Object.create(EventEmitter.prototype);
-	
+
 	p.init = function() {
-	
+
 		var s = this.s;
 		var i;
-	
+
 		// figure out a start section
 		if( s[ '/' ] === undefined ) {
-	
+
 			// find the first path which would be a section
 			for(i in s) {
-	
+
 				if( i[ 0 ] == '/' ) {
-	
+
 					s.start = i;
-	
+
 					break;
 				}
 			}
 		} else {
-	
+
 			s.start = '/';
 		}
-	
-	
+
+
 		// now setup routes
 		for(i in s) {
-	
+
 			if( i[ 0 ] == '/' || i == '404') {
-	
+
 				this.router.addRoute(i, noop);
 			}
 		}
-	
+
 		this.onURL = this.onURL.bind(this);
-	
+
 		if( global.location ) {
 			on(global, 'hashchange', this.onURL);
 		}
-	
+
 		this.onURL(); // force a hash change to start things up
 		
 		return this;
 	};
-	
+
 	p.sub = function(settings) {
-	
+
 		// remove all veriable parts from lastRoute
 		var splitIdx1 = this.lastRoute.indexOf('*');
 		var splitIdx2 = this.lastRoute.indexOf(':');
 		var splitIdx;
-	
+
 		if(splitIdx1 === -1 && splitIdx2 === -1) {
 			throw new Error('when creating a sub router the parent route should have a variable route using either : or *');
 		} else {
@@ -728,71 +713,71 @@
 			splitIdx2 = splitIdx2 !== -1 ? splitIdx2 : this.lastRoute.length;
 			splitIdx = splitIdx1 < splitIdx2 ? splitIdx1 : splitIdx2;
 		}
-	
+
 		this.childFullRoute = this.lastRoute;
 		this.childBaseRoute = this.lastRoute.substring(0, splitIdx - 1);
-	
+
 		settings.postHash = this.s.postHash + this.childBaseRoute;
-	
+
 		this.childRouter = new router(settings);
-	
+
 		this.emit('sub_create', {
 			route: this.childFullRoute,
 			router: this.childRouter
 		});
-	
+
 		return this.childRouter;
 	};
-	
+
 	p.destroySub = function(route) {
-	
+
 		// this.childBaseRoute
 		if(this.childRouter && route.indexOf(this.childBaseRoute) !== 0) {
 			this.childRouter.destroy();
-	
+
 			this.emit('sub_destroy', {
 				route: this.childFullRoute,
 				router: this.childRouter
 			});
-	
+
 			this.childFullRoute = null;
 			this.childBaseRoute = null;
 			this.childRouter = null;
 		}
 	};
-	
+
 	p.destroy = function() {
-	
+
 		if(global.location) {
 			off(global, 'hashchange', this.onURL);	
 		}
 	};
-	
+
 	p.add = function(route, section) {
-	
+
 		var s = this.s;
-	
+
 		s[ route ] = section;
-	
+
 		return this;
 	};
-	
+
 	p.go = function(routeStr) {
-	
+
 		var routeData;
 		var section;
 		var newURL;
 		var doURLChange;
-	
+
 		if( routeStr.charAt(0) != '/' ) {
 			routeStr = '/' + routeStr;
 		}
-	
+
 		newURL = this.s.postHash + routeStr;
 		routeData = this.getRouteData(routeStr) || this.getRouteData('404');
 		section = this.getSection(routeData);
 		doURLChange = this.useURL(section);
-	
+
 		// if this is not a section descriptor or it is a descriptor and we should updateURL
 		if( global.location && doURLChange ) {
 			if(global.location.hash.replace(/^#/, '') != newURL) {
@@ -800,7 +785,7 @@
 			} else if(section.duplicate || !section.useURL) {
 				// Check if duplicate is set. The check is done here since, onhashchange event triggers 
 				// only when url changes and therefore cannot check to allow duplicate/repeating route
-	
+
 				// Additionally check if useURL is set to false. If not, the route is not triggered by
 				// url changes
 				this.doRoute(routeData, section, routeStr);
@@ -809,21 +794,21 @@
 			this.doRoute(routeData, section, routeStr);
 		}
 	};
-	
+
 	p.doRoute = function(routeData, section, path) {
-	
+
 		var s = this.s;
-	
+
 		// check if this is a redirect
 		if( typeof section == 'string' ) {
-	
+
 			this.go(section);
 		} else { 
-	
+
 			if(routeData.route !== this.lastResolvedRoute || section.duplicate) {
-	
+
 				this.lastResolvedRoute = routeData.route;
-	
+
 				// otherwise treat it as a regular section
 				// if this is a object definition vs a section definition (regular section or array)
 				this.emit('route', {
@@ -834,21 +819,21 @@
 			}
 		} 
 	};
-	
+
 	p.getRouteData = function(routeStr) {
-	
+
 		var routeData = this.router.match(routeStr);
-	
+
 		if(routeData) {
 			this.lastRoute = routeData.route;
 			this.destroySub(routeData.route);
 		}
-	
+
 		return routeData;
 	};
-	
+
 	p.getSection = function(routeData) {
-	
+
 		if(routeData) {
 			var hasWildcard = routeData.route && (routeData.route.match(/.*[\[\]@!$&:'()*+,;=].*/g) || routeData.route instanceof RegExp);
 			var sec = this.s[ routeData.route ];
@@ -863,70 +848,67 @@
 				return sec;
 			}
 		} else {
-	
+
 			return null;
 		}
 	};
-	
+
 	p.useURL = function(section) {
-	
+
 		return section && 
 			   ( section.section === undefined ||  // if this is not a section descriptor update url
 			   ( section.section && section.useURL || section.useURL === undefined ) ); //is descriptor and has useURL or undefined
 	};
-	
+
 	p.onURL = function() {
-	
+
 		var routeStr = '/';
 		var routeData;
 		var section;
-	
+
 		if( global.location && global.location.hash !== '' ) {
-	
+
 			// if we've already looked at this url then just get out of this function
 			if(global.location.hash === this.resolved) {
 				return;
 			}
-	
+
 			this.resolved = global.location.hash;
 			routeStr = global.location.hash.substr(1 + this.s.postHash.length);
 		}
-	
+
 		routeData = this.getRouteData(routeStr) || this.getRouteData('404');
 		section = this.getSection(routeData);
-	
+
 		// see if we can deep link into this section (either normal or 404 section)
 		if( this.useURL(section) ) {
 			this.doRoute(routeData, section, routeStr);
 		// else check if there's a 404 if so then go there
 		} else if( this.s['404'] ){
-	
+
 			routeData = this.getRouteData('404');
 			section = this.getSection(routeData);
 			this.doRoute(routeData, section, routeStr);
 		}
 	};
-	
+
 	module.exports = router;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 5 */
-/*!*****************************************************!*\
-  !*** ./~/bigwheel/~/bw-router/~/dom-event/index.js ***!
-  \*****************************************************/
 /***/ function(module, exports) {
 
 	module.exports = on;
 	module.exports.on = on;
 	module.exports.off = off;
-	
+
 	function on (element, event, callback, capture) {
 	  !element.addEventListener && (event = 'on' + event);
 	  (element.addEventListener || element.attachEvent).call(element, event, callback, capture);
 	  return callback;
 	}
-	
+
 	function off (element, event, callback, capture) {
 	  !element.removeEventListener && (event = 'on' + event);
 	  (element.removeEventListener || element.detachEvent).call(element, event, callback, capture);
@@ -936,16 +918,13 @@
 
 /***/ },
 /* 6 */
-/*!********************************************************!*\
-  !*** ./~/bigwheel/~/bw-router/~/routes/dist/routes.js ***!
-  \********************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var require;var require;!function(e){if(true)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.routes=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-	
+
 	var localRoutes = [];
-	
-	
+
+
 	/**
 	 * Convert path to route object
 	 *
@@ -955,12 +934,12 @@
 	 * @param  {String / RegExp} path
 	 * @return {Object}
 	 */
-	
+
 	var Route = function(path){
 	  //using 'new' is optional
-	
+
 	  var src, re, keys = [];
-	
+
 	  if(path instanceof RegExp){
 	    re = path;
 	    src = path.toString();
@@ -968,14 +947,14 @@
 	    re = pathToRegExp(path, keys);
 	    src = path;
 	  }
-	
+
 	  return {
 	  	 re: re,
 	  	 src: path.toString(),
 	  	 keys: keys
 	  }
 	};
-	
+
 	/**
 	 * Normalize the given path string,
 	 * returning a regular expression.
@@ -998,7 +977,7 @@
 					keys.push(undefined);
 					return _;
 				}
-	
+
 				keys.push(key);
 				slash = slash || '';
 				return ''
@@ -1012,7 +991,7 @@
 			.replace(/\*/g, '(.*)');
 		return new RegExp('^' + path + '$', 'i');
 	};
-	
+
 	/**
 	 * Attempt to match the given request to
 	 * one of the routes. When successful
@@ -1024,14 +1003,14 @@
 	 */
 	var match = function (routes, uri, startAt) {
 		var captures, i = startAt || 0;
-	
+
 		for (var len = routes.length; i < len; ++i) {
 			var route = routes[i],
 			    re = route.re,
 			    keys = route.keys,
 			    splats = [],
 			    params = {};
-	
+
 			if (captures = uri.match(re)) {
 				for (var j = 1, len = captures.length; j < len; ++j) {
 					var key = keys[j-1],
@@ -1053,7 +1032,7 @@
 			}
 		}
 	};
-	
+
 	/**
 	 * Default "normal" router constructor.
 	 * accepts path, fn tuples via addRoute
@@ -1062,7 +1041,7 @@
 	 *
 	 * @return {Object}
 	 */
-	
+
 	var Router = function(){
 	  //using 'new' is optional
 	  return {
@@ -1071,14 +1050,14 @@
 	    addRoute: function(path, fn){
 	      if (!path) throw new Error(' route requires a path');
 	      if (!fn) throw new Error(' route ' + path.toString() + ' requires a callback');
-	
+
 	      var route = Route(path);
 	      route.fn = fn;
-	
+
 	      this.routes.push(route);
 	      this.routeMap[path] = fn;
 	    },
-	
+
 	    match: function(pathname, startAt){
 	      var route = match(this.routes, pathname, startAt);
 	      if(route){
@@ -1089,24 +1068,21 @@
 	    }
 	  }
 	};
-	
+
 	Router.Route = Route
 	Router.pathToRegExp = pathToRegExp
 	Router.match = match
 	// back compat
 	Router.Router = Router
-	
+
 	module.exports = Router
-	
+
 	},{}]},{},[1])
 	(1)
 	});
 
 /***/ },
 /* 7 */
-/*!********************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/events/events.js ***!
-  \********************************************************/
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -1129,23 +1105,23 @@
 	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
+
 	function EventEmitter() {
 	  this._events = this._events || {};
 	  this._maxListeners = this._maxListeners || undefined;
 	}
 	module.exports = EventEmitter;
-	
+
 	// Backwards-compat with node 0.10.x
 	EventEmitter.EventEmitter = EventEmitter;
-	
+
 	EventEmitter.prototype._events = undefined;
 	EventEmitter.prototype._maxListeners = undefined;
-	
+
 	// By default EventEmitters will print a warning if more than 10 listeners are
 	// added to it. This is a useful default which helps finding memory leaks.
 	EventEmitter.defaultMaxListeners = 10;
-	
+
 	// Obviously not all Emitters should be limited to 10. This function allows
 	// that to be increased. Set to zero for unlimited.
 	EventEmitter.prototype.setMaxListeners = function(n) {
@@ -1154,13 +1130,13 @@
 	  this._maxListeners = n;
 	  return this;
 	};
-	
+
 	EventEmitter.prototype.emit = function(type) {
 	  var er, handler, len, args, i, listeners;
-	
+
 	  if (!this._events)
 	    this._events = {};
-	
+
 	  // If there is no 'error' event listener then throw.
 	  if (type === 'error') {
 	    if (!this._events.error ||
@@ -1172,12 +1148,12 @@
 	      throw TypeError('Uncaught, unspecified "error" event.');
 	    }
 	  }
-	
+
 	  handler = this._events[type];
-	
+
 	  if (isUndefined(handler))
 	    return false;
-	
+
 	  if (isFunction(handler)) {
 	    switch (arguments.length) {
 	      // fast cases
@@ -1202,26 +1178,26 @@
 	    for (i = 0; i < len; i++)
 	      listeners[i].apply(this, args);
 	  }
-	
+
 	  return true;
 	};
-	
+
 	EventEmitter.prototype.addListener = function(type, listener) {
 	  var m;
-	
+
 	  if (!isFunction(listener))
 	    throw TypeError('listener must be a function');
-	
+
 	  if (!this._events)
 	    this._events = {};
-	
+
 	  // To avoid recursion in the case that type === "newListener"! Before
 	  // adding it to the listeners, first emit "newListener".
 	  if (this._events.newListener)
 	    this.emit('newListener', type,
 	              isFunction(listener.listener) ?
 	              listener.listener : listener);
-	
+
 	  if (!this._events[type])
 	    // Optimize the case of one listener. Don't need the extra array object.
 	    this._events[type] = listener;
@@ -1231,7 +1207,7 @@
 	  else
 	    // Adding the second element, need to change to array.
 	    this._events[type] = [this._events[type], listener];
-	
+
 	  // Check for listener leak
 	  if (isObject(this._events[type]) && !this._events[type].warned) {
 	    if (!isUndefined(this._maxListeners)) {
@@ -1239,7 +1215,7 @@
 	    } else {
 	      m = EventEmitter.defaultMaxListeners;
 	    }
-	
+
 	    if (m && m > 0 && this._events[type].length > m) {
 	      this._events[type].warned = true;
 	      console.error('(node) warning: possible EventEmitter memory ' +
@@ -1252,53 +1228,53 @@
 	      }
 	    }
 	  }
-	
+
 	  return this;
 	};
-	
+
 	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-	
+
 	EventEmitter.prototype.once = function(type, listener) {
 	  if (!isFunction(listener))
 	    throw TypeError('listener must be a function');
-	
+
 	  var fired = false;
-	
+
 	  function g() {
 	    this.removeListener(type, g);
-	
+
 	    if (!fired) {
 	      fired = true;
 	      listener.apply(this, arguments);
 	    }
 	  }
-	
+
 	  g.listener = listener;
 	  this.on(type, g);
-	
+
 	  return this;
 	};
-	
+
 	// emits a 'removeListener' event iff the listener was removed
 	EventEmitter.prototype.removeListener = function(type, listener) {
 	  var list, position, length, i;
-	
+
 	  if (!isFunction(listener))
 	    throw TypeError('listener must be a function');
-	
+
 	  if (!this._events || !this._events[type])
 	    return this;
-	
+
 	  list = this._events[type];
 	  length = list.length;
 	  position = -1;
-	
+
 	  if (list === listener ||
 	      (isFunction(list.listener) && list.listener === listener)) {
 	    delete this._events[type];
 	    if (this._events.removeListener)
 	      this.emit('removeListener', type, listener);
-	
+
 	  } else if (isObject(list)) {
 	    for (i = length; i-- > 0;) {
 	      if (list[i] === listener ||
@@ -1307,30 +1283,30 @@
 	        break;
 	      }
 	    }
-	
+
 	    if (position < 0)
 	      return this;
-	
+
 	    if (list.length === 1) {
 	      list.length = 0;
 	      delete this._events[type];
 	    } else {
 	      list.splice(position, 1);
 	    }
-	
+
 	    if (this._events.removeListener)
 	      this.emit('removeListener', type, listener);
 	  }
-	
+
 	  return this;
 	};
-	
+
 	EventEmitter.prototype.removeAllListeners = function(type) {
 	  var key, listeners;
-	
+
 	  if (!this._events)
 	    return this;
-	
+
 	  // not listening for removeListener, no need to emit
 	  if (!this._events.removeListener) {
 	    if (arguments.length === 0)
@@ -1339,7 +1315,7 @@
 	      delete this._events[type];
 	    return this;
 	  }
-	
+
 	  // emit removeListener for all listeners on all events
 	  if (arguments.length === 0) {
 	    for (key in this._events) {
@@ -1350,9 +1326,9 @@
 	    this._events = {};
 	    return this;
 	  }
-	
+
 	  listeners = this._events[type];
-	
+
 	  if (isFunction(listeners)) {
 	    this.removeListener(type, listeners);
 	  } else if (listeners) {
@@ -1361,10 +1337,10 @@
 	      this.removeListener(type, listeners[listeners.length - 1]);
 	  }
 	  delete this._events[type];
-	
+
 	  return this;
 	};
-	
+
 	EventEmitter.prototype.listeners = function(type) {
 	  var ret;
 	  if (!this._events || !this._events[type])
@@ -1375,11 +1351,11 @@
 	    ret = this._events[type].slice();
 	  return ret;
 	};
-	
+
 	EventEmitter.prototype.listenerCount = function(type) {
 	  if (this._events) {
 	    var evlistener = this._events[type];
-	
+
 	    if (isFunction(evlistener))
 	      return 1;
 	    else if (evlistener)
@@ -1387,23 +1363,23 @@
 	  }
 	  return 0;
 	};
-	
+
 	EventEmitter.listenerCount = function(emitter, type) {
 	  return emitter.listenerCount(type);
 	};
-	
+
 	function isFunction(arg) {
 	  return typeof arg === 'function';
 	}
-	
+
 	function isNumber(arg) {
 	  return typeof arg === 'number';
 	}
-	
+
 	function isObject(arg) {
 	  return typeof arg === 'object' && arg !== null;
 	}
-	
+
 	function isUndefined(arg) {
 	  return arg === void 0;
 	}
@@ -1411,111 +1387,104 @@
 
 /***/ },
 /* 8 */
-/*!*****************************************!*\
-  !*** ./~/bigwheel/~/dom-event/index.js ***!
-  \*****************************************/
 /***/ function(module, exports) {
 
 	module.exports = on;
 	module.exports.on = on;
 	module.exports.off = off;
-	
+
 	function on (element, event, callback, capture) {
-	
+
 	  if( element instanceof NodeList ) {
-	
+
 	    for( var i = 0, len = element.length; i < len; i++ ) {
-	
+
 	      oneOn(element[ i ], event, callback, capture);
 	    }
 	  } else {
-	
+
 	    oneOn(element, event, callback, capture);  
 	  }
-	
+
 	  return callback;
 	}
-	
+
 	function off (element, event, callback, capture) {
-	
+
 	  if( element instanceof NodeList ) {
-	
+
 	    for( var i = 0, len = element.length; i < len; i++ ) {
-	
+
 	      oneOff(element[ i ], event, callback, capture);
 	    }
 	  } else {
-	
+
 	    oneOff( element, event, callback, capture );
 	  }
 	  
 	  return callback;
 	}
-	
+
 	function oneOn (element, event, callback, capture) {
-	
+
 	  (element.addEventListener || element.attachEvent).call(element, event, callback, capture);
 	}
-	
+
 	function oneOff (element, event, callback, capture) {
-	
+
 	  (element.removeEventListener || element.detachEvent).call(element, event, callback, capture);
 	}
 
 /***/ },
 /* 9 */
-/*!*****************************!*\
-  !*** ./assets/js/routes.js ***!
-  \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {
-	    '/': __webpack_require__(/*! ./sections/Home */ 10),
-	    '/1560': __webpack_require__(/*! ./sections/Number */ 27),
-	    '/240': __webpack_require__(/*! ./sections/Number */ 27),
-	    '/120': __webpack_require__(/*! ./sections/Number */ 27),
-	    '/6': __webpack_require__(/*! ./sections/Number */ 27),
-	    '/2': __webpack_require__(/*! ./sections/Number */ 27),
-	    '/1': __webpack_require__(/*! ./sections/Number */ 27),
-	    '/merci': __webpack_require__(/*! ./sections/Home */ 10)
+	    '/': __webpack_require__(10),
+	    '/1560': __webpack_require__(29),
+	    '/240': __webpack_require__(29),
+	    '/120': __webpack_require__(29),
+	    '/6': __webpack_require__(29),
+	    '/2': __webpack_require__(29),
+	    '/1': __webpack_require__(29),
+	    '/merci': __webpack_require__(10)
 	};
 
 /***/ },
 /* 10 */
-/*!************************************!*\
-  !*** ./assets/js/sections/Home.js ***!
-  \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = Home;
-	
+
 	function Home() {}
-	
-	var Tween = __webpack_require__(/*! gsap */ 11),
-	    $ = __webpack_require__(/*! jquery */ 13),
-	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14),
-	    model = __webpack_require__(/*! ../models.js */ 15);
-	
+
+	var Tween = __webpack_require__(11),
+	    $ = __webpack_require__(13),
+	    mousewheel = __webpack_require__(14),
+	    model = __webpack_require__(15);
+
 	Home.prototype = {
-	
+
 	    el: {},
-	
+
 	    init: function(req, done) {
-	
-	        this.el = __webpack_require__(/*! ./../../templates/home.html */ 17);
-	        __webpack_require__(/*! ./../../sass/main.scss */ 21);
-	        __webpack_require__(/*! ./../../sass/partials/home.scss */ 25);
-	
+
+	        var currentRoute = req.route.length > 1 ? req.route: '/home';
+
+	        this.el = __webpack_require__(38)("./templates"+currentRoute+'.html');
+	        __webpack_require__(23);
+	        __webpack_require__(27);
+
 	        var app = document.getElementById('app');
 	        app.innerHTML = this.el(model[ req.route ]);
-	
+
 	        this.bars = document.querySelectorAll('.bar');
 	        this.text = document.querySelectorAll('.text');
 	        this.scroll = document.querySelector('.scroll');
 	        this.tweens = new Array();
 	        this.texts = new Array();
 	        this.tl = new TimelineMax({paused: true});
-	
+
 	        this.tweens.push(Tween.fromTo(this.bars[0], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
 	        this.tweens.push(Tween.fromTo(this.bars[1], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
 	        this.tweens.push(Tween.fromTo(this.bars[2], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
@@ -1525,7 +1494,7 @@
 	        this.texts.push(Tween.fromTo(this.text[0], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
 	        this.texts.push(Tween.fromTo(this.text[1], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
 	        this.texts.push(Tween.fromTo(this.scroll, 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
-	
+
 	        this.tl
 	            .add(this.tweens, '+=0', 'sequence')
 	            .add(this.texts, '+=0', 'start', 0.2)
@@ -1535,16 +1504,16 @@
 	            var barTransition = document.getElementById('bar--transition');
 	            Tween.to(barTransition, 0.5, {height: "14px"})
 	        }
-	
+
 	        this.tl.play();
-	
+
 	    },
-	
+
 	    // the resize function will be called imediately after init
 	    // here you can apply "responsive" calculations on your view
 	    resize: function(width, height) {
 	    },
-	
+
 	    // in animateIn you'll animate in your hidden content that
 	    // was created in init
 	    animateIn: function(req, done) {
@@ -1555,7 +1524,7 @@
 	        }
 	        
 	    },
-	
+
 	    // in animateOut you'll animate out your content that
 	    // was created in init
 	    animateOut: function(req, done) {
@@ -1569,14 +1538,14 @@
 	                ease: Power3.easeIn
 	            }));
 	            tl.add(done);
-	
+
 	        }
 	        this.tl.reverse();
-	
-	
-	
+
+
+
 	    },
-	
+
 	    // in destroy you'll clean up the content which was
 	    // created in init
 	    destroy: function(req, done) {
@@ -1588,9 +1557,6 @@
 
 /***/ },
 /* 11 */
-/*!*********************************************!*\
-  !*** ./~/gsap/src/uncompressed/TweenMax.js ***!
-  \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -1608,11 +1574,11 @@
 	 **/
 	var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
 	(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
-	
+
 		"use strict";
-	
+
 		_gsScope._gsDefine("TweenMax", ["core.Animation","core.SimpleTimeline","TweenLite"], function(Animation, SimpleTimeline, TweenLite) {
-	
+
 			var _slice = function(a) { //don't use [].slice because that doesn't work in IE8 with a NodeList that's returned by querySelectorAll()
 					var b = [],
 						l = a.length,
@@ -1644,7 +1610,7 @@
 				_isArray = TweenLiteInternals.isArray,
 				p = TweenMax.prototype = TweenLite.to({}, 0.1, {}),
 				_blankArray = [];
-	
+
 			TweenMax.version = "1.18.0";
 			p.constructor = TweenMax;
 			p.kill()._gc = false;
@@ -1653,7 +1619,7 @@
 			TweenMax.lagSmoothing = TweenLite.lagSmoothing;
 			TweenMax.ticker = TweenLite.ticker;
 			TweenMax.render = TweenLite.render;
-	
+
 			p.invalidate = function() {
 				this._yoyo = (this.vars.yoyo === true);
 				this._repeat = this.vars.repeat || 0;
@@ -1790,7 +1756,7 @@
 							this._time = 0;
 						}
 					}
-	
+
 					if (this._easeType) {
 						r = this._time / duration;
 						type = this._easeType;
@@ -1810,7 +1776,7 @@
 						} else if (pow === 4) {
 							r *= r * r * r * r;
 						}
-	
+
 						if (type === 1) {
 							this.ratio = 1 - r;
 						} else if (type === 2) {
@@ -1820,7 +1786,7 @@
 						} else {
 							this.ratio = 1 - (r / 2);
 						}
-	
+
 					} else {
 						this.ratio = this._ease.getRatio(this._time / duration);
 					}
@@ -1855,7 +1821,7 @@
 				if (this._lazy !== false) {
 					this._lazy = false;
 				}
-	
+
 				if (!this._active) if (!this._paused && this._time !== prevTime && time >= 0) {
 					this._active = true; //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
 				}
@@ -2093,7 +2059,7 @@
 					a[i]._enabled(false, false);
 				}
 			};
-	
+
 			var _changePause = function(pause, tweens, delayedCalls, timelines) {
 				tweens = (tweens !== false);
 				delayedCalls = (delayedCalls !== false);
@@ -2117,7 +2083,7 @@
 			TweenMax.resumeAll = function(tweens, delayedCalls, timelines) {
 				_changePause(false, tweens, delayedCalls, timelines);
 			};
-	
+
 			TweenMax.globalTimeScale = function(value) {
 				var tl = Animation._rootTimeline,
 					t = TweenLite.ticker.time;
@@ -2161,14 +2127,14 @@
 				}
 				return this.totalTime(value, suppressEvents);
 			};
-	
+
 			p.duration = function(value) {
 				if (!arguments.length) {
 					return this._duration; //don't set _dirty = false because there could be repeats that haven't been factored into the _totalDuration yet. Otherwise, if you create a repeated TweenMax and then immediately check its duration(), it would cache the value and the totalDuration would not be correct, thus repeats wouldn't take effect.
 				}
 				return Animation.prototype.duration.call(this, value);
 			};
-	
+
 			p.totalDuration = function(value) {
 				if (!arguments.length) {
 					if (this._dirty) {
@@ -2209,21 +2175,21 @@
 			return TweenMax;
 			
 		}, true);
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * TimelineLite
 	 * ----------------------------------------------------------------
 	 */
 		_gsScope._gsDefine("TimelineLite", ["core.Animation","core.SimpleTimeline","TweenLite"], function(Animation, SimpleTimeline, TweenLite) {
-	
+
 			var TimelineLite = function(vars) {
 					SimpleTimeline.call(this, vars);
 					this._labels = {};
@@ -2276,11 +2242,11 @@
 					return b;
 				},
 				p = TimelineLite.prototype = new SimpleTimeline();
-	
+
 			TimelineLite.version = "1.18.0";
 			p.constructor = TimelineLite;
 			p.kill()._gc = p._forcingPlayhead = p._hasPause = false;
-	
+
 			/* might use later...
 			//translates a local time inside an animation to the corresponding time on the root/global timeline, factoring in all nesting and timeScales.
 			function localToGlobal(time, animation) {
@@ -2290,7 +2256,7 @@
 				}
 				return time;
 			}
-	
+
 			//translates the supplied time on the root/global timeline into the corresponding local time inside a particular animation, factoring in all nesting and timeScales
 			function globalToLocal(time, animation) {
 				var scale = 1;
@@ -2302,21 +2268,21 @@
 				return time * scale;
 			}
 			*/
-	
+
 			p.to = function(target, duration, vars, position) {
 				var Engine = (vars.repeat && _globals.TweenMax) || TweenLite;
 				return duration ? this.add( new Engine(target, duration, vars), position) : this.set(target, vars, position);
 			};
-	
+
 			p.from = function(target, duration, vars, position) {
 				return this.add( ((vars.repeat && _globals.TweenMax) || TweenLite).from(target, duration, vars), position);
 			};
-	
+
 			p.fromTo = function(target, duration, fromVars, toVars, position) {
 				var Engine = (toVars.repeat && _globals.TweenMax) || TweenLite;
 				return duration ? this.add( Engine.fromTo(target, duration, fromVars, toVars), position) : this.set(target, toVars, position);
 			};
-	
+
 			p.staggerTo = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
 				var tl = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams, callbackScope:onCompleteAllScope, smoothChildTiming:this.smoothChildTiming}),
 					cycle = vars.cycle,
@@ -2349,23 +2315,23 @@
 				}
 				return this.add(tl, position);
 			};
-	
+
 			p.staggerFrom = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
 				vars.immediateRender = (vars.immediateRender != false);
 				vars.runBackwards = true;
 				return this.staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
 			};
-	
+
 			p.staggerFromTo = function(targets, duration, fromVars, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
 				toVars.startAt = fromVars;
 				toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
 				return this.staggerTo(targets, duration, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
 			};
-	
+
 			p.call = function(callback, params, scope, position) {
 				return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
 			};
-	
+
 			p.set = function(target, vars, position) {
 				position = this._parseTimeOrLabel(position, 0, true);
 				if (vars.immediateRender == null) {
@@ -2373,7 +2339,7 @@
 				}
 				return this.add( new TweenLite(target, 0, vars), position);
 			};
-	
+
 			TimelineLite.exportRoot = function(vars, ignoreDelayedCalls) {
 				vars = vars || {};
 				if (vars.smoothChildTiming == null) {
@@ -2399,7 +2365,7 @@
 				root.add(tl, 0);
 				return tl;
 			};
-	
+
 			p.add = function(value, position, align, stagger) {
 				var curTime, l, i, child, tl, beforeRawTime;
 				if (typeof(position) !== "number") {
@@ -2434,9 +2400,9 @@
 						throw("Cannot add " + value + " into the timeline; it is not a tween, timeline, function, or string.");
 					}
 				}
-	
+
 				SimpleTimeline.prototype.add.call(this, value, position);
-	
+
 				//if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly. We should also align the playhead with the parent timeline's when appropriate.
 				if (this._gc || this._time === this._duration) if (!this._paused) if (this._duration < this.duration()) {
 					//in case any of the ancestors had completed but should now be enabled...
@@ -2451,10 +2417,10 @@
 						tl = tl._timeline;
 					}
 				}
-	
+
 				return this;
 			};
-	
+
 			p.remove = function(value) {
 				if (value instanceof Animation) {
 					this._remove(value, false);
@@ -2472,7 +2438,7 @@
 				}
 				return this.kill(null, value);
 			};
-	
+
 			p._remove = function(tween, skipDisable) {
 				SimpleTimeline.prototype._remove.call(this, tween, skipDisable);
 				var last = this._last;
@@ -2484,24 +2450,24 @@
 				}
 				return this;
 			};
-	
+
 			p.append = function(value, offsetOrLabel) {
 				return this.add(value, this._parseTimeOrLabel(null, offsetOrLabel, true, value));
 			};
-	
+
 			p.insert = p.insertMultiple = function(value, position, align, stagger) {
 				return this.add(value, position || 0, align, stagger);
 			};
-	
+
 			p.appendMultiple = function(tweens, offsetOrLabel, align, stagger) {
 				return this.add(tweens, this._parseTimeOrLabel(null, offsetOrLabel, true, tweens), align, stagger);
 			};
-	
+
 			p.addLabel = function(label, position) {
 				this._labels[label] = this._parseTimeOrLabel(position);
 				return this;
 			};
-	
+
 			p.addPause = function(position, callback, params, scope) {
 				var t = TweenLite.delayedCall(0, _pauseCallback, params, scope || this);
 				t.vars.onComplete = t.vars.onReverseComplete = callback;
@@ -2509,16 +2475,16 @@
 				this._hasPause = true;
 				return this.add(t, position);
 			};
-	
+
 			p.removeLabel = function(label) {
 				delete this._labels[label];
 				return this;
 			};
-	
+
 			p.getLabelTime = function(label) {
 				return (this._labels[label] != null) ? this._labels[label] : -1;
 			};
-	
+
 			p._parseTimeOrLabel = function(timeOrLabel, offsetOrLabel, appendIfAbsent, ignore) {
 				var i;
 				//if we're about to add a tween/timeline (or an array of them) that's already a child of this timeline, we should remove it first so that it doesn't contaminate the duration().
@@ -2551,23 +2517,23 @@
 				}
 				return Number(timeOrLabel) + offsetOrLabel;
 			};
-	
+
 			p.seek = function(position, suppressEvents) {
 				return this.totalTime((typeof(position) === "number") ? position : this._parseTimeOrLabel(position), (suppressEvents !== false));
 			};
-	
+
 			p.stop = function() {
 				return this.paused(true);
 			};
-	
+
 			p.gotoAndPlay = function(position, suppressEvents) {
 				return this.play(position, suppressEvents);
 			};
-	
+
 			p.gotoAndStop = function(position, suppressEvents) {
 				return this.pause(position, suppressEvents);
 			};
-	
+
 			p.render = function(time, suppressEvents, force) {
 				if (this._gc) {
 					this._enabled(true, false);
@@ -2593,7 +2559,7 @@
 					}
 					this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 					time = totalDur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7.
-	
+
 				} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
 					this._totalTime = this._time = 0;
 					if (prevTime !== 0 || (this._duration === 0 && this._rawPrevTime !== _tinyNum && (this._rawPrevTime > 0 || (time < 0 && this._rawPrevTime >= 0)))) {
@@ -2625,9 +2591,9 @@
 							internalForce = true;
 						}
 					}
-	
+
 				} else {
-	
+
 					if (this._hasPause && !this._forcingPlayhead && !suppressEvents) {
 						if (time >= prevTime) {
 							tween = this._first;
@@ -2651,7 +2617,7 @@
 							this._totalTime = time + (this._cycle * (this._totalDuration + this._repeatDelay));
 						}
 					}
-	
+
 					this._totalTime = this._time = this._rawPrevTime = time;
 				}
 				if ((this._time === prevTime || !this._first) && !force && !internalForce && !pauseTween) {
@@ -2659,15 +2625,15 @@
 				} else if (!this._initted) {
 					this._initted = true;
 				}
-	
+
 				if (!this._active) if (!this._paused && this._time !== prevTime && time > 0) {
 					this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
 				}
-	
+
 				if (prevTime === 0) if (this.vars.onStart) if (this._time !== 0) if (!suppressEvents) {
 					this._callback("onStart");
 				}
-	
+
 				if (this._time >= prevTime) {
 					tween = this._first;
 					while (tween) {
@@ -2711,14 +2677,14 @@
 						tween = next;
 					}
 				}
-	
+
 				if (this._onUpdate) if (!suppressEvents) {
 					if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
 						_lazyRender();
 					}
 					this._callback("onUpdate");
 				}
-	
+
 				if (callback) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
 					if (isComplete) {
 						if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onComplete on a timeline that reports/checks tweened values.
@@ -2734,7 +2700,7 @@
 					}
 				}
 			};
-	
+
 			p._hasPausedChild = function() {
 				var tween = this._first;
 				while (tween) {
@@ -2745,7 +2711,7 @@
 				}
 				return false;
 			};
-	
+
 			p.getChildren = function(nested, tweens, timelines, ignoreBeforeTime) {
 				ignoreBeforeTime = ignoreBeforeTime || -9999999999;
 				var a = [],
@@ -2771,7 +2737,7 @@
 				}
 				return a;
 			};
-	
+
 			p.getTweensOf = function(target, nested) {
 				var disabled = this._gc,
 					a = [],
@@ -2792,11 +2758,11 @@
 				}
 				return a;
 			};
-	
+
 			p.recent = function() {
 				return this._recent;
 			};
-	
+
 			p._contains = function(tween) {
 				var tl = tween.timeline;
 				while (tl) {
@@ -2807,7 +2773,7 @@
 				}
 				return false;
 			};
-	
+
 			p.shiftChildren = function(amount, adjustLabels, ignoreBeforeTime) {
 				ignoreBeforeTime = ignoreBeforeTime || 0;
 				var tween = this._first,
@@ -2828,7 +2794,7 @@
 				}
 				return this._uncache(true);
 			};
-	
+
 			p._kill = function(vars, target) {
 				if (!vars && !target) {
 					return this._enabled(false, false);
@@ -2843,7 +2809,7 @@
 				}
 				return changed;
 			};
-	
+
 			p.clear = function(labels) {
 				var tweens = this.getChildren(false, true, true),
 					i = tweens.length;
@@ -2856,7 +2822,7 @@
 				}
 				return this._uncache(true);
 			};
-	
+
 			p.invalidate = function() {
 				var tween = this._first;
 				while (tween) {
@@ -2865,7 +2831,7 @@
 				}
 				return Animation.prototype.invalidate.call(this);;
 			};
-	
+
 			p._enabled = function(enabled, ignoreTimeline) {
 				if (enabled === this._gc) {
 					var tween = this._first;
@@ -2876,14 +2842,14 @@
 				}
 				return SimpleTimeline.prototype._enabled.call(this, enabled, ignoreTimeline);
 			};
-	
+
 			p.totalTime = function(time, suppressEvents, uncapped) {
 				this._forcingPlayhead = true;
 				var val = Animation.prototype.totalTime.apply(this, arguments);
 				this._forcingPlayhead = false;
 				return val;
 			};
-	
+
 			p.duration = function(value) {
 				if (!arguments.length) {
 					if (this._dirty) {
@@ -2896,7 +2862,7 @@
 				}
 				return this;
 			};
-	
+
 			p.totalDuration = function(value) {
 				if (!arguments.length) {
 					if (this._dirty) {
@@ -2938,7 +2904,7 @@
 				}
 				return this;
 			};
-	
+
 			p.paused = function(value) {
 				if (!value) { //if there's a pause directly at the spot from where we're unpausing, skip it.
 					var tween = this._first,
@@ -2952,7 +2918,7 @@
 				}
 				return Animation.prototype.paused.apply(this, arguments);
 			};
-	
+
 			p.usesFrames = function() {
 				var tl = this._timeline;
 				while (tl._timeline) {
@@ -2960,22 +2926,22 @@
 				}
 				return (tl === Animation._rootFramesTimeline);
 			};
-	
+
 			p.rawTime = function() {
 				return this._paused ? this._totalTime : (this._timeline.rawTime() - this._startTime) * this._timeScale;
 			};
-	
+
 			return TimelineLite;
-	
+
 		}, true);
 		
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 		
 		
 		
@@ -2987,7 +2953,7 @@
 	 * ----------------------------------------------------------------
 	 */
 		_gsScope._gsDefine("TimelineMax", ["TimelineLite","TweenLite","easing.Ease"], function(TimelineLite, TweenLite, Ease) {
-	
+
 			var TimelineMax = function(vars) {
 					TimelineLite.call(this, vars);
 					this._repeat = this.vars.repeat || 0;
@@ -3002,11 +2968,11 @@
 				_lazyRender = TweenLiteInternals.lazyRender,
 				_easeNone = new Ease(null, null, 1, 0),
 				p = TimelineMax.prototype = new TimelineLite();
-	
+
 			p.constructor = TimelineMax;
 			p.kill()._gc = false;
 			TimelineMax.version = "1.18.0";
-	
+
 			p.invalidate = function() {
 				this._yoyo = (this.vars.yoyo === true);
 				this._repeat = this.vars.repeat || 0;
@@ -3014,11 +2980,11 @@
 				this._uncache(true);
 				return TimelineLite.prototype.invalidate.call(this);
 			};
-	
+
 			p.addCallback = function(callback, position, params, scope) {
 				return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
 			};
-	
+
 			p.removeCallback = function(callback, position) {
 				if (callback) {
 					if (position == null) {
@@ -3036,11 +3002,11 @@
 				}
 				return this;
 			};
-	
+
 			p.removePause = function(position) {
 				return this.removeCallback(TimelineLite._internals.pauseCallback, position);
 			};
-	
+
 			p.tweenTo = function(position, vars) {
 				vars = vars || {};
 				var copy = {ease:_easeNone, useFrames:this.usesFrames(), immediateRender:false},
@@ -3062,7 +3028,7 @@
 				};
 				return t;
 			};
-	
+
 			p.tweenFromTo = function(fromPosition, toPosition, vars) {
 				vars = vars || {};
 				fromPosition = this._parseTimeOrLabel(fromPosition);
@@ -3071,7 +3037,7 @@
 				var t = this.tweenTo(toPosition, vars);
 				return t.duration((Math.abs( t.vars.time - fromPosition) / this._timeScale) || 0.001);
 			};
-	
+
 			p.render = function(time, suppressEvents, force) {
 				if (this._gc) {
 					this._enabled(true, false);
@@ -3109,7 +3075,7 @@
 						this._time = dur;
 						time = dur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7. We cannot do less then 0.0001 because the same issue can occur when the duration is extremely large like 999999999999 in which case adding 0.00000001, for example, causes it to act like nothing was added.
 					}
-	
+
 				} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
 					if (!this._locked) {
 						this._totalTime = this._cycle = 0;
@@ -3144,7 +3110,7 @@
 							internalForce = true;
 						}
 					}
-	
+
 				} else {
 					if (dur === 0 && prevRawPrevTime < 0) { //without this, zero-duration repeating timelines (like with a simple callback nested at the very beginning and a repeatDelay) wouldn't render the first time through.
 						internalForce = true;
@@ -3172,7 +3138,7 @@
 							}
 						}
 					}
-	
+
 					if (this._hasPause && !this._forcingPlayhead && !suppressEvents) {
 						time = this._time;
 						if (time >= prevTime) {
@@ -3197,9 +3163,9 @@
 							this._totalTime = time + (this._cycle * (this._totalDuration + this._repeatDelay));
 						}
 					}
-	
+
 				}
-	
+
 				if (this._cycle !== prevCycle) if (!this._locked) {
 					/*
 					make sure children at the end/beginning of the timeline are rendered properly. If, for example,
@@ -3215,7 +3181,7 @@
 						recCycle = this._cycle,
 						recRawPrevTime = this._rawPrevTime,
 						recTime = this._time;
-	
+
 					this._totalTime = prevCycle * dur;
 					if (this._cycle < prevCycle) {
 						backwards = !backwards;
@@ -3223,7 +3189,7 @@
 						this._totalTime += dur;
 					}
 					this._time = prevTime; //temporarily revert _time so that render() renders the children in the correct order. Without this, tweens won't rewind correctly. We could arhictect things in a "cleaner" way by splitting out the rendering queue into a separate method but for performance reasons, we kept it all inside this method.
-	
+
 					this._rawPrevTime = (dur === 0) ? prevRawPrevTime - 0.0001 : prevRawPrevTime;
 					this._cycle = prevCycle;
 					this._locked = true; //prevents changes to totalTime and skips repeat/yoyo behavior when we recursively call render()
@@ -3247,7 +3213,7 @@
 					this._cycle = recCycle;
 					this._rawPrevTime = recRawPrevTime;
 				}
-	
+
 				if ((this._time === prevTime || !this._first) && !force && !internalForce && !pauseTween) {
 					if (prevTotalTime !== this._totalTime) if (this._onUpdate) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
 						this._callback("onUpdate");
@@ -3256,15 +3222,15 @@
 				} else if (!this._initted) {
 					this._initted = true;
 				}
-	
+
 				if (!this._active) if (!this._paused && this._totalTime !== prevTotalTime && time > 0) {
 					this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
 				}
-	
+
 				if (prevTotalTime === 0) if (this.vars.onStart) if (this._totalTime !== 0) if (!suppressEvents) {
 					this._callback("onStart");
 				}
-	
+
 				if (this._time >= prevTime) {
 					tween = this._first;
 					while (tween) {
@@ -3308,7 +3274,7 @@
 						tween = next;
 					}
 				}
-	
+
 				if (this._onUpdate) if (!suppressEvents) {
 					if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
 						_lazyRender();
@@ -3330,7 +3296,7 @@
 					}
 				}
 			};
-	
+
 			p.getActive = function(nested, tweens, timelines) {
 				if (nested == null) {
 					nested = true;
@@ -3354,8 +3320,8 @@
 				}
 				return a;
 			};
-	
-	
+
+
 			p.getLabelAfter = function(time) {
 				if (!time) if (time !== 0) { //faster than isNan()
 					time = this._time;
@@ -3370,7 +3336,7 @@
 				}
 				return null;
 			};
-	
+
 			p.getLabelBefore = function(time) {
 				if (time == null) {
 					time = this._time;
@@ -3384,7 +3350,7 @@
 				}
 				return null;
 			};
-	
+
 			p.getLabelsArray = function() {
 				var a = [],
 					cnt = 0,
@@ -3397,18 +3363,18 @@
 				});
 				return a;
 			};
-	
-	
+
+
 	//---- GETTERS / SETTERS -------------------------------------------------------------------------------------------------------
-	
+
 			p.progress = function(value, suppressEvents) {
 				return (!arguments.length) ? this._time / this.duration() : this.totalTime( this.duration() * ((this._yoyo && (this._cycle & 1) !== 0) ? 1 - value : value) + (this._cycle * (this._duration + this._repeatDelay)), suppressEvents);
 			};
-	
+
 			p.totalProgress = function(value, suppressEvents) {
 				return (!arguments.length) ? this._totalTime / this.totalDuration() : this.totalTime( this.totalDuration() * value, suppressEvents);
 			};
-	
+
 			p.totalDuration = function(value) {
 				if (!arguments.length) {
 					if (this._dirty) {
@@ -3420,7 +3386,7 @@
 				}
 				return (this._repeat === -1) ? this : this.duration( (value - (this._repeat * this._repeatDelay)) / (this._repeat + 1) );
 			};
-	
+
 			p.time = function(value, suppressEvents) {
 				if (!arguments.length) {
 					return this._time;
@@ -3438,7 +3404,7 @@
 				}
 				return this.totalTime(value, suppressEvents);
 			};
-	
+
 			p.repeat = function(value) {
 				if (!arguments.length) {
 					return this._repeat;
@@ -3446,7 +3412,7 @@
 				this._repeat = value;
 				return this._uncache(true);
 			};
-	
+
 			p.repeatDelay = function(value) {
 				if (!arguments.length) {
 					return this._repeatDelay;
@@ -3454,7 +3420,7 @@
 				this._repeatDelay = value;
 				return this._uncache(true);
 			};
-	
+
 			p.yoyo = function(value) {
 				if (!arguments.length) {
 					return this._yoyo;
@@ -3462,22 +3428,22 @@
 				this._yoyo = value;
 				return this;
 			};
-	
+
 			p.currentLabel = function(value) {
 				if (!arguments.length) {
 					return this.getLabelBefore(this._time + 0.00000001);
 				}
 				return this.seek(value, true);
 			};
-	
+
 			return TimelineMax;
-	
+
 		}, true);
 		
-	
-	
-	
-	
+
+
+
+
 		
 		
 		
@@ -3491,7 +3457,7 @@
 	 * ----------------------------------------------------------------
 	 */
 		(function() {
-	
+
 			var _RAD2DEG = 180 / Math.PI,
 				_r1 = [],
 				_r2 = [],
@@ -3538,7 +3504,7 @@
 						p1 = seg.a;
 						p2 = seg.d;
 						p3 = a[ii+1].d;
-	
+
 						if (correlate) {
 							r1 = _r1[i];
 							r2 = _r2[i];
@@ -3553,18 +3519,18 @@
 						}
 						m1 += mm;
 						m2 += mm;
-	
+
 						seg.c = cp2 = m1;
 						if (i !== 0) {
 							seg.b = cp1;
 						} else {
 							seg.b = cp1 = seg.a + (seg.c - seg.a) * 0.6; //instead of placing b on a exactly, we move it inline with c so that if the user specifies an ease like Back.easeIn or Elastic.easeIn which goes BEYOND the beginning, it will do so smoothly.
 						}
-	
+
 						seg.da = p2 - p1;
 						seg.ca = cp2 - p1;
 						seg.ba = cp1 - p1;
-	
+
 						if (quad) {
 							qb = cubicToQuadratic(p1, cp1, cp2, p2);
 							a.splice(ii, 1, qb[0], qb[1], qb[2], qb[3]);
@@ -3572,7 +3538,7 @@
 						} else {
 							ii++;
 						}
-	
+
 						cp1 = m2;
 					}
 					seg = a[ii];
@@ -3780,16 +3746,16 @@
 					}
 					return {length:total, lengths:lengths, segments:segments};
 				},
-	
-	
-	
+
+
+
 				BezierPlugin = _gsScope._gsDefine.plugin({
 						propName: "bezier",
 						priority: -1,
 						version: "1.3.4",
 						API: 2,
 						global:true,
-	
+
 						//gets called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 						init: function(target, vars, tween) {
 							this._target = target;
@@ -3805,16 +3771,16 @@
 								second = values[0],
 								autoRotate = vars.autoRotate || tween.vars.orientToBezier,
 								p, isFunc, i, j, prepend;
-	
+
 							this._autoRotate = autoRotate ? (autoRotate instanceof Array) ? autoRotate : [["x","y","rotation",((autoRotate === true) ? 0 : Number(autoRotate) || 0)]] : null;
 							for (p in second) {
 								this._props.push(p);
 							}
-	
+
 							i = this._props.length;
 							while (--i > -1) {
 								p = this._props[i];
-	
+
 								this._overwriteProps.push(p);
 								isFunc = this._func[p] = (typeof(target[p]) === "function");
 								first[p] = (!isFunc) ? parseFloat(target[p]) : target[ ((p.indexOf("set") || typeof(target["get" + p.substr(3)]) !== "function") ? p : "get" + p.substr(3)) ]();
@@ -3824,7 +3790,7 @@
 							}
 							this._beziers = (vars.type !== "cubic" && vars.type !== "quadratic" && vars.type !== "soft") ? bezierThrough(values, isNaN(vars.curviness) ? 1 : vars.curviness, false, (vars.type === "thruBasic"), vars.correlate, prepend) : _parseBezierData(values, vars.type, first);
 							this._segCount = this._beziers[p].length;
-	
+
 							if (this._timeRes) {
 								var ld = _parseLengthData(this._beziers, this._timeRes);
 								this._length = ld.length;
@@ -3836,7 +3802,7 @@
 								this._s2 = this._curSeg[0];
 								this._prec = 1 / this._curSeg.length;
 							}
-	
+
 							if ((autoRotate = this._autoRotate)) {
 								this._initialRotations = [];
 								if (!(autoRotate[0] instanceof Array)) {
@@ -3855,7 +3821,7 @@
 							this._startRatio = tween.vars.runBackwards ? 1 : 0; //we determine the starting ratio when the tween inits which is always 0 unless the tween has runBackwards:true (indicating it's a from() tween) in which case it's 1.
 							return true;
 						},
-	
+
 						//called each time the values should be updated, and the ratio gets passed as the only parameter (typically it's a value between 0 and 1, but it can exceed those when using an ease like Elastic.easeOut or Back.easeOut, etc.)
 						set: function(v) {
 							var segments = this._segCount,
@@ -3914,7 +3880,7 @@
 								t = (i + (v - this._s1) / (this._s2 - this._s1)) * this._prec;
 							}
 							inv = 1 - t;
-	
+
 							i = this._props.length;
 							while (--i > -1) {
 								p = this._props[i];
@@ -3929,7 +3895,7 @@
 									target[p] = val;
 								}
 							}
-	
+
 							if (this._autoRotate) {
 								var ar = this._autoRotate,
 									b2, x1, y1, x2, y2, add, conv;
@@ -3940,23 +3906,23 @@
 									conv = (ar[i][4] === true) ? 1 : _RAD2DEG;
 									b = this._beziers[ar[i][0]];
 									b2 = this._beziers[ar[i][1]];
-	
+
 									if (b && b2) { //in case one of the properties got overwritten.
 										b = b[curIndex];
 										b2 = b2[curIndex];
-	
+
 										x1 = b.a + (b.b - b.a) * t;
 										x2 = b.b + (b.c - b.b) * t;
 										x1 += (x2 - x1) * t;
 										x2 += ((b.c + (b.d - b.c) * t) - x2) * t;
-	
+
 										y1 = b2.a + (b2.b - b2.a) * t;
 										y2 = b2.b + (b2.c - b2.b) * t;
 										y1 += (y2 - y1) * t;
 										y2 += ((b2.c + (b2.d - b2.c) * t) - y2) * t;
-	
+
 										val = notStart ? Math.atan2(y2 - y1, x2 - x1) * conv + add : this._initialRotations[i];
-	
+
 										if (func[p]) {
 											target[p](val);
 										} else {
@@ -3968,15 +3934,15 @@
 						}
 				}),
 				p = BezierPlugin.prototype;
-	
-	
+
+
 			BezierPlugin.bezierThrough = bezierThrough;
 			BezierPlugin.cubicToQuadratic = cubicToQuadratic;
 			BezierPlugin._autoCSS = true; //indicates that this plugin can be inserted into the "css" object using the autoCSS feature of TweenLite
 			BezierPlugin.quadraticToCubic = function(a, b, c) {
 				return new Segment(a, (2 * b + a) / 3, (2 * b + c) / 3, c);
 			};
-	
+
 			BezierPlugin._cssRegister = function() {
 				var CSSPlugin = _globals.CSSPlugin;
 				if (!CSSPlugin) {
@@ -4028,7 +3994,7 @@
 					return pt;
 				}});
 			};
-	
+
 			p._roundProps = function(lookup, value) {
 				var op = this._overwriteProps,
 					i = op.length;
@@ -4038,7 +4004,7 @@
 					}
 				}
 			};
-	
+
 			p._kill = function(lookup) {
 				var a = this._props,
 					p, i;
@@ -4056,14 +4022,14 @@
 				}
 				return this._super._kill.call(this, lookup);
 			};
-	
+
 		}());
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 		
 		
 		
@@ -4078,7 +4044,7 @@
 	 * ----------------------------------------------------------------
 	 */
 		_gsScope._gsDefine("plugins.CSSPlugin", ["plugins.TweenPlugin","TweenLite"], function(TweenPlugin, TweenLite) {
-	
+
 			/** @constructor **/
 			var CSSPlugin = function() {
 					TweenPlugin.call(this, "css");
@@ -4092,7 +4058,7 @@
 				_overwriteProps, //alias to the currently instantiating CSSPlugin's _overwriteProps array. We use this closure in order to avoid having to pass a reference around from method to method and aid in minification.
 				_specialProps = {},
 				p = CSSPlugin.prototype = new TweenPlugin("css");
-	
+
 			p.constructor = CSSPlugin;
 			CSSPlugin.version = "1.18.0";
 			CSSPlugin.API = 2;
@@ -4101,8 +4067,8 @@
 			CSSPlugin.defaultSmoothOrigin = true;
 			p = "px"; //we'll reuse the "p" variable to keep file size down
 			CSSPlugin.suffixMap = {top:p, right:p, bottom:p, left:p, width:p, height:p, fontSize:p, padding:p, margin:p, perspective:p, lineHeight:""};
-	
-	
+
+
 			var _numExp = /(?:\d|\-\d|\.\d|\-\.\d)+/g,
 				_relNumExp = /(?:\d|\-\d|\.\d|\-\.\d|\+=\d|\-=\d|\+=.\d|\-=\.\d)+/g,
 				_valuesExp = /(?:\+=|\-=|\-|\b)[\d\-\.]+[a-zA-Z0-9]*(?:%|\b)/gi, //finds all the values that begin with numbers or += or -= and then a number. Includes suffixes. We use this to split complex values apart like "1px 5px 20px rgb(255,102,51)"
@@ -4133,7 +4099,7 @@
 				_agent = navigator.userAgent,
 				_autoRound,
 				_reqSafariFix, //we won't apply the Safari transform fix until we actually come across a tween that affects a transform property (to maintain best performance).
-	
+
 				_isSafari,
 				_isFirefox, //Firefox has a bug that causes 3D transformed elements to randomly disappear unless a repaint is forced after each update on each element.
 				_isSafariLT6, //Safari (and Android 4 which uses a flavor of Safari) has a bug that prevents changes to "top" and "left" properties from rendering properly if changed on the same frame as a transform UNLESS we set the element's WebkitBackfaceVisibility to hidden (weird, I know). Doing this for Android 3 and earlier seems to actually cause other problems, though (fun!)
@@ -4161,10 +4127,10 @@
 						console.log(s);
 					}
 				},
-	
+
 				_prefixCSS = "", //the non-camelCase vendor prefix like "-o-", "-moz-", "-ms-", or "-webkit-"
 				_prefix = "", //camelCase vendor prefix like "O", "ms", "Webkit", or "Moz".
-	
+
 				// @private feed in a camelCase property name like "transform" and it will check to see if it is valid as-is or if it needs a vendor prefix. It returns the corrected camelCase property name (i.e. "WebkitTransform" or "MozTransform" or "transform" or null if no such property is found, like if the browser is IE8 or before, "transform" won't be found at all)
 				_checkPropPrefix = function(p, e) {
 					e = e || _tempDiv;
@@ -4184,9 +4150,9 @@
 					}
 					return null;
 				},
-	
+
 				_getComputedStyle = _doc.defaultView ? _doc.defaultView.getComputedStyle : function() {},
-	
+
 				/**
 				 * @private Returns the css style for a particular property of an element. For example, to get whatever the current "left" css value for an element with an ID of "myElement", you could do:
 				 * var currentLeft = CSSPlugin.getStyle( document.getElementById("myElement"), "left");
@@ -4212,7 +4178,7 @@
 					}
 					return (dflt != null && (!rv || rv === "none" || rv === "auto" || rv === "auto auto")) ? dflt : rv;
 				},
-	
+
 				/**
 				 * @private Pass the target element, the property name, the numeric value, and the suffix (like "%", "em", "px", etc.) and it will spit back the equivalent pixel number.
 				 * @param {!Object} t Target element
@@ -4268,7 +4234,7 @@
 						v = _getStyle(t, "margin" + dim, cs);
 					return t["offset" + dim] - (_convertToPixels(t, p, parseFloat(v), v.replace(_suffixExp, "")) || 0);
 				},
-	
+
 				// @private returns at object containing ALL of the style properties in camelCase and their associated values.
 				_getAllStyles = function(t, cs) {
 					var s = {},
@@ -4316,7 +4282,7 @@
 					}
 					return s;
 				},
-	
+
 				// @private analyzes two style objects (as returned by _getAllStyles()) and only looks for differences between them that contain tweenable values (like a number or color). It returns an object with a "difs" property which refers to an object containing only those isolated properties and values for tweening, and a "firstMPT" property which refers to the first MiniPropTween instance in a linked list that recorded all the starting values of the different properties so that we can revert to them at the end or beginning of the tween - we don't want the cascading to get messed up. The forceLookup parameter is an optional generic object with properties that should be forced into the results - this is necessary for className tweens that are overwriting others because imagine a scenario where a rollover/rollout adds/removes a class and the user swipes the mouse over the target SUPER fast, thus nothing actually changed yet and the subsequent comparison of the properties would indicate they match (especially when px rounding is taken into consideration), thus no tweening is necessary even though it SHOULD tween and remove those properties after the tween (otherwise the inline styles will contaminate things). See the className SpecialProp code for details.
 				_cssDif = function(t, s1, s2, vars, forceLookup) {
 					var difs = {},
@@ -4341,7 +4307,7 @@
 				},
 				_dimensions = {width:["Left","Right"], height:["Top","Bottom"]},
 				_margins = ["marginLeft","marginRight","marginTop","marginBottom"],
-	
+
 				/**
 				 * @private Gets the width or height of an element
 				 * @param {!Object} t Target element
@@ -4360,7 +4326,7 @@
 					}
 					return v;
 				},
-	
+
 				// @private Parses position-related complex strings like "top left" or "50px 10px" or "70% 20%", etc. which are used for things like transformOrigin or backgroundPosition. Optionally decorates a supplied object (recObj) with the following properties: "ox" (offsetX), "oy" (offsetY), "oxp" (if true, "ox" is a percentage not a pixel value), and "oxy" (if true, "oy" is a percentage not a pixel value)
 				_parsePosition = function(v, recObj) {
 					if (v === "contain" || v === "auto" || v === "auto auto") {
@@ -4392,7 +4358,7 @@
 					}
 					return recObj || v;
 				},
-	
+
 				/**
 				 * @private Takes an ending value (typically a string, but can be a number) and a starting value and returns the change between the two, looking for relative value indicators like += and -= and it also ignores suffixes (but make sure the ending value starts with a number or +=/-= and that the starting value is a NUMBER!)
 				 * @param {(number|string)} e End value which is typically a string, but could be a number
@@ -4402,7 +4368,7 @@
 				_parseChange = function(e, b) {
 					return (typeof(e) === "string" && e.charAt(1) === "=") ? parseInt(e.charAt(0) + "1", 10) * parseFloat(e.substr(2)) : parseFloat(e) - parseFloat(b);
 				},
-	
+
 				/**
 				 * @private Takes a value and a default number, checks if the value is relative, null, or numeric and spits back a normalized number accordingly. Primarily used in the _parseTransform() function.
 				 * @param {Object} v Value to be parsed
@@ -4412,7 +4378,7 @@
 				_parseVal = function(v, d) {
 					return (v == null) ? d : (typeof(v) === "string" && v.charAt(1) === "=") ? parseInt(v.charAt(0) + "1", 10) * parseFloat(v.substr(2)) + d : parseFloat(v);
 				},
-	
+
 				/**
 				 * @private Translates strings like "40deg" or "40" or 40rad" or "+=40deg" or "270_short" or "-90_cw" or "+=45_ccw" to a numeric radian angle. Of course a starting/default value must be fed in too so that relative values can be calculated properly.
 				 * @param {Object} v Value to be parsed
@@ -4456,7 +4422,7 @@
 					}
 					return result;
 				},
-	
+
 				_colorLookup = {aqua:[0,255,255],
 					lime:[0,255,0],
 					silver:[192,192,192],
@@ -4477,12 +4443,12 @@
 					pink:[255,192,203],
 					cyan:[0,255,255],
 					transparent:[255,255,255,0]},
-	
+
 				_hue = function(h, m1, m2) {
 					h = (h < 0) ? h + 1 : (h > 1) ? h - 1 : h;
 					return ((((h * 6 < 1) ? m1 + (m2 - m1) * h * 6 : (h < 0.5) ? m2 : (h * 3 < 2) ? m1 + (m2 - m1) * (2 / 3 - h) * 6 : m1) * 255) + 0.5) | 0;
 				},
-	
+
 				/**
 				 * @private Parses a color (like #9F0, #FF9900, rgb(255,51,153) or hsl(108, 50%, 10%)) into an array with 3 elements for red, green, and blue or if toHSL parameter is true, it will populate the array with hue, saturation, and lightness values. If a relative value is found in an hsl() or hsla() string, it will preserve those relative prefixes and all the values in the array will be strings instead of numbers (in all other cases it will be populated with numbers).
 				 * @param {(string|number)} v The value the should be parsed which could be a string like #9F0 or rgb(255,102,51) or rgba(255,0,0,0.5) or it could be a number like 0xFF00CC or even a named color like red, blue, purple, etc.
@@ -4576,12 +4542,12 @@
 					return parsed;
 				},
 				_colorExp = "(?:\\b(?:(?:rgb|rgba|hsl|hsla)\\(.+?\\))|\\B#.+?\\b"; //we'll dynamically build this Regular Expression to conserve file size. After building it, it will be able to find rgb(), rgba(), # (hexadecimal), and named color values like red, blue, purple, etc.
-	
+
 			for (p in _colorLookup) {
 				_colorExp += "|" + p + "\\b";
 			}
 			_colorExp = new RegExp(_colorExp+")", "gi");
-	
+
 			CSSPlugin.colorStringFilter = function(a) {
 				var combined = a[0] + a[1],
 					toHSL;
@@ -4592,11 +4558,11 @@
 					a[1] = _formatColors(a[1], toHSL);
 				}
 			};
-	
+
 			if (!TweenLite.defaultStringFilter) {
 				TweenLite.defaultStringFilter = CSSPlugin.colorStringFilter;
 			}
-	
+
 			/**
 			 * @private Returns a formatter function that handles taking a string (or number in some cases) and returning a consistently formatted one in terms of delimiters, quantity of values, etc. For example, we may get boxShadow values defined as "0px red" or "0px 0px 10px rgb(255,0,0)" or "0px 0px 20px 20px #F00" and we need to ensure that what we get back is described with 4 numbers and a color. This allows us to feed it into the _parseComplex() method and split the values up appropriately. The neat thing about this _getFormatter() function is that the dflt defines a pattern as well as a default, so for example, _getFormatter("0px 0px 0px 0px #777", true) not only sets the default as 0px for all distances and #777 for the color, but also sets the pattern such that 4 numbers and a color will always get returned.
 			 * @param {!string} dflt The default value and pattern to follow. So "0px 0px 0px 0px #777" will ensure that 4 numbers and a color will always get returned.
@@ -4642,7 +4608,7 @@
 							return pfx + vals.join(delim) + delim + color + sfx + (v.indexOf("inset") !== -1 ? " inset" : "");
 						};
 						return formatter;
-	
+
 					}
 					formatter = function(v) {
 						var vals, a, i;
@@ -4666,7 +4632,7 @@
 					};
 					return formatter;
 				},
-	
+
 				/**
 				 * @private returns a formatter function that's used for edge-related values like marginTop, marginLeft, paddingBottom, paddingRight, etc. Just pass a comma-delimited list of property names related to the edges.
 				 * @param {!string} props a comma-delimited list of property names in order from top to left, like "marginTop,marginRight,marginBottom,marginLeft"
@@ -4684,7 +4650,7 @@
 						return cssp.parse(t, vars, pt, plugin);
 					};
 				},
-	
+
 				// @private used when other plugins must tween values first, like BezierPlugin or ThrowPropsPlugin, etc. That plugin's setRatio() gets called first so that the values are updated, and then we loop through the MiniPropTweens  which handle copying the values into their appropriate slots so that they can then be applied correctly in the main CSSPlugin setRatio() method. Remember, we typically create a proxy object that has a bunch of uniquely-named properties that we feed to the sub-plugin and it does its magic normally, and then we must interpret those values and apply them to the css because often numbers must get combined/concatenated, suffixes added, etc. to work with css, like boxShadow could have 4 values plus a color.
 				_setPluginRatio = _internals._setPluginRatio = function(v) {
 					this.plugin.setRatio(v);
@@ -4724,7 +4690,7 @@
 						}
 					}
 				},
-	
+
 				/**
 				 * @private @constructor Used by a few SpecialProps to hold important values for proxies. For example, _parseToProxy() creates a MiniPropTween instance for each property that must get tweened on the proxy, and we record the original property name as well as the unique one we create for the proxy, plus whether or not the value needs to be rounded plus the original value.
 				 * @param {!Object} t target object whose property we're tweening (often a CSSPropTween)
@@ -4743,7 +4709,7 @@
 						this._next = next;
 					}
 				},
-	
+
 				/**
 				 * @private Most other plugins (like BezierPlugin and ThrowPropsPlugin and others) can only tween numeric values, but CSSPlugin must accommodate special values that have a bunch of extra data (like a suffix or strings between numeric values, etc.). For example, boxShadow has values like "10px 10px 20px 30px rgb(255,0,0)" which would utterly confuse other plugins. This method allows us to split that data apart and grab only the numeric data and attach it to uniquely-named properties of a generic proxy object ({}) so that we can feed that to virtually any plugin to have the numbers tweened. However, we must also keep track of which properties from the proxy go with which CSSPropTween values and instances. So we create a linked list of MiniPropTweens. Each one records a target (the original CSSPropTween), property (like "s" or "xn1" or "xn2") that we're tweening and the unique property name that was used for the proxy (like "boxShadow_xn1" and "boxShadow_xn2") and whether or not they need to be rounded. That way, in the _setPluginRatio() method we can simply copy the values over from the proxy to the CSSPropTween instance(s). Then, when the main CSSPlugin setRatio() method runs and applies the CSSPropTween values accordingly, they're updated nicely. So the external plugin tweens the numbers, _setPluginRatio() copies them over, and setRatio() acts normally, applying css-specific values to the element.
 				 * This method returns an object that has the following properties:
@@ -4806,9 +4772,9 @@
 					}
 					return {proxy:start, end:end, firstMPT:mpt, pt:firstPT};
 				},
-	
-	
-	
+
+
+
 				/**
 				 * @constructor Each property that is tweened has at least one CSSPropTween associated with it. These instances store important information like the target, property, starting value, amount of change, etc. They can also optionally have a number of "extra" strings and numeric values named xs1, xn1, xs2, xn2, xs3, xn3, etc. where "s" indicates string and "n" indicates number. These can be pieced together in a complex-value tween (type:1) that has alternating types of data like a string, number, string, number, etc. For example, boxShadow could be "5px 5px 8px rgb(102, 102, 51)". In that value, there are 6 numbers that may need to tween and then pieced back together into a string again with spaces, suffixes, etc. xs0 is special in that it stores the suffix for standard (type:0) tweens, -OR- the first string (prefix) in a complex-value (type:1) CSSPropTween -OR- it can be the non-tweening value in a type:-1 CSSPropTween. We do this to conserve memory.
 				 * CSSPropTweens have the following optional properties as well (not defined through the constructor):
@@ -4851,14 +4817,14 @@
 						next._prev = this;
 					}
 				},
-	
+
 				_addNonTweeningNumericPT = function(target, prop, start, end, next, overwriteProp) { //cleans up some code redundancies and helps minification. Just a fast way to add a NUMERIC non-tweening CSSPropTween
 					var pt = new CSSPropTween(target, prop, start, end - start, next, -1, overwriteProp);
 					pt.b = start;
 					pt.e = pt.xs0 = end;
 					return pt;
 				},
-	
+
 				/**
 				 * Takes a target, the beginning value and ending value (as strings) and parses them into a CSSPropTween (possibly with child CSSPropTweens) that accommodates multiple numbers, colors, comma-delimited values, etc. For example:
 				 * sp.parseComplex(element, "boxShadow", "5px 10px 20px rgb(255,102,51)", "0px 0px 0px red", true, "0px 0px 0px rgb(0,0,0,0)", pt);
@@ -4907,7 +4873,7 @@
 						//if the value begins with a number (most common). It's fine if it has a suffix like px
 						if (bn || bn === 0) {
 							pt.appendXtra("", bn, _parseChange(ev, bn), ev.replace(_relNumExp, ""), (autoRound && ev.indexOf("px") !== -1), true);
-	
+
 						//if the value is a color
 						} else if (clrs && _colorExp.test(bv)) {
 							str = ev.charAt(ev.length - 1) === "," ? ")," : ")"; //if there's a comma at the end, retain it.
@@ -4931,21 +4897,21 @@
 										.appendXtra("", bv[1], ev[1] - bv[1], ",", true)
 										.appendXtra("", bv[2], ev[2] - bv[2], (hasAlpha ? "," : str), true);
 								}
-	
+
 								if (hasAlpha) {
 									bv = (bv.length < 4) ? 1 : bv[3];
 									pt.appendXtra("", bv, ((ev.length < 4) ? 1 : ev[3]) - bv, str, false);
 								}
 							}
 							_colorExp.lastIndex = 0; //otherwise the test() on the RegExp could move the lastIndex and taint future results.
-	
+
 						} else {
 							bnums = bv.match(_numExp); //gets each group of numbers in the beginning value string and drops them into an array
-	
+
 							//if no number is found, treat it as a non-tweening value and just append the string to the current xs.
 							if (!bnums) {
 								pt["xs" + pt.l] += pt.l ? " " + bv : bv;
-	
+
 							//loop through all the numbers that are found and construct the extra values on the pt.
 							} else {
 								enums = ev.match(_relNumExp); //get each group of numbers in the end value string and drop them into an array. We allow relative values too, like +=50 or -=.5
@@ -4979,8 +4945,8 @@
 					return pt.xfirst || pt;
 				},
 				i = 9;
-	
-	
+
+
 			p = CSSPropTween.prototype;
 			p.l = p.pr = 0; //length (number of extra properties like xn1, xn2, xn3, etc.
 			while (--i > 0) {
@@ -4989,8 +4955,8 @@
 			}
 			p.xs0 = "";
 			p._next = p._prev = p.xfirst = p.data = p.plugin = p.setRatio = p.rxp = null;
-	
-	
+
+
 			/**
 			 * Appends and extra tweening value to a CSSPropTween and automatically manages any prefix and suffix strings. The first extra value is stored in the s and c of the main CSSPropTween instance, but thereafter any extras are stored in the xn1, xn2, xn3, etc. The prefixes and suffixes are stored in the xs0, xs1, xs2, etc. properties. For example, if I walk through a clip value like "rect(10px, 5px, 0px, 20px)", the values would be stored like this:
 			 * xs0:"rect(", s:10, xs1:"px, ", xn1:5, xs2:"px, ", xn2:0, xs3:"px, ", xn3:20, xn4:"px)"
@@ -5031,7 +4997,7 @@
 				pt.r = r;
 				return pt;
 			};
-	
+
 			/**
 			 * @constructor A SpecialProp is basically a css property that needs to be treated in a non-standard way, like if it may contain a complex value like boxShadow:"5px 10px 15px rgb(255, 102, 51)" or if it is associated with another plugin like ThrowPropsPlugin or BezierPlugin. Every SpecialProp is associated with a particular property name like "boxShadow" or "throwProps" or "bezier" and it will intercept those values in the vars object that's passed to the CSSPlugin and handle them accordingly.
 			 * @param {!string} p Property name (like "boxShadow" or "throwProps")
@@ -5060,7 +5026,7 @@
 					this.dflt = options.defaultValue;
 					this.pr = options.priority || 0;
 				},
-	
+
 				//shortcut for creating a new SpecialProp that can accept multiple properties as a comma-delimited list (helps minification). dflt can be an array for multiple values (we don't do a comma-delimited list because the default value may contain commas, like rect(0px,0px,0px,0px)). We attach this method to the SpecialProp class/object instead of using a private _createSpecialProp() method so that we can tap into it externally if necessary, like from another plugin.
 				_registerComplexSpecialProp = _internals._registerComplexSpecialProp = function(p, options, defaults) {
 					if (typeof(options) !== "object") {
@@ -5076,7 +5042,7 @@
 						temp = new SpecialProp(a[i], options);
 					}
 				},
-	
+
 				//creates a placeholder special prop for a plugin so that the property gets caught the first time a tween of it is attempted, and at that time it makes the plugin register itself, thus taking over for all future tweens of that property. This allows us to not mandate that things load in a particular order and it also allows us to log() an error that informs the user when they attempt to tween an external plugin-related property without loading its .js file.
 				_registerPluginProp = function(p) {
 					if (!_specialProps[p]) {
@@ -5092,10 +5058,10 @@
 						}});
 					}
 				};
-	
-	
+
+
 			p = SpecialProp.prototype;
-	
+
 			/**
 			 * Alias for _parseComplex() that automatically plugs in certain values for this SpecialProp, like its property name, whether or not colors should be sensed, the default value, and priority. It also looks for any keyword that the SpecialProp defines (like "inset" for boxShadow) and ensures that the beginning and ending values have the same number of values for SpecialProps where multi is true (like boxShadow and textShadow can have a comma-delimited list)
 			 * @param {!Object} t target element
@@ -5139,7 +5105,7 @@
 				}
 				return _parseComplex(t, this.p, b, e, this.clrs, this.dflt, pt, this.pr, plugin, setRatio);
 			};
-	
+
 			/**
 			 * Accepts a target and end value and spits back a CSSPropTween that has been inserted into the CSSPlugin's linked list and conforms with all the conventions we use internally, like type:-1, 0, 1, or 2, setting up any extra property tweens, priority, etc. For example, if we have a boxShadow SpecialProp and call:
 			 * this._firstPT = sp.parse(element, "5px 10px 20px rgb(2550,102,51)", "boxShadow", this);
@@ -5156,7 +5122,7 @@
 			p.parse = function(t, e, p, cssp, pt, plugin, vars) {
 				return this.parseComplex(t.style, this.format(_getStyle(t, this.p, _cs, false, this.dflt)), this.format(e), pt, plugin);
 			};
-	
+
 			/**
 			 * Registers a special property that should be intercepted from any "css" objects defined in tweens. This allows you to handle them however you want without CSSPlugin doing it for you. The 2nd parameter should be a function that accepts 3 parameters:
 			 *  1) Target object whose property should be tweened (typically a DOM element)
@@ -5191,12 +5157,12 @@
 					return rv;
 				}, priority:priority});
 			};
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 			//transform-related methods and properties
 			CSSPlugin.useSVGTransformAttr = _isSafari || _isFirefox; //Safari and Firefox both have some rendering bugs when applying CSS transforms to SVG elements, so default to using the "transform" attribute instead (users can override this).
 			var _transformProps = ("scaleX,scaleY,scaleZ,x,y,z,skewX,skewY,rotation,rotationX,rotationY,perspective,xPercent,yPercent").split(","),
@@ -5211,7 +5177,7 @@
 				_SVGElement = window.SVGElement,
 				_useSVGTransformAttr,
 				//Some browsers (like Firefox and IE) don't honor transform-origin properly in SVG elements, so we need to manually adjust the matrix accordingly. We feature detect here rather than always doing the conversion for certain browsers because they may fix the problem at some point in the future.
-	
+
 				_createSVG = function(type, container, attributes) {
 					var element = _doc.createElementNS("http://www.w3.org/2000/svg", type),
 						reg = /([a-z])([A-Z])/g,
@@ -5326,7 +5292,7 @@
 					}
 					return (force2D && m.length > 6) ? [m[0], m[1], m[4], m[5], m[12], m[13]] : m;
 				},
-	
+
 				/**
 				 * Parses the transform values for an element, returning an object with x, y, z, scaleX, scaleY, scaleZ, rotation, rotationX, rotationY, skewX, and skewY properties. Note: by default (for performance reasons), all skewing is combined into skewX and rotation but skewY still has a place in the transform object so that we can record how much of the skew is attributed to skewX vs skewY. Remember, a skewY of 10 looks the same as a rotation of 10 and skewX of -10.
 				 * @param {!Object} t target element
@@ -5346,7 +5312,7 @@
 						zOrigin = _supports3D ? parseFloat(_getStyle(t, _transformOriginProp, cs, false, "0 0 0").split(" ")[2]) || tm.zOrigin  || 0 : 0,
 						defaultTransformPerspective = parseFloat(CSSPlugin.defaultTransformPerspective) || 0,
 						m, i, scaleX, scaleY, rotation, skewX;
-	
+
 					tm.svg = !!(t.getBBox && _isSVG(t));
 					if (tm.svg) {
 						_parseSVGOrigin(t, _getStyle(t, _transformOriginProp, _cs, false, "50% 50%") + "", tm, t.getAttribute("data-svg-origin"));
@@ -5354,7 +5320,7 @@
 					}
 					m = _getMatrix(t);
 					if (m !== _identity2DMatrix) {
-	
+
 						if (m.length === 16) {
 							//we'll only look at these position-related 6 variables first because if x/y/z all match, it's relatively safe to assume we don't need to re-parse everything which risks losing important rotational information (like rotationX:180 plus rotationY:180 would look the same as rotation:180 - there's no way to know for sure which direction was taken based solely on the matrix3d() values)
 							var a11 = m[0], a21 = m[1], a31 = m[2], a41 = m[3],
@@ -5364,7 +5330,7 @@
 								a43 = m[11],
 								angle = Math.atan2(a32, a33),
 								t1, t2, t3, t4, cos, sin;
-	
+
 							//we manually compensate for non-zero z component of transformOrigin to work around bugs in Safari
 							if (tm.zOrigin) {
 								a34 = -tm.zOrigin;
@@ -5416,12 +5382,12 @@
 								a32 = a31*-sin+a32*cos;
 								a21 = t2;
 							}
-	
+
 							if (tm.rotationX && Math.abs(tm.rotationX) + Math.abs(tm.rotation) > 359.9) { //when rotationY is set, it will often be parsed as 180 degrees different than it should be, and rotationX and rotation both being 180 (it looks the same), so we adjust for that here.
 								tm.rotationX = tm.rotation = 0;
 								tm.rotationY += 180;
 							}
-	
+
 							tm.scaleX = ((Math.sqrt(a11 * a11 + a21 * a21) * rnd + 0.5) | 0) / rnd;
 							tm.scaleY = ((Math.sqrt(a22 * a22 + a23 * a23) * rnd + 0.5) | 0) / rnd;
 							tm.scaleZ = ((Math.sqrt(a32 * a32 + a33 * a33) * rnd + 0.5) | 0) / rnd;
@@ -5434,7 +5400,7 @@
 								tm.x -= tm.xOrigin - (tm.xOrigin * a11 - tm.yOrigin * a12);
 								tm.y -= tm.yOrigin - (tm.yOrigin * a21 - tm.xOrigin * a22);
 							}
-	
+
 						} else if ((!_supports3D || parse || !m.length || tm.x !== m[4] || tm.y !== m[5] || (!tm.rotationX && !tm.rotationY)) && !(tm.x !== undefined && _getStyle(t, "display", cs) === "none")) { //sometimes a 6-element matrix is returned even when we performed 3D transforms, like if rotationX and rotationY are 180. In cases like this, we still need to honor the 3D transforms. If we just rely on the 2D info, it could affect how the data is interpreted, like scaleY might get set to -1 or rotation could get offset by 180 degrees. For example, do a TweenLite.to(element, 1, {css:{rotationX:180, rotationY:180}}) and then later, TweenLite.to(element, 1, {css:{rotationX:0}}) and without this conditional logic in place, it'd jump to a state of being unrotated when the 2nd tween starts. Then again, we need to honor the fact that the user COULD alter the transforms outside of CSSPlugin, like by manually applying new css, so we try to sense that by looking at x and y because if those changed, we know the changes were made outside CSSPlugin and we force a reinterpretation of the matrix values. Also, in Webkit browsers, if the element's "display" is "none", its calculated style value will always return empty, so if we've already recorded the values in the _gsTransform object, we'll just rely on those.
 							var k = (m.length >= 6),
 								a = k ? m[0] : 1,
@@ -5496,7 +5462,7 @@
 					}
 					return tm;
 				},
-	
+
 				//for setting 2D transforms in IE6, IE7, and IE8 (must use a "filter" to emulate the behavior of modern day browser transforms)
 				_setIETransformRatio = function(v) {
 					var t = this.data, //refers to the element's _gsTransform object
@@ -5525,7 +5491,7 @@
 						ox = t.x + (w * t.xPercent / 100),
 						oy = t.y + (h * t.yPercent / 100),
 						dx, dy;
-	
+
 					//if transformOrigin is being used, adjust the offset x and y
 					if (t.ox != null) {
 						dx = ((t.oxp) ? w * t.ox * 0.01 : t.ox) - w / 2;
@@ -5533,7 +5499,7 @@
 						ox += dx - (dx * a + dy * b);
 						oy += dy - (dx * c + dy * d);
 					}
-	
+
 					if (!clip) {
 						m += ", sizingMethod='auto expand')";
 					} else {
@@ -5547,12 +5513,12 @@
 					} else {
 						style.filter = m + " " + filters; //we must always put the transform/matrix FIRST (before alpha(opacity=xx)) to avoid an IE bug that slices part of the object when rotation is applied with alpha.
 					}
-	
+
 					//at the end or beginning of the tween, if the matrix is normal (1, 0, 0, 1) and opacity is 100 (or doesn't exist), remove the filter to improve browser performance.
 					if (v === 0 || v === 1) if (a === 1) if (b === 0) if (c === 0) if (d === 1) if (!clip || m.indexOf("Dx=0, Dy=0") !== -1) if (!_opacityExp.test(filters) || parseFloat(RegExp.$1) === 100) if (filters.indexOf("gradient(" && filters.indexOf("Alpha")) === -1) {
 						style.removeAttribute("filter");
 					}
-	
+
 					//we must set the margins AFTER applying the filter in order to avoid some bugs in IE8 that could (in rare scenarios) cause them to be ignored intermittently (vibration).
 					if (!clip) {
 						var mult = (_ieVers < 8) ? 1 : -1, //in Internet Explorer 7 and before, the box model is broken, causing the browser to treat the width/height of the actual rotated filtered image as the width/height of the box itself, but Microsoft corrected that in IE8. We must use a negative offset in IE8 on the right/bottom
@@ -5575,7 +5541,7 @@
 						}
 					}
 				},
-	
+
 				/* translates a super small decimal to a string WITHOUT scientific notation
 				_safeDecimal = function(n) {
 					var s = (n < 0 ? -n : n) + "",
@@ -5583,7 +5549,7 @@
 					return (n < 0 ? "-0." : "0.") + new Array(parseInt(a[1], 10) || 0).join("0") + a[0].split(".").join("");
 				},
 				*/
-	
+
 				_setTransformRatio = _internals.set3DTransformRatio = _internals.setTransformRatio = function(v) {
 					var t = this.data, //refers to the element's _gsTransform object
 						style = this.t.style,
@@ -5603,7 +5569,7 @@
 						zOrigin, min, cos, sin, t1, t2, transform, comma, zero, skew, rnd;
 					//check to see if we should render as 2D (and SVGs must use 2D when _useSVGTransformAttr is true)
 					if (((((v === 1 || v === 0) && force3D === "auto" && (this.tween._totalTime === this.tween._totalDuration || !this.tween._totalTime)) || !force3D) && !z && !perspective && !rotationY && !rotationX) || (_useSVGTransformAttr && isSVG) || !_supports3D) { //on the final render (which could be 0 for a from tween), if there are no 3D aspects, render in 2D to free up memory and improve performance especially on mobile devices. Check the tween's totalTime/totalDuration too in order to make sure it doesn't happen between repeats if it's a repeating tween.
-	
+
 						//2D
 						if (angle || t.skewX || isSVG) {
 							angle *= _DEG2RAD;
@@ -5650,7 +5616,7 @@
 							style[_transformProp] = ((t.xPercent || t.yPercent) ? "translate(" + t.xPercent + "%," + t.yPercent + "%) matrix(" : "matrix(") + sx + ",0,0," + sy + "," + x + "," + y + ")";
 						}
 						return;
-	
+
 					}
 					if (_isFirefox) { //Firefox has a bug (at least in v25) that causes it to render the transparent part of 32-bit PNG images as black when displayed inside an iframe and the 3D scale is very small and doesn't change sufficiently enough between renders (like if you use a Power4.easeInOut to scale from 0 to 1 where the beginning values only change a tiny amount to begin the tween before accelerating). In this case, we force the scale to be 0.00002 instead which is visually the same but works around the Firefox issue.
 						min = 0.0001;
@@ -5685,7 +5651,7 @@
 						}
 						a12 = -sin;
 						a22 = cos;
-	
+
 					} else if (!rotationY && !rotationX && sz === 1 && !perspective && !isSVG) { //if we're only translating and/or 2D scaling, this is faster...
 						style[_transformProp] = ((t.xPercent || t.yPercent) ? "translate(" + t.xPercent + "%," + t.yPercent + "%) translate3d(" : "translate3d(") + x + "px," + y + "px," + z +"px)" + ((sx !== 1 || sy !== 1) ? " scale(" + sx + "," + sy + ")" : "");
 						return;
@@ -5766,7 +5732,7 @@
 						a31*=sx;
 						a41*=sx;
 					}
-	
+
 					if (zOrigin || isSVG) {
 						if (zOrigin) {
 							x += a13*-zOrigin;
@@ -5787,7 +5753,7 @@
 							z = 0; //don't use string because we calculate perspective later and need the number.
 						}
 					}
-	
+
 					//optimized way of concatenating all the values into a string. If we do it all in one shot, it's slower because of the way browsers have to create temp strings and the way it affects memory. If we do it piece-by-piece with +=, it's a bit slower too. We found that doing it in these sized chunks works best overall:
 					transform = ((t.xPercent || t.yPercent) ? "translate(" + t.xPercent + "%," + t.yPercent + "%) matrix3d(" : "matrix3d(");
 					transform += ((a11 < min && a11 > -min) ? zero : a11) + comma + ((a21 < min && a21 > -min) ? zero : a21) + comma + ((a31 < min && a31 > -min) ? zero : a31);
@@ -5799,14 +5765,14 @@
 						transform += ",0,0,0,0,1,0,";
 					}
 					transform += x + comma + y + comma + z + comma + (perspective ? (1 + (-z / perspective)) : 1) + ")";
-	
+
 					style[_transformProp] = transform;
 				};
-	
+
 			p = Transform.prototype;
 			p.x = p.y = p.z = p.skewX = p.skewY = p.rotation = p.rotationX = p.rotationY = p.zOrigin = p.xPercent = p.yPercent = p.xOffset = p.yOffset = 0;
 			p.scaleX = p.scaleY = p.scaleZ = 1;
-	
+
 			_registerComplexSpecialProp("transform,scale,scaleX,scaleY,scaleZ,x,y,z,rotation,rotationX,rotationY,rotationZ,skewX,skewY,shortRotation,shortRotationX,shortRotationY,shortRotationZ,transformOrigin,svgOrigin,transformPerspective,directionalRotation,parseTransform,force3D,skewType,xPercent,yPercent,smoothOrigin", {parser:function(t, e, p, cssp, pt, plugin, vars) {
 				if (cssp._lastParsedTransform === vars) { return pt; } //only need to parse the transform once, and only if the browser supports it.
 				cssp._lastParsedTransform = vars;
@@ -5872,14 +5838,14 @@
 						m2.y = 0;
 						m2.yPercent = _parseVal(v.y, m1.yPercent);
 					}
-	
+
 					m2.rotation = _parseAngle(("rotation" in v) ? v.rotation : ("shortRotation" in v) ? v.shortRotation + "_short" : ("rotationZ" in v) ? v.rotationZ : m1.rotation, m1.rotation, "rotation", endRotations);
 					if (_supports3D) {
 						m2.rotationX = _parseAngle(("rotationX" in v) ? v.rotationX : ("shortRotationX" in v) ? v.shortRotationX + "_short" : m1.rotationX || 0, m1.rotationX, "rotationX", endRotations);
 						m2.rotationY = _parseAngle(("rotationY" in v) ? v.rotationY : ("shortRotationY" in v) ? v.shortRotationY + "_short" : m1.rotationY || 0, m1.rotationY, "rotationY", endRotations);
 					}
 					m2.skewX = (v.skewX == null) ? m1.skewX : _parseAngle(v.skewX, m1.skewX);
-	
+
 					//note: for performance reasons, we combine all skewing into the skewX and rotation values, ignoring skewY but we must still record it so that we can discern how much of the overall skew is attributed to skewX vs. skewY. Otherwise, if the skewY would always act relative (tween skewY to 10deg, for example, multiple times and if we always combine things into skewX, we can't remember that skewY was 10 from last time). Remember, a skewY of 10 degrees looks the same as a rotation of 10 degrees plus a skewX of -10 degrees.
 					m2.skewY = (v.skewY == null) ? m1.skewY : _parseAngle(v.skewY, m1.skewY);
 					if ((skewY = m2.skewY - m1.skewY)) {
@@ -5891,14 +5857,14 @@
 					m1.force3D = v.force3D;
 					hasChange = true;
 				}
-	
+
 				m1.skewType = v.skewType || m1.skewType || CSSPlugin.defaultSkewType;
-	
+
 				has3D = (m1.force3D || m1.z || m1.rotationX || m1.rotationY || m2.z || m2.rotationX || m2.rotationY || m2.perspective);
 				if (!has3D && v.scale != null) {
 					m2.scaleZ = 1; //no need to tween scaleZ.
 				}
-	
+
 				while (--i > -1) {
 					p = _transformProps[i];
 					orig = m2[p] - m1[p];
@@ -5913,7 +5879,7 @@
 						cssp._overwriteProps.push(pt.n);
 					}
 				}
-	
+
 				orig = v.transformOrigin;
 				if (m1.svg && (orig || v.svgOrigin)) {
 					x = m1.xOffset; //when we change the origin, in order to prevent things from jumping we adjust the x/y so we must record those here so that we can create PropTweens for them and flip them at the same time as the origin
@@ -5946,7 +5912,7 @@
 						} else {
 							pt.xs0 = pt.e = orig;
 						}
-	
+
 						//for older versions of IE (6-8), we need to manually calculate things inside the setRatio() function. We record origin x and y (ox and oy) and whether or not the values are percentages (oxp and oyp).
 					} else {
 						_parsePosition(orig + "", m1);
@@ -5957,9 +5923,9 @@
 				}
 				return pt;
 			}, prefix:true});
-	
+
 			_registerComplexSpecialProp("boxShadow", {defaultValue:"0px 0px 0px 0px #999", prefix:true, color:true, multi:true, keyword:"inset"});
-	
+
 			_registerComplexSpecialProp("borderRadius", {defaultValue:"0px", parser:function(t, e, p, cssp, pt, plugin) {
 				e = this.format(e);
 				var props = ["borderTopLeftRadius","borderTopRightRadius","borderBottomRightRadius","borderBottomLeftRadius"],
@@ -6078,7 +6044,7 @@
 					prop = ("cssFloat" in s) ? "cssFloat" : "styleFloat";
 				return new CSSPropTween(s, prop, 0, 0, pt, -1, p, false, 0, s[prop], e);
 			}});
-	
+
 			//opacity-related
 			var _setIEOpacityRatio = function(v) {
 					var t = this.t, //refers to the element's style property
@@ -6138,8 +6104,8 @@
 				}
 				return pt;
 			}});
-	
-	
+
+
 			var _removeProp = function(s, p) {
 					if (p) {
 						if (s.removeProperty) {
@@ -6204,8 +6170,8 @@
 				pt = pt.xfirst = cssp.parse(t, difData.difs, pt, plugin); //we record the CSSPropTween as the xfirst so that we can handle overwriting propertly (if "className" gets overwritten, we must kill all the properties associated with the className part of the tween, so we can loop through from xfirst to the pt itself)
 				return pt;
 			}});
-	
-	
+
+
 			var _setClearPropsRatio = function(v) {
 				if (v === 1 || v === 0) if (this.data._totalTime === this.data._totalDuration && this.data.data !== "isFromStart") { //this.data refers to the tween. Only clear at the END of the tween (remember, from() tweens make the ratio go from 1 to 0, so we can't just check that and if the tween is the zero-duration one that's created internally to render the starting values in a from() tween, ignore that because otherwise, for example, from(...{height:100, clearProps:"height", delay:1}) would wipe the height at the beginning of the tween and after 1 second, it'd kick back in).
 					var s = this.t.style,
@@ -6239,7 +6205,7 @@
 							delete this.t._gsTransform;
 						}
 					}
-	
+
 				}
 			};
 			_registerComplexSpecialProp("clearProps", {parser:function(t, e, p, cssp, pt) {
@@ -6251,23 +6217,23 @@
 				_hasPriority = true;
 				return pt;
 			}});
-	
+
 			p = "bezier,throwProps,physicsProps,physics2D".split(",");
 			i = p.length;
 			while (i--) {
 				_registerPluginProp(p[i]);
 			}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 			p = CSSPlugin.prototype;
 			p._firstPT = p._lastParsedTransform = p._transform = null;
-	
+
 			//gets called when the tween renders for the first time. This kicks everything off, recording start/end values, etc.
 			p._onInitTween = function(target, vars, tween) {
 				if (!target.nodeType) { //css is only for dom elements
@@ -6290,7 +6256,7 @@
 						this._addLazySet(style, "zIndex", 0);
 					}
 				}
-	
+
 				if (typeof(vars) === "string") {
 					first = style.cssText;
 					v = _getAllStyles(target, _cs);
@@ -6302,13 +6268,13 @@
 					vars = v;
 					style.cssText = first;
 				}
-	
+
 				if (vars.className) { //className tweens will combine any differences they find in the css with the vars that are passed in, so {className:"myClass", scale:0.5, left:20} would work.
 					this._firstPT = pt = _specialProps.className.parse(target, vars.className, "className", this, null, null, vars);
 				} else {
 					this._firstPT = pt = this.parse(target, vars, null);
 				}
-	
+
 				if (this._transformType) {
 					threeD = (this._transformType === 3);
 					if (!_transformProp) {
@@ -6343,7 +6309,7 @@
 					tpt.pr = -1; //ensures that the transforms get applied after the components are updated.
 					_overwriteProps.pop(); //we don't want to force the overwrite of all "transform" tweens of the target - we only care about individual transform properties like scaleX, rotation, etc. The CSSPropTween constructor automatically adds the property to _overwriteProps which is why we need to pop() here.
 				}
-	
+
 				if (_hasPriority) {
 					//reorders the linked list in order of pr (priority)
 					while (pt) {
@@ -6368,8 +6334,8 @@
 				}
 				return true;
 			};
-	
-	
+
+
 			p.parse = function(target, vars, pt, plugin) {
 				var style = target.style,
 					p, sp, bn, en, bs, es, bsfx, esfx, isStr, rel;
@@ -6378,7 +6344,7 @@
 					sp = _specialProps[p]; //SpecialProp lookup.
 					if (sp) {
 						pt = sp.parse(target, es, p, this, pt, plugin, vars);
-	
+
 					} else {
 						bs = _getStyle(target, p, _cs) + "";
 						isStr = (typeof(es) === "string");
@@ -6388,14 +6354,14 @@
 								es = ((es.length > 3) ? "rgba(" : "rgb(") + es.join(",") + ")";
 							}
 							pt = _parseComplex(style, p, bs, es, true, "transparent", pt, 0, plugin);
-	
+
 						} else if (isStr && (es.indexOf(" ") !== -1 || es.indexOf(",") !== -1)) {
 							pt = _parseComplex(style, p, bs, es, true, null, pt, 0, plugin);
-	
+
 						} else {
 							bn = parseFloat(bs);
 							bsfx = (bn || bn === 0) ? bs.substr((bn + "").length) : ""; //remember, bs could be non-numeric like "normal" for fontWeight, so we should default to a blank suffix in that case.
-	
+
 							if (bs === "" || bs === "auto") {
 								if (p === "width" || p === "height") {
 									bn = _getDimension(target, p, _cs);
@@ -6408,7 +6374,7 @@
 									bsfx = "";
 								}
 							}
-	
+
 							rel = (isStr && es.charAt(1) === "=");
 							if (rel) {
 								en = parseInt(es.charAt(0) + "1", 10);
@@ -6419,13 +6385,13 @@
 								en = parseFloat(es);
 								esfx = isStr ? es.replace(_suffixExp, "") : "";
 							}
-	
+
 							if (esfx === "") {
 								esfx = (p in _suffixMap) ? _suffixMap[p] : bsfx; //populate the end suffix, prioritizing the map, then if none is found, use the beginning suffix.
 							}
-	
+
 							es = (en || en === 0) ? (rel ? en + bn : en) + esfx : vars[p]; //ensures that any += or -= prefixes are taken care of. Record the end value before normalizing the suffix because we always want to end the tween on exactly what they intended even if it doesn't match the beginning value's suffix.
-	
+
 							//if the beginning/ending suffixes don't match, normalize them...
 							if (bsfx !== esfx) if (esfx !== "") if (en || en === 0) if (bn) { //note: if the beginning value (bn) is 0, we don't need to convert units!
 								bn = _convertToPixels(target, p, bn, bsfx);
@@ -6434,10 +6400,10 @@
 									if (vars.strictUnits !== true) { //some browsers report only "px" values instead of allowing "%" with getComputedStyle(), so we assume that if we're tweening to a %, we should start there too unless strictUnits:true is defined. This approach is particularly useful for responsive designs that use from() tweens.
 										bs = bn + "%";
 									}
-	
+
 								} else if (esfx === "em" || esfx === "rem") {
 									bn /= _convertToPixels(target, p, 1, esfx);
-	
+
 								//otherwise convert to pixels.
 								} else if (esfx !== "px") {
 									en = _convertToPixels(target, p, en, esfx);
@@ -6447,11 +6413,11 @@
 									es = (en + bn) + esfx; //the changes we made affect relative calculations, so adjust the end value here.
 								}
 							}
-	
+
 							if (rel) {
 								en += bn;
 							}
-	
+
 							if ((bn || bn === 0) && (en || en === 0)) { //faster than isNaN(). Also, previously we required en !== bn but that doesn't really gain much performance and it prevents _parseToProxy() from working properly if beginning and ending values match but need to get tweened by an external plugin anyway. For example, a bezier tween where the target starts at left:0 and has these points: [{left:50},{left:0}] wouldn't work properly because when parsing the last point, it'd match the first (current) one and a non-tweening CSSPropTween would be recorded when we actually need a normal tween (type:0) so that things get updated during the tween properly.
 								pt = new CSSPropTween(style, p, bn, en - bn, pt, 0, p, (_autoRound !== false && (esfx === "px" || p === "zIndex")), 0, bs, es);
 								pt.xs0 = esfx;
@@ -6471,8 +6437,8 @@
 				}
 				return pt;
 			};
-	
-	
+
+
 			//gets called every time the tween updates, passing the new ratio (typically a value between 0 and 1, but not always (for example, if an Elastic.easeOut is used, the value can jump above 1 mid-tween). It will always start and 0 and end at 1.
 			p.setRatio = function(v) {
 				var pt = this._firstPT,
@@ -6502,7 +6468,7 @@
 						}
 						pt = pt._next;
 					}
-	
+
 				} else if (v || !(this._tween._time === this._tween._duration || this._tween._time === 0) || this._tween._rawPrevTime === -0.000001) {
 					while (pt) {
 						val = pt.c * v + pt.s;
@@ -6530,16 +6496,16 @@
 								}
 								pt.t[pt.p] = str;
 							}
-	
+
 						} else if (pt.type === -1) { //non-tweening value
 							pt.t[pt.p] = pt.xs0;
-	
+
 						} else if (pt.setRatio) { //custom setRatio() for things like SpecialProps, external plugins, etc.
 							pt.setRatio(v);
 						}
 						pt = pt._next;
 					}
-	
+
 				//if the tween is reversed all the way back to the beginning, we need to restore the original values which may have different units (like % instead of px or em or whatever).
 				} else {
 					while (pt) {
@@ -6552,7 +6518,7 @@
 					}
 				}
 			};
-	
+
 			/**
 			 * @private
 			 * Forces rendering of the target's transforms (rotation, scale, etc.) whenever the CSSPlugin's setRatio() is called.
@@ -6568,7 +6534,7 @@
 				this._transform = this._transform || _getTransform(this._target, _cs, true); //ensures that the element has a _gsTransform property with the appropriate values.
 				this._transformType = (!(this._transform.svg && _useSVGTransformAttr) && (threeD || this._transformType === 3)) ? 3 : 2;
 			};
-	
+
 			var lazySet = function(v) {
 				this.t[this.p] = this.e;
 				this.data._linkCSSP(this, this._next, null, true); //we purposefully keep this._next even though it'd make sense to null it, but this is a performance optimization, as this happens during the while (pt) {} loop in setRatio() at the bottom of which it sets pt = pt._next, so if we null it, the linked list will be broken in that loop.
@@ -6580,7 +6546,7 @@
 				pt.setRatio = lazySet;
 				pt.data = this;
 			};
-	
+
 			/** @private **/
 			p._linkCSSP = function(pt, next, prev, remove) {
 				if (pt) {
@@ -6606,7 +6572,7 @@
 				}
 				return pt;
 			};
-	
+
 			//we need to make sure that if alpha or autoAlpha is killed, opacity is too. And autoAlpha affects the "visibility" property.
 			p._kill = function(lookup) {
 				var copy = lookup,
@@ -6635,9 +6601,9 @@
 				}
 				return TweenPlugin.prototype._kill.call(this, copy);
 			};
-	
-	
-	
+
+
+
 			//used by cascadeTo() for gathering all the style properties of each child element into an array for comparison.
 			var _getChildStyles = function(e, props, targets) {
 					var children, i, child, type;
@@ -6664,7 +6630,7 @@
 						}
 					}
 				};
-	
+
 			/**
 			 * Typically only useful for className tweens that may affect child elements, this method creates a TweenLite
 			 * and then compares the style properties of all the target's child elements at the tween's start and end, and
@@ -6716,12 +6682,12 @@
 				}
 				return results;
 			};
-	
+
 			TweenPlugin.activate([CSSPlugin]);
 			return CSSPlugin;
-	
+
 		}, true);
-	
+
 		
 		
 		
@@ -6738,19 +6704,19 @@
 	 * ----------------------------------------------------------------
 	 */
 		(function() {
-	
+
 			var RoundPropsPlugin = _gsScope._gsDefine.plugin({
 					propName: "roundProps",
 					version: "1.5",
 					priority: -1,
 					API: 2,
-	
+
 					//called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 					init: function(target, value, tween) {
 						this._tween = tween;
 						return true;
 					}
-	
+
 				}),
 				_roundLinkedList = function(node) {
 					while (node) {
@@ -6761,7 +6727,7 @@
 					}
 				},
 				p = RoundPropsPlugin.prototype;
-	
+
 			p._onInitAllProps = function() {
 				var tween = this._tween,
 					rp = (tween.vars.roundProps.join) ? tween.vars.roundProps : tween.vars.roundProps.split(","),
@@ -6803,36 +6769,36 @@
 				}
 				return false;
 			};
-	
+
 			p._add = function(target, p, s, c) {
 				this._addTween(target, p, s, s + c, p, true);
 				this._overwriteProps.push(p);
 			};
-	
+
 		}());
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * AttrPlugin
 	 * ----------------------------------------------------------------
 	 */
-	
+
 		(function() {
-	
+
 			_gsScope._gsDefine.plugin({
 				propName: "attr",
 				API: 2,
 				version: "0.5.0",
-	
+
 				//called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 				init: function(target, value, tween) {
 					var p;
@@ -6845,20 +6811,20 @@
 					}
 					return true;
 				}
-	
+
 			});
-	
+
 		}());
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * DirectionalRotationPlugin
@@ -6868,7 +6834,7 @@
 			propName: "directionalRotation",
 			version: "0.2.1",
 			API: 2,
-	
+
 			//called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 			init: function(target, value, tween) {
 				if (typeof(value) !== "object") {
@@ -6907,7 +6873,7 @@
 				}
 				return true;
 			},
-	
+
 			//called each time the values should be updated, and the ratio gets passed as the only parameter (typically it's a value between 0 and 1, but it can exceed those when using an ease like Elastic.easeOut or Back.easeOut, etc.)
 			set: function(ratio) {
 				var pt;
@@ -6925,15 +6891,15 @@
 					}
 				}
 			}
-	
+
 		})._autoCSS = true;
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 		
 		
 		
@@ -6977,7 +6943,7 @@
 						this.gap = next.t - time;
 					}
 				},
-	
+
 				//Back
 				_createBack = function(n, f) {
 					var C = _class("easing." + n, function(overshoot) {
@@ -6992,7 +6958,7 @@
 					};
 					return C;
 				},
-	
+
 				Back = _wrap("Back",
 					_createBack("BackOut", function(p) {
 						return ((p = p - 1) * p * ((this._p1 + 1) * p + this._p1) + 1);
@@ -7004,8 +6970,8 @@
 						return ((p *= 2) < 1) ? 0.5 * p * p * ((this._p2 + 1) * p - this._p2) : 0.5 * ((p -= 2) * p * ((this._p2 + 1) * p + this._p2) + 2);
 					})
 				),
-	
-	
+
+
 				//SlowMo
 				SlowMo = _class("easing.SlowMo", function(linearRatio, power, yoyoMode) {
 					power = (power || power === 0) ? power : 0.7;
@@ -7022,7 +6988,7 @@
 				}, true),
 				p = SlowMo.prototype = new Ease(),
 				SteppedEase, RoughEase, _createElastic;
-	
+
 			p.constructor = SlowMo;
 			p.getRatio = function(p) {
 				var r = p + (0.5 - p) * this._p;
@@ -7034,12 +7000,12 @@
 				return this._calcEnd ? 1 : r;
 			};
 			SlowMo.ease = new SlowMo(0.7, 0.7);
-	
+
 			p.config = SlowMo.config = function(linearRatio, power, yoyoMode) {
 				return new SlowMo(linearRatio, power, yoyoMode);
 			};
-	
-	
+
+
 			//SteppedEase
 			SteppedEase = _class("easing.SteppedEase", function(steps) {
 					steps = steps || 1;
@@ -7059,8 +7025,8 @@
 			p.config = SteppedEase.config = function(steps) {
 				return new SteppedEase(steps);
 			};
-	
-	
+
+
 			//RoughEase
 			RoughEase = _class("easing.RoughEase", function(vars) {
 				vars = vars || {};
@@ -7110,14 +7076,14 @@
 				a.sort(function(a, b) {
 					return a.x - b.x;
 				});
-	
+
 				pnt = new EasePoint(1, 1, null);
 				i = points;
 				while (--i > -1) {
 					obj = a[i];
 					pnt = new EasePoint(obj.x, obj.y, pnt);
 				}
-	
+
 				this._prev = new EasePoint(0, 0, (pnt.t !== 0) ? pnt : pnt.next);
 			}, true);
 			p = RoughEase.prototype = new Ease();
@@ -7141,8 +7107,8 @@
 				return new RoughEase(vars);
 			};
 			RoughEase.ease = new RoughEase();
-	
-	
+
+
 			//Bounce
 			_wrap("Bounce",
 				_create("BounceOut", function(p) {
@@ -7184,8 +7150,8 @@
 					return invert ? (1 - p) * 0.5 : p * 0.5 + 0.5;
 				})
 			);
-	
-	
+
+
 			//CIRC
 			_wrap("Circ",
 				_create("CircOut", function(p) {
@@ -7198,8 +7164,8 @@
 					return ((p*=2) < 1) ? -0.5 * (Math.sqrt(1 - p * p) - 1) : 0.5 * (Math.sqrt(1 - (p -= 2) * p) + 1);
 				})
 			);
-	
-	
+
+
 			//Elastic
 			_createElastic = function(n, f, def) {
 				var C = _class("easing." + n, function(amplitude, period) {
@@ -7227,8 +7193,8 @@
 					return ((p *= 2) < 1) ? -0.5 * (this._p1 * Math.pow(2, 10 * (p -= 1)) * Math.sin( (p - this._p3) * this._p2)) : this._p1 * Math.pow(2, -10 *(p -= 1)) * Math.sin( (p - this._p3) * this._p2 ) * 0.5 + 1;
 				}, 0.45)
 			);
-	
-	
+
+
 			//Expo
 			_wrap("Expo",
 				_create("ExpoOut", function(p) {
@@ -7241,8 +7207,8 @@
 					return ((p *= 2) < 1) ? 0.5 * Math.pow(2, 10 * (p - 1)) : 0.5 * (2 - Math.pow(2, -10 * (p - 1)));
 				})
 			);
-	
-	
+
+
 			//Sine
 			_wrap("Sine",
 				_create("SineOut", function(p) {
@@ -7255,44 +7221,44 @@
 					return -0.5 * (Math.cos(Math.PI * p) - 1);
 				})
 			);
-	
+
 			_class("easing.EaseLookup", {
 					find:function(s) {
 						return Ease.map[s];
 					}
 				}, true);
-	
+
 			//register the non-standard eases
 			_easeReg(w.SlowMo, "SlowMo", "ease,");
 			_easeReg(RoughEase, "RoughEase", "ease,");
 			_easeReg(SteppedEase, "SteppedEase", "ease,");
-	
+
 			return Back;
 			
 		}, true);
-	
-	
+
+
 	});
-	
+
 	if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case TweenLite was already loaded separately.
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * Base classes like TweenLite, SimpleTimeline, Ease, Ticker, etc.
 	 * ----------------------------------------------------------------
 	 */
 	(function(window, moduleName) {
-	
+
 			"use strict";
 			var _globals = window.GreenSockGlobals = window.GreenSockGlobals || window;
 			if (_globals.TweenLite) {
@@ -7325,7 +7291,7 @@
 				}()),
 				a, i, p, _ticker, _tickerActive,
 				_defLookup = {},
-	
+
 				/**
 				 * @constructor
 				 * Defines a GreenSock class, optionally with an array of dependencies that must be instantiated first and passed into the definition.
@@ -7381,12 +7347,12 @@
 							a = ("com.greensock." + ns).split(".");
 							n = a.pop();
 							cl = _namespace(a.join("."))[n] = this.gsClass = func.apply(func, _classes);
-	
+
 							//exports to multiple environments
 							if (global) {
 								_globals[n] = cl; //provides a way to avoid global namespace pollution. By default, the main classes like TweenLite, Power1, Strong, etc. are added to window unless a GreenSockGlobals is defined. So if you want to have things added to a custom object instead, just do something like window.GreenSockGlobals = {} before loading any GreenSock files. You can even set up an alias like window.GreenSockGlobals = windows.gs = {} so that you can access everything like gs.TweenLite. Also remember that ALL classes are added to the window.com.greensock object (in their respective packages, like com.greensock.easing.Power1, com.greensock.TweenLite, etc.)
 								hasModule = (typeof(module) !== "undefined" && module.exports);
-								if (!hasModule && "function" === "function" && __webpack_require__(/*! !webpack amd options */ 12)){ //AMD
+								if (!hasModule && "function" === "function" && __webpack_require__(12)){ //AMD
 									!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() { return cl; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 								} else if (ns === moduleName && hasModule){ //node
 									module.exports = cl;
@@ -7399,23 +7365,23 @@
 					};
 					this.check(true);
 				},
-	
+
 				//used to create Definition instances (which basically registers a class that has dependencies).
 				_gsDefine = window._gsDefine = function(ns, dependencies, func, global) {
 					return new Definition(ns, dependencies, func, global);
 				},
-	
+
 				//a quick way to create a class that doesn't have any dependencies. Returns the class, but first registers it in the GreenSock namespace so that other classes can grab it (other classes might be dependent on the class).
 				_class = gs._class = function(ns, func, global) {
 					func = func || function() {};
 					_gsDefine(ns, [], function(){ return func; }, global);
 					return func;
 				};
-	
+
 			_gsDefine.globals = _globals;
-	
-	
-	
+
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * Ease
@@ -7445,7 +7411,7 @@
 						}
 					}
 				};
-	
+
 			p = Ease.prototype;
 			p._calcEnd = false;
 			p.getRatio = function(p) {
@@ -7467,7 +7433,7 @@
 				}
 				return (t === 1) ? 1 - r : (t === 2) ? r : (p < 0.5) ? r / 2 : 1 - (r / 2);
 			};
-	
+
 			//create all the standard eases like Linear, Quad, Cubic, Quart, Quint, Strong, Power0, Power1, Power2, Power3, and Power4 (each with easeIn, easeOut, and easeInOut)
 			a = ["Linear","Quad","Cubic","Quart","Quint,Strong"];
 			i = a.length;
@@ -7479,8 +7445,8 @@
 			}
 			_easeMap.linear = gs.easing.Linear.easeIn;
 			_easeMap.swing = gs.easing.Quad.easeInOut; //for jQuery folks
-	
-	
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * EventDispatcher
@@ -7491,7 +7457,7 @@
 				this._eventTarget = target || this;
 			});
 			p = EventDispatcher.prototype;
-	
+
 			p.addEventListener = function(type, callback, scope, useParam, priority) {
 				priority = priority || 0;
 				var list = this._listeners[type],
@@ -7514,7 +7480,7 @@
 					_ticker.wake();
 				}
 			};
-	
+
 			p.removeEventListener = function(type, callback) {
 				var list = this._listeners[type], i;
 				if (list) {
@@ -7527,7 +7493,7 @@
 					}
 				}
 			};
-	
+
 			p.dispatchEvent = function(type) {
 				var list = this._listeners[type],
 					i, t, listener;
@@ -7546,8 +7512,8 @@
 					}
 				}
 			};
-	
-	
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * Ticker
@@ -7557,7 +7523,7 @@
 				_cancelAnimFrame = window.cancelAnimationFrame,
 				_getTime = Date.now || function() {return new Date().getTime();},
 				_lastUpdate = _getTime();
-	
+
 			//now try to determine the requestAnimationFrame and cancelAnimationFrame functions and if none are found, we'll use a setTimeout()/clearTimeout() polyfill.
 			a = ["ms","moz","webkit","o"];
 			i = a.length;
@@ -7565,7 +7531,7 @@
 				_reqAnimFrame = window[a[i] + "RequestAnimationFrame"];
 				_cancelAnimFrame = window[a[i] + "CancelAnimationFrame"] || window[a[i] + "CancelRequestAnimationFrame"];
 			}
-	
+
 			_class("Ticker", function(fps, useRAF) {
 				var _self = this,
 					_startTime = _getTime(),
@@ -7595,18 +7561,18 @@
 							_self.dispatchEvent(_tickWord);
 						}
 					};
-	
+
 				EventDispatcher.call(_self);
 				_self.time = _self.frame = 0;
 				_self.tick = function() {
 					_tick(true);
 				};
-	
+
 				_self.lagSmoothing = function(threshold, adjustedLag) {
 					_lagThreshold = threshold || (1 / _tinyNum); //zero should be interpreted as basically unlimited
 					_adjustedLag = Math.min(adjustedLag, _lagThreshold, 0);
 				};
-	
+
 				_self.sleep = function() {
 					if (_id == null) {
 						return;
@@ -7622,7 +7588,7 @@
 						_tickerActive = false;
 					}
 				};
-	
+
 				_self.wake = function() {
 					if (_id !== null) {
 						_self.sleep();
@@ -7635,7 +7601,7 @@
 					}
 					_tick(2);
 				};
-	
+
 				_self.fps = function(value) {
 					if (!arguments.length) {
 						return _fps;
@@ -7645,7 +7611,7 @@
 					_nextTime = this.time + _gap;
 					_self.wake();
 				};
-	
+
 				_self.useRAF = function(value) {
 					if (!arguments.length) {
 						return _useRAF;
@@ -7655,7 +7621,7 @@
 					_self.fps(_fps);
 				};
 				_self.fps(fps);
-	
+
 				//a bug in iOS 6 Safari occasionally prevents the requestAnimationFrame from working initially, so we use a 1.5-second timeout that automatically falls back to setTimeout() if it senses this condition.
 				setTimeout(function() {
 					if (_useRAF && _self.frame < 5) {
@@ -7663,11 +7629,11 @@
 					}
 				}, 1500);
 			});
-	
+
 			p = gs.Ticker.prototype = new gs.events.EventDispatcher();
 			p.constructor = gs.Ticker;
-	
-	
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * Animation
@@ -7681,22 +7647,22 @@
 					this._active = (vars.immediateRender === true);
 					this.data = vars.data;
 					this._reversed = (vars.reversed === true);
-	
+
 					if (!_rootTimeline) {
 						return;
 					}
 					if (!_tickerActive) { //some browsers (like iOS 6 Safari) shut down JavaScript execution when the tab is disabled and they [occasionally] neglect to start up requestAnimationFrame again when returning - this code ensures that the engine starts up again properly.
 						_ticker.wake();
 					}
-	
+
 					var tl = this.vars.useFrames ? _rootFramesTimeline : _rootTimeline;
 					tl.add(this, tl._time);
-	
+
 					if (this.vars.paused) {
 						this.paused(true);
 					}
 				});
-	
+
 			_ticker = Animation.ticker = new gs.Ticker();
 			p = Animation.prototype;
 			p._dirty = p._gc = p._initted = p._paused = false;
@@ -7704,8 +7670,8 @@
 			p._rawPrevTime = -1;
 			p._next = p._last = p._onUpdate = p._timeline = p.timeline = null;
 			p._paused = false;
-	
-	
+
+
 			//some browsers (like iOS) occasionally drop the requestAnimationFrame event when the user switches to a different tab and then comes back again, so we use a 2-second setTimeout() to sense if/when that condition occurs and then wake() the ticker.
 			var _checkTimeout = function() {
 					if (_tickerActive && _getTime() - _lastUpdate > 2000) {
@@ -7714,48 +7680,48 @@
 					setTimeout(_checkTimeout, 2000);
 				};
 			_checkTimeout();
-	
-	
+
+
 			p.play = function(from, suppressEvents) {
 				if (from != null) {
 					this.seek(from, suppressEvents);
 				}
 				return this.reversed(false).paused(false);
 			};
-	
+
 			p.pause = function(atTime, suppressEvents) {
 				if (atTime != null) {
 					this.seek(atTime, suppressEvents);
 				}
 				return this.paused(true);
 			};
-	
+
 			p.resume = function(from, suppressEvents) {
 				if (from != null) {
 					this.seek(from, suppressEvents);
 				}
 				return this.paused(false);
 			};
-	
+
 			p.seek = function(time, suppressEvents) {
 				return this.totalTime(Number(time), suppressEvents !== false);
 			};
-	
+
 			p.restart = function(includeDelay, suppressEvents) {
 				return this.reversed(false).paused(false).totalTime(includeDelay ? -this._delay : 0, (suppressEvents !== false), true);
 			};
-	
+
 			p.reverse = function(from, suppressEvents) {
 				if (from != null) {
 					this.seek((from || this.totalDuration()), suppressEvents);
 				}
 				return this.reversed(true).paused(false);
 			};
-	
+
 			p.render = function(time, suppressEvents, force) {
 				//stub - we override this method in subclasses.
 			};
-	
+
 			p.invalidate = function() {
 				this._time = this._totalTime = 0;
 				this._initted = this._gc = false;
@@ -7765,14 +7731,14 @@
 				}
 				return this;
 			};
-	
+
 			p.isActive = function() {
 				var tl = this._timeline, //the 2 root timelines won't have a _timeline; they're always active.
 					startTime = this._startTime,
 					rawTime;
 				return (!tl || (!this._gc && !this._paused && tl.isActive() && (rawTime = tl.rawTime()) >= startTime && rawTime < startTime + this.totalDuration() / this._timeScale));
 			};
-	
+
 			p._enabled = function (enabled, ignoreTimeline) {
 				if (!_tickerActive) {
 					_ticker.wake();
@@ -7788,17 +7754,17 @@
 				}
 				return false;
 			};
-	
-	
+
+
 			p._kill = function(vars, target) {
 				return this._enabled(false, false);
 			};
-	
+
 			p.kill = function(vars, target) {
 				this._kill(vars, target);
 				return this;
 			};
-	
+
 			p._uncache = function(includeSelf) {
 				var tween = includeSelf ? this : this.timeline;
 				while (tween) {
@@ -7807,7 +7773,7 @@
 				}
 				return this;
 			};
-	
+
 			p._swapSelfInParams = function(params) {
 				var i = params.length,
 					copy = params.concat();
@@ -7818,14 +7784,14 @@
 				}
 				return copy;
 			};
-	
+
 			p._callback = function(type) {
 				var v = this.vars;
 				v[type].apply(v[type + "Scope"] || v.callbackScope || this, v[type + "Params"] || _blankArray);
 			};
-	
+
 	//----Animation getters/setters --------------------------------------------------------
-	
+
 			p.eventCallback = function(type, callback, params, scope) {
 				if ((type || "").substr(0,2) === "on") {
 					var v = this.vars;
@@ -7845,7 +7811,7 @@
 				}
 				return this;
 			};
-	
+
 			p.delay = function(value) {
 				if (!arguments.length) {
 					return this._delay;
@@ -7856,7 +7822,7 @@
 				this._delay = value;
 				return this;
 			};
-	
+
 			p.duration = function(value) {
 				if (!arguments.length) {
 					this._dirty = false;
@@ -7869,12 +7835,12 @@
 				}
 				return this;
 			};
-	
+
 			p.totalDuration = function(value) {
 				this._dirty = false;
 				return (!arguments.length) ? this._totalDuration : this.duration(value);
 			};
-	
+
 			p.time = function(value, suppressEvents) {
 				if (!arguments.length) {
 					return this._time;
@@ -7884,7 +7850,7 @@
 				}
 				return this.totalTime((value > this._duration) ? this._duration : value, suppressEvents);
 			};
-	
+
 			p.totalTime = function(time, suppressEvents, uncapped) {
 				if (!_tickerActive) {
 					_ticker.wake();
@@ -7934,12 +7900,12 @@
 				}
 				return this;
 			};
-	
+
 			p.progress = p.totalProgress = function(value, suppressEvents) {
 				var duration = this.duration();
 				return (!arguments.length) ? (duration ? this._time / duration : this.ratio) : this.totalTime(duration * value, suppressEvents);
 			};
-	
+
 			p.startTime = function(value) {
 				if (!arguments.length) {
 					return this._startTime;
@@ -7952,11 +7918,11 @@
 				}
 				return this;
 			};
-	
+
 			p.endTime = function(includeRepeats) {
 				return this._startTime + ((includeRepeats != false) ? this.totalDuration() : this.duration()) / this._timeScale;
 			};
-	
+
 			p.timeScale = function(value) {
 				if (!arguments.length) {
 					return this._timeScale;
@@ -7970,7 +7936,7 @@
 				this._timeScale = value;
 				return this._uncache(false);
 			};
-	
+
 			p.reversed = function(value) {
 				if (!arguments.length) {
 					return this._reversed;
@@ -7981,7 +7947,7 @@
 				}
 				return this;
 			};
-	
+
 			p.paused = function(value) {
 				if (!arguments.length) {
 					return this._paused;
@@ -8011,8 +7977,8 @@
 				}
 				return this;
 			};
-	
-	
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * SimpleTimeline
@@ -8022,13 +7988,13 @@
 				Animation.call(this, 0, vars);
 				this.autoRemoveChildren = this.smoothChildTiming = true;
 			});
-	
+
 			p = SimpleTimeline.prototype = new Animation();
 			p.constructor = SimpleTimeline;
 			p.kill()._gc = false;
 			p._first = p._last = p._recent = null;
 			p._sortChildren = false;
-	
+
 			p.add = p.insert = function(child, position, align, stagger) {
 				var prevTween, st;
 				child._startTime = Number(position || 0) + child._delay;
@@ -8068,13 +8034,13 @@
 				}
 				return this;
 			};
-	
+
 			p._remove = function(tween, skipDisable) {
 				if (tween.timeline === this) {
 					if (!skipDisable) {
 						tween._enabled(false, true);
 					}
-	
+
 					if (tween._prev) {
 						tween._prev._next = tween._next;
 					} else if (this._first === tween) {
@@ -8089,14 +8055,14 @@
 					if (tween === this._recent) {
 						this._recent = this._last;
 					}
-	
+
 					if (this._timeline) {
 						this._uncache(true);
 					}
 				}
 				return this;
 			};
-	
+
 			p.render = function(time, suppressEvents, force) {
 				var tween = this._first,
 					next;
@@ -8113,14 +8079,14 @@
 					tween = next;
 				}
 			};
-	
+
 			p.rawTime = function() {
 				if (!_tickerActive) {
 					_ticker.wake();
 				}
 				return this._totalTime;
 			};
-	
+
 	/*
 	 * ----------------------------------------------------------------
 	 * TweenLite
@@ -8129,19 +8095,19 @@
 			var TweenLite = _class("TweenLite", function(target, duration, vars) {
 					Animation.call(this, duration, vars);
 					this.render = TweenLite.prototype.render; //speed optimization (avoid prototype lookup on this "hot" method)
-	
+
 					if (target == null) {
 						throw "Cannot tween a null target.";
 					}
-	
+
 					this.target = target = (typeof(target) !== "string") ? target : TweenLite.selector(target) || target;
-	
+
 					var isSelector = (target.jquery || (target.length && target !== window && target[0] && (target[0] === window || (target[0].nodeType && target[0].style && !target.nodeType)))),
 						overwrite = this.vars.overwrite,
 						i, targ, targets;
-	
+
 					this._overwrite = overwrite = (overwrite == null) ? _overwriteLookup[TweenLite.defaultOverwrite] : (typeof(overwrite) === "number") ? overwrite >> 0 : _overwriteLookup[overwrite];
-	
+
 					if ((isSelector || target instanceof Array || (target.push && _isArray(target))) && typeof(target[0]) !== "number") {
 						this._targets = targets = _slice(target);  //don't use Array.prototype.slice.call(target, 0) because that doesn't work in IE8 with a NodeList that's returned by querySelectorAll()
 						this._propLookup = [];
@@ -8167,7 +8133,7 @@
 								_applyOverwrite(targ, this, null, 1, this._siblings[i]);
 							}
 						}
-	
+
 					} else {
 						this._propLookup = {};
 						this._siblings = _register(target, this, false);
@@ -8194,17 +8160,17 @@
 					}
 					vars.css = css;
 				};
-	
+
 			p = TweenLite.prototype = new Animation();
 			p.constructor = TweenLite;
 			p.kill()._gc = false;
-	
+
 	//----TweenLite defaults, overwrite management, and root updates ----------------------------------------------------
-	
+
 			p.ratio = 0;
 			p._firstPT = p._targets = p._overwrittenProps = p._startAt = null;
 			p._notifyPluginsOfEnabled = p._lazy = false;
-	
+
 			TweenLite.version = "1.18.0";
 			TweenLite.defaultEase = p._ease = new Ease(null, null, 1, 1);
 			TweenLite.defaultOverwrite = "auto";
@@ -8213,7 +8179,7 @@
 			TweenLite.lagSmoothing = function(threshold, adjustedLag) {
 				_ticker.lagSmoothing(threshold, adjustedLag);
 			};
-	
+
 			TweenLite.selector = window.$ || window.jQuery || function(e) {
 				var selector = window.$ || window.jQuery;
 				if (selector) {
@@ -8222,7 +8188,7 @@
 				}
 				return (typeof(document) === "undefined") ? e : (document.querySelectorAll ? document.querySelectorAll(e) : document.getElementById((e.charAt(0) === "#") ? e.substr(1) : e));
 			};
-	
+
 			var _lazyTweens = [],
 				_lazyLookup = {},
 				_numbersExp = /(?:(-|-=|\+=)?\d*\.?\d*(?:e[\-+]?\d+)?)[0-9]/ig,
@@ -8352,12 +8318,12 @@
 					}
 					_lazyTweens.length = 0;
 				};
-	
+
 			_rootTimeline._startTime = _ticker.time;
 			_rootFramesTimeline._startTime = _ticker.frame;
 			_rootTimeline._active = _rootFramesTimeline._active = true;
 			setTimeout(_lazyRender, 1); //on some mobile devices, there isn't a "tick" before code runs which means any lazy renders wouldn't run before the next official "tick".
-	
+
 			Animation._updateRoot = TweenLite.render = function() {
 					var i, a, p;
 					if (_lazyTweens.length) { //if code is run outside of the requestAnimationFrame loop, there may be tweens queued AFTER the engine refreshed, so we need to ensure any pending renders occur before we refresh again.
@@ -8394,9 +8360,9 @@
 						}
 					}
 				};
-	
+
 			_ticker.addEventListener("tick", Animation._updateRoot);
-	
+
 			var _register = function(target, tween, scrub) {
 					var id = target._gsTweenID, a, i;
 					if (!_tweenLookup[id || (target._gsTweenID = id = "t" + (_tweenLookupNum++))]) {
@@ -8462,7 +8428,7 @@
 							overlaps[oCount++] = curTween;
 						}
 					}
-	
+
 					i = oCount;
 					while (--i > -1) {
 						curTween = overlaps[i];
@@ -8495,10 +8461,10 @@
 					t /= ts;
 					return (t > reference) ? t - reference : ((zeroDur && t === reference) || (!tween._initted && t - reference < 2 * _tinyNum)) ? _tinyNum : ((t += tween.totalDuration() / tween._timeScale / ts) > reference + _tinyNum) ? 0 : t - reference - _tinyNum;
 				};
-	
-	
+
+
 	//---- TweenLite instance methods -----------------------------------------------------------------------------
-	
+
 			p._init = function() {
 				var v = this.vars,
 					op = this._overwrittenProps,
@@ -8566,7 +8532,7 @@
 				this._easeType = this._ease._type;
 				this._easePower = this._ease._power;
 				this._firstPT = null;
-	
+
 				if (this._targets) {
 					i = this._targets.length;
 					while (--i > -1) {
@@ -8577,7 +8543,7 @@
 				} else {
 					initPlugins = this._initProps(this.target, this._propLookup, this._siblings, op);
 				}
-	
+
 				if (initPlugins) {
 					TweenLite._onPluginEvent("_onInitAllProps", this); //reorders the array in order of priority. Uses a static TweenPlugin method in order to minimize file size in TweenLite
 				}
@@ -8595,17 +8561,17 @@
 				this._onUpdate = v.onUpdate;
 				this._initted = true;
 			};
-	
+
 			p._initProps = function(target, propLookup, siblings, overwrittenProps) {
 				var p, i, initPlugins, plugin, pt, v;
 				if (target == null) {
 					return false;
 				}
-	
+
 				if (_lazyLookup[target._gsTweenID]) {
 					_lazyRender(); //if other tweens of the same target have recently initted but haven't rendered yet, we've got to force the render so that the starting values are correct (imagine populating a timeline with a bunch of sequential tweens and then jumping to the end)
 				}
-	
+
 				if (!this.vars.css) if (target.style) if (target !== window && target.nodeType) if (_plugins.css) if (this.vars.autoCSS !== false) { //it's so common to use TweenLite/Max to animate the css of DOM elements, we assume that if the target is a DOM element, that's what is intended (a convenience so that users don't have to wrap things in css:{}, although we still recommend it for a slight performance boost and better specificity). Note: we cannot check "nodeType" on the window inside an iframe.
 					_autoCSS(this.vars, target);
 				}
@@ -8615,9 +8581,9 @@
 						if (v) if ((v instanceof Array) || (v.push && _isArray(v))) if (v.join("").indexOf("{self}") !== -1) {
 							this.vars[p] = v = this._swapSelfInParams(v, this);
 						}
-	
+
 					} else if (_plugins[p] && (plugin = new _plugins[p]())._onInitTween(target, this.vars[p], this)) {
-	
+
 						//t - target 		[object]
 						//p - property 		[string]
 						//s - start			[number]
@@ -8640,12 +8606,12 @@
 						if (pt._next) {
 							pt._next._prev = pt;
 						}
-	
+
 					} else {
 						propLookup[p] = _addPropTween.call(this, target, p, "get", v, p, 0, null, this.vars.stringFilter);
 					}
 				}
-	
+
 				if (overwrittenProps) if (this._kill(overwrittenProps, target)) { //another tween may have tried to overwrite properties of this tween before init() was called (like if two tweens start at the same time, the one created second will run first)
 					return this._initProps(target, propLookup, siblings, overwrittenProps);
 				}
@@ -8658,7 +8624,7 @@
 				}
 				return initPlugins;
 			};
-	
+
 			p.render = function(time, suppressEvents, force) {
 				var prevTime = this._time,
 					duration = this._duration,
@@ -8684,7 +8650,7 @@
 						}
 						this._rawPrevTime = rawPrevTime = (!suppressEvents || time || prevRawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 					}
-	
+
 				} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
 					this._totalTime = this._time = 0;
 					this.ratio = this._ease._calcEnd ? this._ease.getRatio(0) : 0;
@@ -8706,7 +8672,7 @@
 					}
 				} else {
 					this._totalTime = this._time = time;
-	
+
 					if (this._easeType) {
 						var r = time / duration, type = this._easeType, pow = this._easePower;
 						if (type === 1 || (type === 3 && r >= 0.5)) {
@@ -8724,7 +8690,7 @@
 						} else if (pow === 4) {
 							r *= r * r * r * r;
 						}
-	
+
 						if (type === 1) {
 							this.ratio = 1 - r;
 						} else if (type === 2) {
@@ -8734,12 +8700,12 @@
 						} else {
 							this.ratio = 1 - (r / 2);
 						}
-	
+
 					} else {
 						this.ratio = this._ease.getRatio(time / duration);
 					}
 				}
-	
+
 				if (this._time === prevTime && !force) {
 					return;
 				} else if (!this._initted) {
@@ -8787,7 +8753,7 @@
 					}
 					pt = pt._next;
 				}
-	
+
 				if (this._onUpdate) {
 					if (time < 0) if (this._startAt && time !== -0.0001) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
 						this._startAt.render(time, suppressEvents, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
@@ -8814,7 +8780,7 @@
 					}
 				}
 			};
-	
+
 			p._kill = function(vars, target, overwritingTween) {
 				if (vars === "all") {
 					vars = null;
@@ -8850,7 +8816,7 @@
 						propLookup = this._propLookup;
 						overwrittenProps = this._overwrittenProps = vars ? this._overwrittenProps || {} : "all";
 					}
-	
+
 					if (propLookup) {
 						killProps = vars || propLookup;
 						record = (vars !== overwrittenProps && overwrittenProps !== "all" && vars !== propLookup && (typeof(vars) !== "object" || !vars._tempKill)); //_tempKill is a super-secret way to delete a particular tweening property but NOT have it remembered as an official overwritten property (like in BezierPlugin)
@@ -8867,7 +8833,7 @@
 								return false;
 							}
 						}
-	
+
 						for (p in killProps) {
 							if ((pt = propLookup[p])) {
 								if (simultaneousOverwrite) { //if another tween overwrites this one and they both start at exactly the same time, yet this tween has already rendered once (for example, at 0.001) because it's first in the queue, we should revert the values to where they were at 0 so that the starting values aren't contaminated on the overwriting tween.
@@ -8905,7 +8871,7 @@
 				}
 				return changed;
 			};
-	
+
 			p.invalidate = function() {
 				if (this._notifyPluginsOfEnabled) {
 					TweenLite._onPluginEvent("_onDisable", this);
@@ -8920,7 +8886,7 @@
 				}
 				return this;
 			};
-	
+
 			p._enabled = function(enabled, ignoreTimeline) {
 				if (!_tickerActive) {
 					_ticker.wake();
@@ -8943,34 +8909,34 @@
 				}
 				return false;
 			};
-	
-	
+
+
 	//----TweenLite static methods -----------------------------------------------------
-	
+
 			TweenLite.to = function(target, duration, vars) {
 				return new TweenLite(target, duration, vars);
 			};
-	
+
 			TweenLite.from = function(target, duration, vars) {
 				vars.runBackwards = true;
 				vars.immediateRender = (vars.immediateRender != false);
 				return new TweenLite(target, duration, vars);
 			};
-	
+
 			TweenLite.fromTo = function(target, duration, fromVars, toVars) {
 				toVars.startAt = fromVars;
 				toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
 				return new TweenLite(target, duration, toVars);
 			};
-	
+
 			TweenLite.delayedCall = function(delay, callback, params, scope, useFrames) {
 				return new TweenLite(callback, 0, {delay:delay, onComplete:callback, onCompleteParams:params, callbackScope:scope, onReverseComplete:callback, onReverseCompleteParams:params, immediateRender:false, lazy:false, useFrames:useFrames, overwrite:0});
 			};
-	
+
 			TweenLite.set = function(target, vars) {
 				return new TweenLite(target, 0, vars);
 			};
-	
+
 			TweenLite.getTweensOf = function(target, onlyActive) {
 				if (target == null) { return []; }
 				target = (typeof(target) !== "string") ? target : TweenLite.selector(target) || target;
@@ -9003,7 +8969,7 @@
 				}
 				return a;
 			};
-	
+
 			TweenLite.killTweensOf = TweenLite.killDelayedCallsTo = function(target, onlyActive, vars) {
 				if (typeof(onlyActive) === "object") {
 					vars = onlyActive; //for backwards compatibility (before "onlyActive" parameter was inserted)
@@ -9015,9 +8981,9 @@
 					a[i]._kill(vars, target);
 				}
 			};
-	
-	
-	
+
+
+
 	/*
 	 * ----------------------------------------------------------------
 	 * TweenPlugin   (could easily be split out as a separate file/class, but included for ease of use (so that people don't need to include another script call before loading plugins which is easy to forget)
@@ -9029,14 +8995,14 @@
 						this._priority = priority || 0;
 						this._super = TweenPlugin.prototype;
 					}, true);
-	
+
 			p = TweenPlugin.prototype;
 			TweenPlugin.version = "1.18.0";
 			TweenPlugin.API = 2;
 			p._firstPT = null;
 			p._addTween = _addPropTween;
 			p.setRatio = _setRatio;
-	
+
 			p._kill = function(lookup) {
 				var a = this._overwriteProps,
 					pt = this._firstPT,
@@ -9067,7 +9033,7 @@
 				}
 				return false;
 			};
-	
+
 			p._roundProps = function(lookup, value) {
 				var pt = this._firstPT;
 				while (pt) {
@@ -9077,7 +9043,7 @@
 					pt = pt._next;
 				}
 			};
-	
+
 			TweenLite._onPluginEvent = function(type, tween) {
 				var pt = tween._firstPT,
 					changed, pt2, first, last, next;
@@ -9111,7 +9077,7 @@
 				}
 				return changed;
 			};
-	
+
 			TweenPlugin.activate = function(plugins) {
 				var i = plugins.length;
 				while (--i > -1) {
@@ -9121,7 +9087,7 @@
 				}
 				return true;
 			};
-	
+
 			//provides a more concise way to define plugins that have no dependencies besides TweenPlugin and TweenLite, wrapping common boilerplate stuff into one function (added in 1.9.0). You don't NEED to use this to define a plugin - the old way still works and can be useful in certain (rare) situations.
 			_gsDefine.plugin = function(config) {
 				if (!config || !config.propName || !config.init || !config.API) { throw "illegal plugin definition."; }
@@ -9147,8 +9113,8 @@
 				TweenPlugin.activate([Plugin]);
 				return Plugin;
 			};
-	
-	
+
+
 			//now run through all the dependencies discovered and if any are missing, log that to the console as a warning. This is why it's best to have TweenLite load last - it can check all the dependencies for you.
 			a = window._gsQueue;
 			if (a) {
@@ -9161,28 +9127,22 @@
 					}
 				}
 			}
-	
+
 			_tickerActive = false; //ensures that the first official animation forces a ticker.tick() to update the time when it is instantiated
-	
+
 	})((typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window, "TweenMax");
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 12 */
-/*!****************************************!*\
-  !*** (webpack)/buildin/amd-options.js ***!
-  \****************************************/
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
 /* 13 */
-/*!*********************************!*\
-  !*** ./~/jquery/dist/jquery.js ***!
-  \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -9198,9 +9158,9 @@
 	 *
 	 * Date: 2015-04-28T16:01Z
 	 */
-	
+
 	(function( global, factory ) {
-	
+
 		if ( typeof module === "object" && typeof module.exports === "object" ) {
 			// For CommonJS and CommonJS-like environments where a proper `window`
 			// is present, execute the factory and get jQuery.
@@ -9220,174 +9180,174 @@
 		} else {
 			factory( global );
 		}
-	
+
 	// Pass this if window is not defined yet
 	}(typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
-	
+
 	// Support: Firefox 18+
 	// Can't be in strict mode, several libs including ASP.NET trace
 	// the stack via arguments.caller.callee and Firefox dies if
 	// you try to trace through "use strict" call chains. (#13335)
 	//
-	
+
 	var arr = [];
-	
+
 	var slice = arr.slice;
-	
+
 	var concat = arr.concat;
-	
+
 	var push = arr.push;
-	
+
 	var indexOf = arr.indexOf;
-	
+
 	var class2type = {};
-	
+
 	var toString = class2type.toString;
-	
+
 	var hasOwn = class2type.hasOwnProperty;
-	
+
 	var support = {};
-	
-	
-	
+
+
+
 	var
 		// Use the correct document accordingly with window argument (sandbox)
 		document = window.document,
-	
+
 		version = "2.1.4",
-	
+
 		// Define a local copy of jQuery
 		jQuery = function( selector, context ) {
 			// The jQuery object is actually just the init constructor 'enhanced'
 			// Need init if jQuery is called (just allow error to be thrown if not included)
 			return new jQuery.fn.init( selector, context );
 		},
-	
+
 		// Support: Android<4.1
 		// Make sure we trim BOM and NBSP
 		rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
-	
+
 		// Matches dashed string for camelizing
 		rmsPrefix = /^-ms-/,
 		rdashAlpha = /-([\da-z])/gi,
-	
+
 		// Used by jQuery.camelCase as callback to replace()
 		fcamelCase = function( all, letter ) {
 			return letter.toUpperCase();
 		};
-	
+
 	jQuery.fn = jQuery.prototype = {
 		// The current version of jQuery being used
 		jquery: version,
-	
+
 		constructor: jQuery,
-	
+
 		// Start with an empty selector
 		selector: "",
-	
+
 		// The default length of a jQuery object is 0
 		length: 0,
-	
+
 		toArray: function() {
 			return slice.call( this );
 		},
-	
+
 		// Get the Nth element in the matched element set OR
 		// Get the whole matched element set as a clean array
 		get: function( num ) {
 			return num != null ?
-	
+
 				// Return just the one element from the set
 				( num < 0 ? this[ num + this.length ] : this[ num ] ) :
-	
+
 				// Return all the elements in a clean array
 				slice.call( this );
 		},
-	
+
 		// Take an array of elements and push it onto the stack
 		// (returning the new matched element set)
 		pushStack: function( elems ) {
-	
+
 			// Build a new jQuery matched element set
 			var ret = jQuery.merge( this.constructor(), elems );
-	
+
 			// Add the old object onto the stack (as a reference)
 			ret.prevObject = this;
 			ret.context = this.context;
-	
+
 			// Return the newly-formed element set
 			return ret;
 		},
-	
+
 		// Execute a callback for every element in the matched set.
 		// (You can seed the arguments with an array of args, but this is
 		// only used internally.)
 		each: function( callback, args ) {
 			return jQuery.each( this, callback, args );
 		},
-	
+
 		map: function( callback ) {
 			return this.pushStack( jQuery.map(this, function( elem, i ) {
 				return callback.call( elem, i, elem );
 			}));
 		},
-	
+
 		slice: function() {
 			return this.pushStack( slice.apply( this, arguments ) );
 		},
-	
+
 		first: function() {
 			return this.eq( 0 );
 		},
-	
+
 		last: function() {
 			return this.eq( -1 );
 		},
-	
+
 		eq: function( i ) {
 			var len = this.length,
 				j = +i + ( i < 0 ? len : 0 );
 			return this.pushStack( j >= 0 && j < len ? [ this[j] ] : [] );
 		},
-	
+
 		end: function() {
 			return this.prevObject || this.constructor(null);
 		},
-	
+
 		// For internal use only.
 		// Behaves like an Array's method, not like a jQuery method.
 		push: push,
 		sort: arr.sort,
 		splice: arr.splice
 	};
-	
+
 	jQuery.extend = jQuery.fn.extend = function() {
 		var options, name, src, copy, copyIsArray, clone,
 			target = arguments[0] || {},
 			i = 1,
 			length = arguments.length,
 			deep = false;
-	
+
 		// Handle a deep copy situation
 		if ( typeof target === "boolean" ) {
 			deep = target;
-	
+
 			// Skip the boolean and the target
 			target = arguments[ i ] || {};
 			i++;
 		}
-	
+
 		// Handle case when target is a string or something (possible in deep copy)
 		if ( typeof target !== "object" && !jQuery.isFunction(target) ) {
 			target = {};
 		}
-	
+
 		// Extend jQuery itself if only one argument is passed
 		if ( i === length ) {
 			target = this;
 			i--;
 		}
-	
+
 		for ( ; i < length; i++ ) {
 			// Only deal with non-null/undefined values
 			if ( (options = arguments[ i ]) != null ) {
@@ -9395,25 +9355,25 @@
 				for ( name in options ) {
 					src = target[ name ];
 					copy = options[ name ];
-	
+
 					// Prevent never-ending loop
 					if ( target === copy ) {
 						continue;
 					}
-	
+
 					// Recurse if we're merging plain objects or arrays
 					if ( deep && copy && ( jQuery.isPlainObject(copy) || (copyIsArray = jQuery.isArray(copy)) ) ) {
 						if ( copyIsArray ) {
 							copyIsArray = false;
 							clone = src && jQuery.isArray(src) ? src : [];
-	
+
 						} else {
 							clone = src && jQuery.isPlainObject(src) ? src : {};
 						}
-	
+
 						// Never move original objects, clone them
 						target[ name ] = jQuery.extend( deep, clone, copy );
-	
+
 					// Don't bring in undefined values
 					} else if ( copy !== undefined ) {
 						target[ name ] = copy;
@@ -9421,34 +9381,34 @@
 				}
 			}
 		}
-	
+
 		// Return the modified object
 		return target;
 	};
-	
+
 	jQuery.extend({
 		// Unique for each copy of jQuery on the page
 		expando: "jQuery" + ( version + Math.random() ).replace( /\D/g, "" ),
-	
+
 		// Assume jQuery is ready without the ready module
 		isReady: true,
-	
+
 		error: function( msg ) {
 			throw new Error( msg );
 		},
-	
+
 		noop: function() {},
-	
+
 		isFunction: function( obj ) {
 			return jQuery.type(obj) === "function";
 		},
-	
+
 		isArray: Array.isArray,
-	
+
 		isWindow: function( obj ) {
 			return obj != null && obj === obj.window;
 		},
-	
+
 		isNumeric: function( obj ) {
 			// parseFloat NaNs numeric-cast false positives (null|true|false|"")
 			// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
@@ -9456,7 +9416,7 @@
 			// adding 1 corrects loss of precision from parseFloat (#15100)
 			return !jQuery.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
 		},
-	
+
 		isPlainObject: function( obj ) {
 			// Not plain objects:
 			// - Any object or value whose internal [[Class]] property is not "[object Object]"
@@ -9465,17 +9425,17 @@
 			if ( jQuery.type( obj ) !== "object" || obj.nodeType || jQuery.isWindow( obj ) ) {
 				return false;
 			}
-	
+
 			if ( obj.constructor &&
 					!hasOwn.call( obj.constructor.prototype, "isPrototypeOf" ) ) {
 				return false;
 			}
-	
+
 			// If the function hasn't returned already, we're confident that
 			// |obj| is a plain object, created by {} or constructed with new Object
 			return true;
 		},
-	
+
 		isEmptyObject: function( obj ) {
 			var name;
 			for ( name in obj ) {
@@ -9483,7 +9443,7 @@
 			}
 			return true;
 		},
-	
+
 		type: function( obj ) {
 			if ( obj == null ) {
 				return obj + "";
@@ -9493,14 +9453,14 @@
 				class2type[ toString.call(obj) ] || "object" :
 				typeof obj;
 		},
-	
+
 		// Evaluates a script in a global context
 		globalEval: function( code ) {
 			var script,
 				indirect = eval;
-	
+
 			code = jQuery.trim( code );
-	
+
 			if ( code ) {
 				// If the code includes a valid, prologue position
 				// strict mode pragma, execute code by injecting a
@@ -9516,30 +9476,30 @@
 				}
 			}
 		},
-	
+
 		// Convert dashed to camelCase; used by the css and data modules
 		// Support: IE9-11+
 		// Microsoft forgot to hump their vendor prefix (#9572)
 		camelCase: function( string ) {
 			return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
 		},
-	
+
 		nodeName: function( elem, name ) {
 			return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 		},
-	
+
 		// args is for internal usage only
 		each: function( obj, callback, args ) {
 			var value,
 				i = 0,
 				length = obj.length,
 				isArray = isArraylike( obj );
-	
+
 			if ( args ) {
 				if ( isArray ) {
 					for ( ; i < length; i++ ) {
 						value = callback.apply( obj[ i ], args );
-	
+
 						if ( value === false ) {
 							break;
 						}
@@ -9547,19 +9507,19 @@
 				} else {
 					for ( i in obj ) {
 						value = callback.apply( obj[ i ], args );
-	
+
 						if ( value === false ) {
 							break;
 						}
 					}
 				}
-	
+
 			// A special, fast, case for the most common use of each
 			} else {
 				if ( isArray ) {
 					for ( ; i < length; i++ ) {
 						value = callback.call( obj[ i ], i, obj[ i ] );
-	
+
 						if ( value === false ) {
 							break;
 						}
@@ -9567,28 +9527,28 @@
 				} else {
 					for ( i in obj ) {
 						value = callback.call( obj[ i ], i, obj[ i ] );
-	
+
 						if ( value === false ) {
 							break;
 						}
 					}
 				}
 			}
-	
+
 			return obj;
 		},
-	
+
 		// Support: Android<4.1
 		trim: function( text ) {
 			return text == null ?
 				"" :
 				( text + "" ).replace( rtrim, "" );
 		},
-	
+
 		// results is for internal usage only
 		makeArray: function( arr, results ) {
 			var ret = results || [];
-	
+
 			if ( arr != null ) {
 				if ( isArraylike( Object(arr) ) ) {
 					jQuery.merge( ret,
@@ -9599,35 +9559,35 @@
 					push.call( ret, arr );
 				}
 			}
-	
+
 			return ret;
 		},
-	
+
 		inArray: function( elem, arr, i ) {
 			return arr == null ? -1 : indexOf.call( arr, elem, i );
 		},
-	
+
 		merge: function( first, second ) {
 			var len = +second.length,
 				j = 0,
 				i = first.length;
-	
+
 			for ( ; j < len; j++ ) {
 				first[ i++ ] = second[ j ];
 			}
-	
+
 			first.length = i;
-	
+
 			return first;
 		},
-	
+
 		grep: function( elems, callback, invert ) {
 			var callbackInverse,
 				matches = [],
 				i = 0,
 				length = elems.length,
 				callbackExpect = !invert;
-	
+
 			// Go through the array, only saving the items
 			// that pass the validator function
 			for ( ; i < length; i++ ) {
@@ -9636,10 +9596,10 @@
 					matches.push( elems[ i ] );
 				}
 			}
-	
+
 			return matches;
 		},
-	
+
 		// arg is for internal usage only
 		map: function( elems, callback, arg ) {
 			var value,
@@ -9647,93 +9607,93 @@
 				length = elems.length,
 				isArray = isArraylike( elems ),
 				ret = [];
-	
+
 			// Go through the array, translating each of the items to their new values
 			if ( isArray ) {
 				for ( ; i < length; i++ ) {
 					value = callback( elems[ i ], i, arg );
-	
+
 					if ( value != null ) {
 						ret.push( value );
 					}
 				}
-	
+
 			// Go through every key on the object,
 			} else {
 				for ( i in elems ) {
 					value = callback( elems[ i ], i, arg );
-	
+
 					if ( value != null ) {
 						ret.push( value );
 					}
 				}
 			}
-	
+
 			// Flatten any nested arrays
 			return concat.apply( [], ret );
 		},
-	
+
 		// A global GUID counter for objects
 		guid: 1,
-	
+
 		// Bind a function to a context, optionally partially applying any
 		// arguments.
 		proxy: function( fn, context ) {
 			var tmp, args, proxy;
-	
+
 			if ( typeof context === "string" ) {
 				tmp = fn[ context ];
 				context = fn;
 				fn = tmp;
 			}
-	
+
 			// Quick check to determine if target is callable, in the spec
 			// this throws a TypeError, but we will just return undefined.
 			if ( !jQuery.isFunction( fn ) ) {
 				return undefined;
 			}
-	
+
 			// Simulated bind
 			args = slice.call( arguments, 2 );
 			proxy = function() {
 				return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
 			};
-	
+
 			// Set the guid of unique handler to the same of original handler, so it can be removed
 			proxy.guid = fn.guid = fn.guid || jQuery.guid++;
-	
+
 			return proxy;
 		},
-	
+
 		now: Date.now,
-	
+
 		// jQuery.support is not used in Core but other projects attach their
 		// properties to it so it needs to exist.
 		support: support
 	});
-	
+
 	// Populate the class2type map
 	jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
 		class2type[ "[object " + name + "]" ] = name.toLowerCase();
 	});
-	
+
 	function isArraylike( obj ) {
-	
+
 		// Support: iOS 8.2 (not reproducible in simulator)
 		// `in` check used to prevent JIT error (gh-2145)
 		// hasOwn isn't used here due to false negatives
 		// regarding Nodelist length in IE
 		var length = "length" in obj && obj.length,
 			type = jQuery.type( obj );
-	
+
 		if ( type === "function" || jQuery.isWindow( obj ) ) {
 			return false;
 		}
-	
+
 		if ( obj.nodeType === 1 && length ) {
 			return true;
 		}
-	
+
 		return type === "array" || length === 0 ||
 			typeof length === "number" && length > 0 && ( length - 1 ) in obj;
 	}
@@ -9749,7 +9709,7 @@
 	 * Date: 2014-12-16
 	 */
 	(function( window ) {
-	
+
 	var i,
 		support,
 		Expr,
@@ -9761,7 +9721,7 @@
 		outermostContext,
 		sortInput,
 		hasDuplicate,
-	
+
 		// Local document vars
 		setDocument,
 		document,
@@ -9771,7 +9731,7 @@
 		rbuggyMatches,
 		matches,
 		contains,
-	
+
 		// Instance-specific data
 		expando = "sizzle" + 1 * new Date(),
 		preferredDoc = window.document,
@@ -9786,10 +9746,10 @@
 			}
 			return 0;
 		},
-	
+
 		// General-purpose constants
 		MAX_NEGATIVE = 1 << 31,
-	
+
 		// Instance methods
 		hasOwn = ({}).hasOwnProperty,
 		arr = [],
@@ -9809,21 +9769,21 @@
 			}
 			return -1;
 		},
-	
+
 		booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped",
-	
+
 		// Regular expressions
-	
+
 		// Whitespace characters http://www.w3.org/TR/css3-selectors/#whitespace
 		whitespace = "[\\x20\\t\\r\\n\\f]",
 		// http://www.w3.org/TR/css3-syntax/#characters
 		characterEncoding = "(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",
-	
+
 		// Loosely modeled on CSS identifier characters
 		// An unquoted value should be a CSS identifier http://www.w3.org/TR/css3-selectors/#attribute-selectors
 		// Proper syntax: http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier
 		identifier = characterEncoding.replace( "w", "w#" ),
-	
+
 		// Attribute selectors: http://www.w3.org/TR/selectors/#attribute-selectors
 		attributes = "\\[" + whitespace + "*(" + characterEncoding + ")(?:" + whitespace +
 			// Operator (capture 2)
@@ -9831,7 +9791,7 @@
 			// "Attribute values must be CSS identifiers [capture 5] or strings [capture 3 or capture 4]"
 			"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier + "))|)" + whitespace +
 			"*\\]",
-	
+
 		pseudos = ":(" + characterEncoding + ")(?:\\((" +
 			// To reduce the number of selectors needing tokenize in the preFilter, prefer arguments:
 			// 1. quoted (capture 3; capture 4 or capture 5)
@@ -9841,19 +9801,19 @@
 			// 3. anything else (capture 2)
 			".*" +
 			")\\)|)",
-	
+
 		// Leading and non-escaped trailing whitespace, capturing some non-whitespace characters preceding the latter
 		rwhitespace = new RegExp( whitespace + "+", "g" ),
 		rtrim = new RegExp( "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace + "+$", "g" ),
-	
+
 		rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" ),
 		rcombinators = new RegExp( "^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*" ),
-	
+
 		rattributeQuotes = new RegExp( "=" + whitespace + "*([^\\]'\"]*?)" + whitespace + "*\\]", "g" ),
-	
+
 		rpseudo = new RegExp( pseudos ),
 		ridentifier = new RegExp( "^" + identifier + "$" ),
-	
+
 		matchExpr = {
 			"ID": new RegExp( "^#(" + characterEncoding + ")" ),
 			"CLASS": new RegExp( "^\\.(" + characterEncoding + ")" ),
@@ -9869,18 +9829,18 @@
 			"needsContext": new RegExp( "^" + whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
 				whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
 		},
-	
+
 		rinputs = /^(?:input|select|textarea|button)$/i,
 		rheader = /^h\d$/i,
-	
+
 		rnative = /^[^{]+\{\s*\[native \w/,
-	
+
 		// Easily-parseable/retrievable ID or TAG or CLASS selectors
 		rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
-	
+
 		rsibling = /[+~]/,
 		rescape = /'|\\/g,
-	
+
 		// CSS escapes http://www.w3.org/TR/CSS21/syndata.html#escaped-characters
 		runescape = new RegExp( "\\\\([\\da-f]{1,6}" + whitespace + "?|(" + whitespace + ")|.)", "ig" ),
 		funescape = function( _, escaped, escapedWhitespace ) {
@@ -9896,7 +9856,7 @@
 					// Supplemental Plane codepoint (surrogate pair)
 					String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
 		},
-	
+
 		// Used for iframes
 		// See setDocument()
 		// Removing the function wrapper causes a "Permission Denied"
@@ -9904,7 +9864,7 @@
 		unloadHandler = function() {
 			setDocument();
 		};
-	
+
 	// Optimize for push.apply( _, NodeList )
 	try {
 		push.apply(
@@ -9916,12 +9876,12 @@
 		arr[ preferredDoc.childNodes.length ].nodeType;
 	} catch ( e ) {
 		push = { apply: arr.length ?
-	
+
 			// Leverage slice if possible
 			function( target, els ) {
 				push_native.apply( target, slice.call(els) );
 			} :
-	
+
 			// Support: IE<9
 			// Otherwise append directly
 			function( target, els ) {
@@ -9933,28 +9893,28 @@
 			}
 		};
 	}
-	
+
 	function Sizzle( selector, context, results, seed ) {
 		var match, elem, m, nodeType,
 			// QSA vars
 			i, groups, old, nid, newContext, newSelector;
-	
+
 		if ( ( context ? context.ownerDocument || context : preferredDoc ) !== document ) {
 			setDocument( context );
 		}
-	
+
 		context = context || document;
 		results = results || [];
 		nodeType = context.nodeType;
-	
+
 		if ( typeof selector !== "string" || !selector ||
 			nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
-	
+
 			return results;
 		}
-	
+
 		if ( !seed && documentIsHTML ) {
-	
+
 			// Try to shortcut find operations when possible (e.g., not under DocumentFragment)
 			if ( nodeType !== 11 && (match = rquickExpr.exec( selector )) ) {
 				// Speed-up: Sizzle("#ID")
@@ -9981,39 +9941,39 @@
 							return results;
 						}
 					}
-	
+
 				// Speed-up: Sizzle("TAG")
 				} else if ( match[2] ) {
 					push.apply( results, context.getElementsByTagName( selector ) );
 					return results;
-	
+
 				// Speed-up: Sizzle(".CLASS")
 				} else if ( (m = match[3]) && support.getElementsByClassName ) {
 					push.apply( results, context.getElementsByClassName( m ) );
 					return results;
 				}
 			}
-	
+
 			// QSA path
 			if ( support.qsa && (!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
 				nid = old = expando;
 				newContext = context;
 				newSelector = nodeType !== 1 && selector;
-	
+
 				// qSA works strangely on Element-rooted queries
 				// We can work around this by specifying an extra ID on the root
 				// and working up from there (Thanks to Andrew Dupont for the technique)
 				// IE 8 doesn't work on object elements
 				if ( nodeType === 1 && context.nodeName.toLowerCase() !== "object" ) {
 					groups = tokenize( selector );
-	
+
 					if ( (old = context.getAttribute("id")) ) {
 						nid = old.replace( rescape, "\\$&" );
 					} else {
 						context.setAttribute( "id", nid );
 					}
 					nid = "[id='" + nid + "'] ";
-	
+
 					i = groups.length;
 					while ( i-- ) {
 						groups[i] = nid + toSelector( groups[i] );
@@ -10021,7 +9981,7 @@
 					newContext = rsibling.test( selector ) && testContext( context.parentNode ) || context;
 					newSelector = groups.join(",");
 				}
-	
+
 				if ( newSelector ) {
 					try {
 						push.apply( results,
@@ -10037,11 +9997,11 @@
 				}
 			}
 		}
-	
+
 		// All others
 		return select( selector.replace( rtrim, "$1" ), context, results, seed );
 	}
-	
+
 	/**
 	 * Create key-value caches of limited size
 	 * @returns {Function(string, Object)} Returns the Object data after storing it on itself with
@@ -10050,7 +10010,7 @@
 	 */
 	function createCache() {
 		var keys = [];
-	
+
 		function cache( key, value ) {
 			// Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
 			if ( keys.push( key + " " ) > Expr.cacheLength ) {
@@ -10061,7 +10021,7 @@
 		}
 		return cache;
 	}
-	
+
 	/**
 	 * Mark a function for special use by Sizzle
 	 * @param {Function} fn The function to mark
@@ -10070,14 +10030,14 @@
 		fn[ expando ] = true;
 		return fn;
 	}
-	
+
 	/**
 	 * Support testing using an element
 	 * @param {Function} fn Passed the created div and expects a boolean result
 	 */
 	function assert( fn ) {
 		var div = document.createElement("div");
-	
+
 		try {
 			return !!fn( div );
 		} catch (e) {
@@ -10091,7 +10051,7 @@
 			div = null;
 		}
 	}
-	
+
 	/**
 	 * Adds the same handler for all of the specified attrs
 	 * @param {String} attrs Pipe-separated list of attributes
@@ -10100,12 +10060,12 @@
 	function addHandle( attrs, handler ) {
 		var arr = attrs.split("|"),
 			i = attrs.length;
-	
+
 		while ( i-- ) {
 			Expr.attrHandle[ arr[i] ] = handler;
 		}
 	}
-	
+
 	/**
 	 * Checks document order of two siblings
 	 * @param {Element} a
@@ -10117,12 +10077,12 @@
 			diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
 				( ~b.sourceIndex || MAX_NEGATIVE ) -
 				( ~a.sourceIndex || MAX_NEGATIVE );
-	
+
 		// Use IE sourceIndex if available on both nodes
 		if ( diff ) {
 			return diff;
 		}
-	
+
 		// Check if b follows a
 		if ( cur ) {
 			while ( (cur = cur.nextSibling) ) {
@@ -10131,10 +10091,10 @@
 				}
 			}
 		}
-	
+
 		return a ? 1 : -1;
 	}
-	
+
 	/**
 	 * Returns a function to use in pseudos for input types
 	 * @param {String} type
@@ -10145,7 +10105,7 @@
 			return name === "input" && elem.type === type;
 		};
 	}
-	
+
 	/**
 	 * Returns a function to use in pseudos for buttons
 	 * @param {String} type
@@ -10156,7 +10116,7 @@
 			return (name === "input" || name === "button") && elem.type === type;
 		};
 	}
-	
+
 	/**
 	 * Returns a function to use in pseudos for positionals
 	 * @param {Function} fn
@@ -10168,7 +10128,7 @@
 				var j,
 					matchIndexes = fn( [], seed.length, argument ),
 					i = matchIndexes.length;
-	
+
 				// Match elements found at the specified indexes
 				while ( i-- ) {
 					if ( seed[ (j = matchIndexes[i]) ] ) {
@@ -10178,7 +10138,7 @@
 			});
 		});
 	}
-	
+
 	/**
 	 * Checks a node for validity as a Sizzle context
 	 * @param {Element|Object=} context
@@ -10187,10 +10147,10 @@
 	function testContext( context ) {
 		return context && typeof context.getElementsByTagName !== "undefined" && context;
 	}
-	
+
 	// Expose support vars for convenience
 	support = Sizzle.support = {};
-	
+
 	/**
 	 * Detects XML nodes
 	 * @param {Element|Object} elem An element or a document
@@ -10202,7 +10162,7 @@
 		var documentElement = elem && (elem.ownerDocument || elem).documentElement;
 		return documentElement ? documentElement.nodeName !== "HTML" : false;
 	};
-	
+
 	/**
 	 * Sets document-related variables once based on the current document
 	 * @param {Element|Object} [doc] An element or document object to use to set the document
@@ -10211,17 +10171,17 @@
 	setDocument = Sizzle.setDocument = function( node ) {
 		var hasCompare, parent,
 			doc = node ? node.ownerDocument || node : preferredDoc;
-	
+
 		// If no document and documentElement is available, return
 		if ( doc === document || doc.nodeType !== 9 || !doc.documentElement ) {
 			return document;
 		}
-	
+
 		// Set our document
 		document = doc;
 		docElem = doc.documentElement;
 		parent = doc.defaultView;
-	
+
 		// Support: IE>8
 		// If iframe document is assigned to "document" variable and if iframe has been reloaded,
 		// IE will throw "permission denied" error when accessing "document" variable, see jQuery #13936
@@ -10234,14 +10194,14 @@
 				parent.attachEvent( "onunload", unloadHandler );
 			}
 		}
-	
+
 		/* Support tests
 		---------------------------------------------------------------------- */
 		documentIsHTML = !isXML( doc );
-	
+
 		/* Attributes
 		---------------------------------------------------------------------- */
-	
+
 		// Support: IE<8
 		// Verify that getAttribute really returns attributes and not properties
 		// (excepting IE8 booleans)
@@ -10249,19 +10209,19 @@
 			div.className = "i";
 			return !div.getAttribute("className");
 		});
-	
+
 		/* getElement(s)By*
 		---------------------------------------------------------------------- */
-	
+
 		// Check if getElementsByTagName("*") returns only elements
 		support.getElementsByTagName = assert(function( div ) {
 			div.appendChild( doc.createComment("") );
 			return !div.getElementsByTagName("*").length;
 		});
-	
+
 		// Support: IE<9
 		support.getElementsByClassName = rnative.test( doc.getElementsByClassName );
-	
+
 		// Support: IE<10
 		// Check if getElementById returns elements by name
 		// The broken getElementById methods don't pick up programatically-set names,
@@ -10270,7 +10230,7 @@
 			docElem.appendChild( div ).id = expando;
 			return !doc.getElementsByName || !doc.getElementsByName( expando ).length;
 		});
-	
+
 		// ID find and filter
 		if ( support.getById ) {
 			Expr.find["ID"] = function( id, context ) {
@@ -10291,7 +10251,7 @@
 			// Support: IE6/7
 			// getElementById is not reliable as a find shortcut
 			delete Expr.find["ID"];
-	
+
 			Expr.filter["ID"] =  function( id ) {
 				var attrId = id.replace( runescape, funescape );
 				return function( elem ) {
@@ -10300,26 +10260,26 @@
 				};
 			};
 		}
-	
+
 		// Tag
 		Expr.find["TAG"] = support.getElementsByTagName ?
 			function( tag, context ) {
 				if ( typeof context.getElementsByTagName !== "undefined" ) {
 					return context.getElementsByTagName( tag );
-	
+
 				// DocumentFragment nodes don't have gEBTN
 				} else if ( support.qsa ) {
 					return context.querySelectorAll( tag );
 				}
 			} :
-	
+
 			function( tag, context ) {
 				var elem,
 					tmp = [],
 					i = 0,
 					// By happy coincidence, a (broken) gEBTN appears on DocumentFragment nodes too
 					results = context.getElementsByTagName( tag );
-	
+
 				// Filter out possible comments
 				if ( tag === "*" ) {
 					while ( (elem = results[i++]) ) {
@@ -10327,34 +10287,34 @@
 							tmp.push( elem );
 						}
 					}
-	
+
 					return tmp;
 				}
 				return results;
 			};
-	
+
 		// Class
 		Expr.find["CLASS"] = support.getElementsByClassName && function( className, context ) {
 			if ( documentIsHTML ) {
 				return context.getElementsByClassName( className );
 			}
 		};
-	
+
 		/* QSA/matchesSelector
 		---------------------------------------------------------------------- */
-	
+
 		// QSA and matchesSelector support
-	
+
 		// matchesSelector(:active) reports false when true (IE9/Opera 11.5)
 		rbuggyMatches = [];
-	
+
 		// qSa(:focus) reports false when true (Chrome 21)
 		// We allow this because of a bug in IE8/9 that throws an error
 		// whenever `document.activeElement` is accessed on an iframe
 		// So, we allow :focus to pass through QSA all the time to avoid the IE error
 		// See http://bugs.jquery.com/ticket/13378
 		rbuggyQSA = [];
-	
+
 		if ( (support.qsa = rnative.test( doc.querySelectorAll )) ) {
 			// Build QSA regex
 			// Regex strategy adopted from Diego Perini
@@ -10367,7 +10327,7 @@
 				docElem.appendChild( div ).innerHTML = "<a id='" + expando + "'></a>" +
 					"<select id='" + expando + "-\f]' msallowcapture=''>" +
 					"<option selected=''></option></select>";
-	
+
 				// Support: IE8, Opera 11-12.16
 				// Nothing should be selected when empty strings follow ^= or $= or *=
 				// The test attribute must be unknown in Opera but "safe" for WinRT
@@ -10375,25 +10335,25 @@
 				if ( div.querySelectorAll("[msallowcapture^='']").length ) {
 					rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
 				}
-	
+
 				// Support: IE8
 				// Boolean attributes and "value" are not treated correctly
 				if ( !div.querySelectorAll("[selected]").length ) {
 					rbuggyQSA.push( "\\[" + whitespace + "*(?:value|" + booleans + ")" );
 				}
-	
+
 				// Support: Chrome<29, Android<4.2+, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.7+
 				if ( !div.querySelectorAll( "[id~=" + expando + "-]" ).length ) {
 					rbuggyQSA.push("~=");
 				}
-	
+
 				// Webkit/Opera - :checked should return selected option elements
 				// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
 				// IE8 throws error here and will not see later tests
 				if ( !div.querySelectorAll(":checked").length ) {
 					rbuggyQSA.push(":checked");
 				}
-	
+
 				// Support: Safari 8+, iOS 8+
 				// https://bugs.webkit.org/show_bug.cgi?id=136851
 				// In-page `selector#id sibing-combinator selector` fails
@@ -10401,57 +10361,57 @@
 					rbuggyQSA.push(".#.+[+~]");
 				}
 			});
-	
+
 			assert(function( div ) {
 				// Support: Windows 8 Native Apps
 				// The type and name attributes are restricted during .innerHTML assignment
 				var input = doc.createElement("input");
 				input.setAttribute( "type", "hidden" );
 				div.appendChild( input ).setAttribute( "name", "D" );
-	
+
 				// Support: IE8
 				// Enforce case-sensitivity of name attribute
 				if ( div.querySelectorAll("[name=d]").length ) {
 					rbuggyQSA.push( "name" + whitespace + "*[*^$|!~]?=" );
 				}
-	
+
 				// FF 3.5 - :enabled/:disabled and hidden elements (hidden elements are still enabled)
 				// IE8 throws error here and will not see later tests
 				if ( !div.querySelectorAll(":enabled").length ) {
 					rbuggyQSA.push( ":enabled", ":disabled" );
 				}
-	
+
 				// Opera 10-11 does not throw on post-comma invalid pseudos
 				div.querySelectorAll("*,:x");
 				rbuggyQSA.push(",.*:");
 			});
 		}
-	
+
 		if ( (support.matchesSelector = rnative.test( (matches = docElem.matches ||
 			docElem.webkitMatchesSelector ||
 			docElem.mozMatchesSelector ||
 			docElem.oMatchesSelector ||
 			docElem.msMatchesSelector) )) ) {
-	
+
 			assert(function( div ) {
 				// Check to see if it's possible to do matchesSelector
 				// on a disconnected node (IE 9)
 				support.disconnectedMatch = matches.call( div, "div" );
-	
+
 				// This should fail with an exception
 				// Gecko does not error, returns false instead
 				matches.call( div, "[s!='']:x" );
 				rbuggyMatches.push( "!=", pseudos );
 			});
 		}
-	
+
 		rbuggyQSA = rbuggyQSA.length && new RegExp( rbuggyQSA.join("|") );
 		rbuggyMatches = rbuggyMatches.length && new RegExp( rbuggyMatches.join("|") );
-	
+
 		/* Contains
 		---------------------------------------------------------------------- */
 		hasCompare = rnative.test( docElem.compareDocumentPosition );
-	
+
 		// Element contains another
 		// Purposefully does not implement inclusive descendent
 		// As in, an element does not contain itself
@@ -10475,37 +10435,37 @@
 				}
 				return false;
 			};
-	
+
 		/* Sorting
 		---------------------------------------------------------------------- */
-	
+
 		// Document order sorting
 		sortOrder = hasCompare ?
 		function( a, b ) {
-	
+
 			// Flag for duplicate removal
 			if ( a === b ) {
 				hasDuplicate = true;
 				return 0;
 			}
-	
+
 			// Sort on method existence if only one input has compareDocumentPosition
 			var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
 			if ( compare ) {
 				return compare;
 			}
-	
+
 			// Calculate position if both inputs belong to the same document
 			compare = ( a.ownerDocument || a ) === ( b.ownerDocument || b ) ?
 				a.compareDocumentPosition( b ) :
-	
+
 				// Otherwise we know they are disconnected
 				1;
-	
+
 			// Disconnected nodes
 			if ( compare & 1 ||
 				(!support.sortDetached && b.compareDocumentPosition( a ) === compare) ) {
-	
+
 				// Choose the first element that is related to our preferred document
 				if ( a === doc || a.ownerDocument === preferredDoc && contains(preferredDoc, a) ) {
 					return -1;
@@ -10513,13 +10473,13 @@
 				if ( b === doc || b.ownerDocument === preferredDoc && contains(preferredDoc, b) ) {
 					return 1;
 				}
-	
+
 				// Maintain original order
 				return sortInput ?
 					( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
 					0;
 			}
-	
+
 			return compare & 4 ? -1 : 1;
 		} :
 		function( a, b ) {
@@ -10528,14 +10488,14 @@
 				hasDuplicate = true;
 				return 0;
 			}
-	
+
 			var cur,
 				i = 0,
 				aup = a.parentNode,
 				bup = b.parentNode,
 				ap = [ a ],
 				bp = [ b ];
-	
+
 			// Parentless nodes are either documents or disconnected
 			if ( !aup || !bup ) {
 				return a === doc ? -1 :
@@ -10545,12 +10505,12 @@
 					sortInput ?
 					( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
 					0;
-	
+
 			// If the nodes are siblings, we can do a quick check
 			} else if ( aup === bup ) {
 				return siblingCheck( a, b );
 			}
-	
+
 			// Otherwise we need full lists of their ancestors for comparison
 			cur = a;
 			while ( (cur = cur.parentNode) ) {
@@ -10560,45 +10520,45 @@
 			while ( (cur = cur.parentNode) ) {
 				bp.unshift( cur );
 			}
-	
+
 			// Walk down the tree looking for a discrepancy
 			while ( ap[i] === bp[i] ) {
 				i++;
 			}
-	
+
 			return i ?
 				// Do a sibling check if the nodes have a common ancestor
 				siblingCheck( ap[i], bp[i] ) :
-	
+
 				// Otherwise nodes in our document sort first
 				ap[i] === preferredDoc ? -1 :
 				bp[i] === preferredDoc ? 1 :
 				0;
 		};
-	
+
 		return doc;
 	};
-	
+
 	Sizzle.matches = function( expr, elements ) {
 		return Sizzle( expr, null, null, elements );
 	};
-	
+
 	Sizzle.matchesSelector = function( elem, expr ) {
 		// Set document vars if needed
 		if ( ( elem.ownerDocument || elem ) !== document ) {
 			setDocument( elem );
 		}
-	
+
 		// Make sure that attribute selectors are quoted
 		expr = expr.replace( rattributeQuotes, "='$1']" );
-	
+
 		if ( support.matchesSelector && documentIsHTML &&
 			( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
 			( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
-	
+
 			try {
 				var ret = matches.call( elem, expr );
-	
+
 				// IE 9's matchesSelector returns false on disconnected nodes
 				if ( ret || support.disconnectedMatch ||
 						// As well, disconnected nodes are said to be in a document
@@ -10608,10 +10568,10 @@
 				}
 			} catch (e) {}
 		}
-	
+
 		return Sizzle( expr, document, null, [ elem ] ).length > 0;
 	};
-	
+
 	Sizzle.contains = function( context, elem ) {
 		// Set document vars if needed
 		if ( ( context.ownerDocument || context ) !== document ) {
@@ -10619,19 +10579,19 @@
 		}
 		return contains( context, elem );
 	};
-	
+
 	Sizzle.attr = function( elem, name ) {
 		// Set document vars if needed
 		if ( ( elem.ownerDocument || elem ) !== document ) {
 			setDocument( elem );
 		}
-	
+
 		var fn = Expr.attrHandle[ name.toLowerCase() ],
 			// Don't get fooled by Object.prototype properties (jQuery #13807)
 			val = fn && hasOwn.call( Expr.attrHandle, name.toLowerCase() ) ?
 				fn( elem, name, !documentIsHTML ) :
 				undefined;
-	
+
 		return val !== undefined ?
 			val :
 			support.attributes || !documentIsHTML ?
@@ -10640,11 +10600,11 @@
 					val.value :
 					null;
 	};
-	
+
 	Sizzle.error = function( msg ) {
 		throw new Error( "Syntax error, unrecognized expression: " + msg );
 	};
-	
+
 	/**
 	 * Document sorting and removing duplicates
 	 * @param {ArrayLike} results
@@ -10654,12 +10614,12 @@
 			duplicates = [],
 			j = 0,
 			i = 0;
-	
+
 		// Unless we *know* we can detect duplicates, assume their presence
 		hasDuplicate = !support.detectDuplicates;
 		sortInput = !support.sortStable && results.slice( 0 );
 		results.sort( sortOrder );
-	
+
 		if ( hasDuplicate ) {
 			while ( (elem = results[i++]) ) {
 				if ( elem === results[ i ] ) {
@@ -10670,14 +10630,14 @@
 				results.splice( duplicates[ j ], 1 );
 			}
 		}
-	
+
 		// Clear input after sorting to release objects
 		// See https://github.com/jquery/sizzle/pull/225
 		sortInput = null;
-	
+
 		return results;
 	};
-	
+
 	/**
 	 * Utility function for retrieving the text value of an array of DOM nodes
 	 * @param {Array|Element} elem
@@ -10687,7 +10647,7 @@
 			ret = "",
 			i = 0,
 			nodeType = elem.nodeType;
-	
+
 		if ( !nodeType ) {
 			// If no nodeType, this is expected to be an array
 			while ( (node = elem[i++]) ) {
@@ -10709,44 +10669,44 @@
 			return elem.nodeValue;
 		}
 		// Do not include comment or processing instruction nodes
-	
+
 		return ret;
 	};
-	
+
 	Expr = Sizzle.selectors = {
-	
+
 		// Can be adjusted by the user
 		cacheLength: 50,
-	
+
 		createPseudo: markFunction,
-	
+
 		match: matchExpr,
-	
+
 		attrHandle: {},
-	
+
 		find: {},
-	
+
 		relative: {
 			">": { dir: "parentNode", first: true },
 			" ": { dir: "parentNode" },
 			"+": { dir: "previousSibling", first: true },
 			"~": { dir: "previousSibling" }
 		},
-	
+
 		preFilter: {
 			"ATTR": function( match ) {
 				match[1] = match[1].replace( runescape, funescape );
-	
+
 				// Move the given value to match[3] whether quoted or unquoted
 				match[3] = ( match[3] || match[4] || match[5] || "" ).replace( runescape, funescape );
-	
+
 				if ( match[2] === "~=" ) {
 					match[3] = " " + match[3] + " ";
 				}
-	
+
 				return match.slice( 0, 4 );
 			},
-	
+
 			"CHILD": function( match ) {
 				/* matches from matchExpr["CHILD"]
 					1 type (only|nth|...)
@@ -10759,57 +10719,57 @@
 					8 y of y-component
 				*/
 				match[1] = match[1].toLowerCase();
-	
+
 				if ( match[1].slice( 0, 3 ) === "nth" ) {
 					// nth-* requires argument
 					if ( !match[3] ) {
 						Sizzle.error( match[0] );
 					}
-	
+
 					// numeric x and y parameters for Expr.filter.CHILD
 					// remember that false/true cast respectively to 0/1
 					match[4] = +( match[4] ? match[5] + (match[6] || 1) : 2 * ( match[3] === "even" || match[3] === "odd" ) );
 					match[5] = +( ( match[7] + match[8] ) || match[3] === "odd" );
-	
+
 				// other types prohibit arguments
 				} else if ( match[3] ) {
 					Sizzle.error( match[0] );
 				}
-	
+
 				return match;
 			},
-	
+
 			"PSEUDO": function( match ) {
 				var excess,
 					unquoted = !match[6] && match[2];
-	
+
 				if ( matchExpr["CHILD"].test( match[0] ) ) {
 					return null;
 				}
-	
+
 				// Accept quoted arguments as-is
 				if ( match[3] ) {
 					match[2] = match[4] || match[5] || "";
-	
+
 				// Strip excess characters from unquoted arguments
 				} else if ( unquoted && rpseudo.test( unquoted ) &&
 					// Get excess from tokenize (recursively)
 					(excess = tokenize( unquoted, true )) &&
 					// advance to the next closing parenthesis
 					(excess = unquoted.indexOf( ")", unquoted.length - excess ) - unquoted.length) ) {
-	
+
 					// excess is a negative index
 					match[0] = match[0].slice( 0, excess );
 					match[2] = unquoted.slice( 0, excess );
 				}
-	
+
 				// Return only captures needed by the pseudo filter method (type and argument)
 				return match.slice( 0, 3 );
 			}
 		},
-	
+
 		filter: {
-	
+
 			"TAG": function( nodeNameSelector ) {
 				var nodeName = nodeNameSelector.replace( runescape, funescape ).toLowerCase();
 				return nodeNameSelector === "*" ?
@@ -10818,30 +10778,30 @@
 						return elem.nodeName && elem.nodeName.toLowerCase() === nodeName;
 					};
 			},
-	
+
 			"CLASS": function( className ) {
 				var pattern = classCache[ className + " " ];
-	
+
 				return pattern ||
 					(pattern = new RegExp( "(^|" + whitespace + ")" + className + "(" + whitespace + "|$)" )) &&
 					classCache( className, function( elem ) {
 						return pattern.test( typeof elem.className === "string" && elem.className || typeof elem.getAttribute !== "undefined" && elem.getAttribute("class") || "" );
 					});
 			},
-	
+
 			"ATTR": function( name, operator, check ) {
 				return function( elem ) {
 					var result = Sizzle.attr( elem, name );
-	
+
 					if ( result == null ) {
 						return operator === "!=";
 					}
 					if ( !operator ) {
 						return true;
 					}
-	
+
 					result += "";
-	
+
 					return operator === "=" ? result === check :
 						operator === "!=" ? result !== check :
 						operator === "^=" ? check && result.indexOf( check ) === 0 :
@@ -10852,28 +10812,28 @@
 						false;
 				};
 			},
-	
+
 			"CHILD": function( type, what, argument, first, last ) {
 				var simple = type.slice( 0, 3 ) !== "nth",
 					forward = type.slice( -4 ) !== "last",
 					ofType = what === "of-type";
-	
+
 				return first === 1 && last === 0 ?
-	
+
 					// Shortcut for :nth-*(n)
 					function( elem ) {
 						return !!elem.parentNode;
 					} :
-	
+
 					function( elem, context, xml ) {
 						var cache, outerCache, node, diff, nodeIndex, start,
 							dir = simple !== forward ? "nextSibling" : "previousSibling",
 							parent = elem.parentNode,
 							name = ofType && elem.nodeName.toLowerCase(),
 							useCache = !xml && !ofType;
-	
+
 						if ( parent ) {
-	
+
 							// :(first|last|only)-(child|of-type)
 							if ( simple ) {
 								while ( dir ) {
@@ -10888,9 +10848,9 @@
 								}
 								return true;
 							}
-	
+
 							start = [ forward ? parent.firstChild : parent.lastChild ];
-	
+
 							// non-xml :nth-child(...) stores cache data on `parent`
 							if ( forward && useCache ) {
 								// Seek `elem` from a previously-cached index
@@ -10899,49 +10859,49 @@
 								nodeIndex = cache[0] === dirruns && cache[1];
 								diff = cache[0] === dirruns && cache[2];
 								node = nodeIndex && parent.childNodes[ nodeIndex ];
-	
+
 								while ( (node = ++nodeIndex && node && node[ dir ] ||
-	
+
 									// Fallback to seeking `elem` from the start
 									(diff = nodeIndex = 0) || start.pop()) ) {
-	
+
 									// When found, cache indexes on `parent` and break
 									if ( node.nodeType === 1 && ++diff && node === elem ) {
 										outerCache[ type ] = [ dirruns, nodeIndex, diff ];
 										break;
 									}
 								}
-	
+
 							// Use previously-cached element index if available
 							} else if ( useCache && (cache = (elem[ expando ] || (elem[ expando ] = {}))[ type ]) && cache[0] === dirruns ) {
 								diff = cache[1];
-	
+
 							// xml :nth-child(...) or :nth-last-child(...) or :nth(-last)?-of-type(...)
 							} else {
 								// Use the same loop as above to seek `elem` from the start
 								while ( (node = ++nodeIndex && node && node[ dir ] ||
 									(diff = nodeIndex = 0) || start.pop()) ) {
-	
+
 									if ( ( ofType ? node.nodeName.toLowerCase() === name : node.nodeType === 1 ) && ++diff ) {
 										// Cache the index of each encountered element
 										if ( useCache ) {
 											(node[ expando ] || (node[ expando ] = {}))[ type ] = [ dirruns, diff ];
 										}
-	
+
 										if ( node === elem ) {
 											break;
 										}
 									}
 								}
 							}
-	
+
 							// Incorporate the offset, then check against cycle size
 							diff -= last;
 							return diff === first || ( diff % first === 0 && diff / first >= 0 );
 						}
 					};
 			},
-	
+
 			"PSEUDO": function( pseudo, argument ) {
 				// pseudo-class names are case-insensitive
 				// http://www.w3.org/TR/selectors/#pseudo-classes
@@ -10950,14 +10910,14 @@
 				var args,
 					fn = Expr.pseudos[ pseudo ] || Expr.setFilters[ pseudo.toLowerCase() ] ||
 						Sizzle.error( "unsupported pseudo: " + pseudo );
-	
+
 				// The user may use createPseudo to indicate that
 				// arguments are needed to create the filter function
 				// just as Sizzle does
 				if ( fn[ expando ] ) {
 					return fn( argument );
 				}
-	
+
 				// But maintain support for old signatures
 				if ( fn.length > 1 ) {
 					args = [ pseudo, pseudo, "", argument ];
@@ -10975,11 +10935,11 @@
 							return fn( elem, 0, args );
 						};
 				}
-	
+
 				return fn;
 			}
 		},
-	
+
 		pseudos: {
 			// Potentially complex pseudos
 			"not": markFunction(function( selector ) {
@@ -10989,13 +10949,13 @@
 				var input = [],
 					results = [],
 					matcher = compile( selector.replace( rtrim, "$1" ) );
-	
+
 				return matcher[ expando ] ?
 					markFunction(function( seed, matches, context, xml ) {
 						var elem,
 							unmatched = matcher( seed, null, xml, [] ),
 							i = seed.length;
-	
+
 						// Match elements unmatched by `matcher`
 						while ( i-- ) {
 							if ( (elem = unmatched[i]) ) {
@@ -11011,20 +10971,20 @@
 						return !results.pop();
 					};
 			}),
-	
+
 			"has": markFunction(function( selector ) {
 				return function( elem ) {
 					return Sizzle( selector, elem ).length > 0;
 				};
 			}),
-	
+
 			"contains": markFunction(function( text ) {
 				text = text.replace( runescape, funescape );
 				return function( elem ) {
 					return ( elem.textContent || elem.innerText || getText( elem ) ).indexOf( text ) > -1;
 				};
 			}),
-	
+
 			// "Whether an element is represented by a :lang() selector
 			// is based solely on the element's language value
 			// being equal to the identifier C,
@@ -11044,7 +11004,7 @@
 						if ( (elemLang = documentIsHTML ?
 							elem.lang :
 							elem.getAttribute("xml:lang") || elem.getAttribute("lang")) ) {
-	
+
 							elemLang = elemLang.toLowerCase();
 							return elemLang === lang || elemLang.indexOf( lang + "-" ) === 0;
 						}
@@ -11052,47 +11012,47 @@
 					return false;
 				};
 			}),
-	
+
 			// Miscellaneous
 			"target": function( elem ) {
 				var hash = window.location && window.location.hash;
 				return hash && hash.slice( 1 ) === elem.id;
 			},
-	
+
 			"root": function( elem ) {
 				return elem === docElem;
 			},
-	
+
 			"focus": function( elem ) {
 				return elem === document.activeElement && (!document.hasFocus || document.hasFocus()) && !!(elem.type || elem.href || ~elem.tabIndex);
 			},
-	
+
 			// Boolean properties
 			"enabled": function( elem ) {
 				return elem.disabled === false;
 			},
-	
+
 			"disabled": function( elem ) {
 				return elem.disabled === true;
 			},
-	
+
 			"checked": function( elem ) {
 				// In CSS3, :checked should return both checked and selected elements
 				// http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
 				var nodeName = elem.nodeName.toLowerCase();
 				return (nodeName === "input" && !!elem.checked) || (nodeName === "option" && !!elem.selected);
 			},
-	
+
 			"selected": function( elem ) {
 				// Accessing this property makes selected-by-default
 				// options in Safari work properly
 				if ( elem.parentNode ) {
 					elem.parentNode.selectedIndex;
 				}
-	
+
 				return elem.selected === true;
 			},
-	
+
 			// Contents
 			"empty": function( elem ) {
 				// http://www.w3.org/TR/selectors/#empty-pseudo
@@ -11106,48 +11066,48 @@
 				}
 				return true;
 			},
-	
+
 			"parent": function( elem ) {
 				return !Expr.pseudos["empty"]( elem );
 			},
-	
+
 			// Element/input types
 			"header": function( elem ) {
 				return rheader.test( elem.nodeName );
 			},
-	
+
 			"input": function( elem ) {
 				return rinputs.test( elem.nodeName );
 			},
-	
+
 			"button": function( elem ) {
 				var name = elem.nodeName.toLowerCase();
 				return name === "input" && elem.type === "button" || name === "button";
 			},
-	
+
 			"text": function( elem ) {
 				var attr;
 				return elem.nodeName.toLowerCase() === "input" &&
 					elem.type === "text" &&
-	
+
 					// Support: IE<8
 					// New HTML5 attribute values (e.g., "search") appear with elem.type === "text"
 					( (attr = elem.getAttribute("type")) == null || attr.toLowerCase() === "text" );
 			},
-	
+
 			// Position-in-collection
 			"first": createPositionalPseudo(function() {
 				return [ 0 ];
 			}),
-	
+
 			"last": createPositionalPseudo(function( matchIndexes, length ) {
 				return [ length - 1 ];
 			}),
-	
+
 			"eq": createPositionalPseudo(function( matchIndexes, length, argument ) {
 				return [ argument < 0 ? argument + length : argument ];
 			}),
-	
+
 			"even": createPositionalPseudo(function( matchIndexes, length ) {
 				var i = 0;
 				for ( ; i < length; i += 2 ) {
@@ -11155,7 +11115,7 @@
 				}
 				return matchIndexes;
 			}),
-	
+
 			"odd": createPositionalPseudo(function( matchIndexes, length ) {
 				var i = 1;
 				for ( ; i < length; i += 2 ) {
@@ -11163,7 +11123,7 @@
 				}
 				return matchIndexes;
 			}),
-	
+
 			"lt": createPositionalPseudo(function( matchIndexes, length, argument ) {
 				var i = argument < 0 ? argument + length : argument;
 				for ( ; --i >= 0; ) {
@@ -11171,7 +11131,7 @@
 				}
 				return matchIndexes;
 			}),
-	
+
 			"gt": createPositionalPseudo(function( matchIndexes, length, argument ) {
 				var i = argument < 0 ? argument + length : argument;
 				for ( ; ++i < length; ) {
@@ -11181,9 +11141,9 @@
 			})
 		}
 	};
-	
+
 	Expr.pseudos["nth"] = Expr.pseudos["eq"];
-	
+
 	// Add button/input type pseudos
 	for ( i in { radio: true, checkbox: true, file: true, password: true, image: true } ) {
 		Expr.pseudos[ i ] = createInputPseudo( i );
@@ -11191,27 +11151,27 @@
 	for ( i in { submit: true, reset: true } ) {
 		Expr.pseudos[ i ] = createButtonPseudo( i );
 	}
-	
+
 	// Easy API for creating new setFilters
 	function setFilters() {}
 	setFilters.prototype = Expr.filters = Expr.pseudos;
 	Expr.setFilters = new setFilters();
-	
+
 	tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
 		var matched, match, tokens, type,
 			soFar, groups, preFilters,
 			cached = tokenCache[ selector + " " ];
-	
+
 		if ( cached ) {
 			return parseOnly ? 0 : cached.slice( 0 );
 		}
-	
+
 		soFar = selector;
 		groups = [];
 		preFilters = Expr.preFilter;
-	
+
 		while ( soFar ) {
-	
+
 			// Comma and first run
 			if ( !matched || (match = rcomma.exec( soFar )) ) {
 				if ( match ) {
@@ -11220,9 +11180,9 @@
 				}
 				groups.push( (tokens = []) );
 			}
-	
+
 			matched = false;
-	
+
 			// Combinators
 			if ( (match = rcombinators.exec( soFar )) ) {
 				matched = match.shift();
@@ -11233,7 +11193,7 @@
 				});
 				soFar = soFar.slice( matched.length );
 			}
-	
+
 			// Filters
 			for ( type in Expr.filter ) {
 				if ( (match = matchExpr[ type ].exec( soFar )) && (!preFilters[ type ] ||
@@ -11247,12 +11207,12 @@
 					soFar = soFar.slice( matched.length );
 				}
 			}
-	
+
 			if ( !matched ) {
 				break;
 			}
 		}
-	
+
 		// Return the length of the invalid excess
 		// if we're just parsing
 		// Otherwise, throw an error or return tokens
@@ -11263,7 +11223,7 @@
 				// Cache the tokens
 				tokenCache( selector, groups ).slice( 0 );
 	};
-	
+
 	function toSelector( tokens ) {
 		var i = 0,
 			len = tokens.length,
@@ -11273,12 +11233,12 @@
 		}
 		return selector;
 	}
-	
+
 	function addCombinator( matcher, combinator, base ) {
 		var dir = combinator.dir,
 			checkNonElements = base && dir === "parentNode",
 			doneName = done++;
-	
+
 		return combinator.first ?
 			// Check against closest ancestor/preceding element
 			function( elem, context, xml ) {
@@ -11288,12 +11248,12 @@
 					}
 				}
 			} :
-	
+
 			// Check against all ancestor/preceding elements
 			function( elem, context, xml ) {
 				var oldCache, outerCache,
 					newCache = [ dirruns, doneName ];
-	
+
 				// We can't set arbitrary data on XML nodes, so they don't benefit from dir caching
 				if ( xml ) {
 					while ( (elem = elem[ dir ]) ) {
@@ -11309,13 +11269,13 @@
 							outerCache = elem[ expando ] || (elem[ expando ] = {});
 							if ( (oldCache = outerCache[ dir ]) &&
 								oldCache[ 0 ] === dirruns && oldCache[ 1 ] === doneName ) {
-	
+
 								// Assign to newCache so results back-propagate to previous elements
 								return (newCache[ 2 ] = oldCache[ 2 ]);
 							} else {
 								// Reuse newcache so results back-propagate to previous elements
 								outerCache[ dir ] = newCache;
-	
+
 								// A match means we're done; a fail means we have to keep checking
 								if ( (newCache[ 2 ] = matcher( elem, context, xml )) ) {
 									return true;
@@ -11326,7 +11286,7 @@
 				}
 			};
 	}
-	
+
 	function elementMatcher( matchers ) {
 		return matchers.length > 1 ?
 			function( elem, context, xml ) {
@@ -11340,7 +11300,7 @@
 			} :
 			matchers[0];
 	}
-	
+
 	function multipleContexts( selector, contexts, results ) {
 		var i = 0,
 			len = contexts.length;
@@ -11349,14 +11309,14 @@
 		}
 		return results;
 	}
-	
+
 	function condense( unmatched, map, filter, context, xml ) {
 		var elem,
 			newUnmatched = [],
 			i = 0,
 			len = unmatched.length,
 			mapped = map != null;
-	
+
 		for ( ; i < len; i++ ) {
 			if ( (elem = unmatched[i]) ) {
 				if ( !filter || filter( elem, context, xml ) ) {
@@ -11367,10 +11327,10 @@
 				}
 			}
 		}
-	
+
 		return newUnmatched;
 	}
-	
+
 	function setMatcher( preFilter, selector, matcher, postFilter, postFinder, postSelector ) {
 		if ( postFilter && !postFilter[ expando ] ) {
 			postFilter = setMatcher( postFilter );
@@ -11383,36 +11343,36 @@
 				preMap = [],
 				postMap = [],
 				preexisting = results.length,
-	
+
 				// Get initial elements from seed or context
 				elems = seed || multipleContexts( selector || "*", context.nodeType ? [ context ] : context, [] ),
-	
+
 				// Prefilter to get matcher input, preserving a map for seed-results synchronization
 				matcherIn = preFilter && ( seed || !selector ) ?
 					condense( elems, preMap, preFilter, context, xml ) :
 					elems,
-	
+
 				matcherOut = matcher ?
 					// If we have a postFinder, or filtered seed, or non-seed postFilter or preexisting results,
 					postFinder || ( seed ? preFilter : preexisting || postFilter ) ?
-	
+
 						// ...intermediate processing is necessary
 						[] :
-	
+
 						// ...otherwise use results directly
 						results :
 					matcherIn;
-	
+
 			// Find primary matches
 			if ( matcher ) {
 				matcher( matcherIn, matcherOut, context, xml );
 			}
-	
+
 			// Apply postFilter
 			if ( postFilter ) {
 				temp = condense( matcherOut, postMap );
 				postFilter( temp, [], context, xml );
-	
+
 				// Un-match failing elements by moving them back to matcherIn
 				i = temp.length;
 				while ( i-- ) {
@@ -11421,7 +11381,7 @@
 					}
 				}
 			}
-	
+
 			if ( seed ) {
 				if ( postFinder || preFilter ) {
 					if ( postFinder ) {
@@ -11436,18 +11396,18 @@
 						}
 						postFinder( null, (matcherOut = []), temp, xml );
 					}
-	
+
 					// Move matched elements from seed to results to keep them synchronized
 					i = matcherOut.length;
 					while ( i-- ) {
 						if ( (elem = matcherOut[i]) &&
 							(temp = postFinder ? indexOf( seed, elem ) : preMap[i]) > -1 ) {
-	
+
 							seed[temp] = !(results[temp] = elem);
 						}
 					}
 				}
-	
+
 			// Add elements to results, through postFinder if defined
 			} else {
 				matcherOut = condense(
@@ -11463,14 +11423,14 @@
 			}
 		});
 	}
-	
+
 	function matcherFromTokens( tokens ) {
 		var checkContext, matcher, j,
 			len = tokens.length,
 			leadingRelative = Expr.relative[ tokens[0].type ],
 			implicitRelative = leadingRelative || Expr.relative[" "],
 			i = leadingRelative ? 1 : 0,
-	
+
 			// The foundational matcher ensures that elements are reachable from top-level context(s)
 			matchContext = addCombinator( function( elem ) {
 				return elem === checkContext;
@@ -11487,13 +11447,13 @@
 				checkContext = null;
 				return ret;
 			} ];
-	
+
 		for ( ; i < len; i++ ) {
 			if ( (matcher = Expr.relative[ tokens[i].type ]) ) {
 				matchers = [ addCombinator(elementMatcher( matchers ), matcher) ];
 			} else {
 				matcher = Expr.filter[ tokens[i].type ].apply( null, tokens[i].matches );
-	
+
 				// Return special upon seeing a positional matcher
 				if ( matcher[ expando ] ) {
 					// Find the next relative operator (if any) for proper handling
@@ -11518,10 +11478,10 @@
 				matchers.push( matcher );
 			}
 		}
-	
+
 		return elementMatcher( matchers );
 	}
-	
+
 	function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
 		var bySet = setMatchers.length > 0,
 			byElement = elementMatchers.length > 0,
@@ -11537,11 +11497,11 @@
 					// Use integer dirruns iff this is the outermost matcher
 					dirrunsUnique = (dirruns += contextBackup == null ? 1 : Math.random() || 0.1),
 					len = elems.length;
-	
+
 				if ( outermost ) {
 					outermostContext = context !== document && context;
 				}
-	
+
 				// Add elements passing elementMatchers directly to results
 				// Keep `i` a string if there are no elements so `matchedCount` will be "00" below
 				// Support: IE<9, Safari
@@ -11559,21 +11519,21 @@
 							dirruns = dirrunsUnique;
 						}
 					}
-	
+
 					// Track unmatched elements for set filters
 					if ( bySet ) {
 						// They will have gone through all possible matchers
 						if ( (elem = !matcher && elem) ) {
 							matchedCount--;
 						}
-	
+
 						// Lengthen the array for every element, matched or not
 						if ( seed ) {
 							unmatched.push( elem );
 						}
 					}
 				}
-	
+
 				// Apply set filters to unmatched elements
 				matchedCount += i;
 				if ( bySet && i !== matchedCount ) {
@@ -11581,7 +11541,7 @@
 					while ( (matcher = setMatchers[j++]) ) {
 						matcher( unmatched, setMatched, context, xml );
 					}
-	
+
 					if ( seed ) {
 						// Reintegrate element matches to eliminate the need for sorting
 						if ( matchedCount > 0 ) {
@@ -11591,42 +11551,42 @@
 								}
 							}
 						}
-	
+
 						// Discard index placeholder values to get only actual matches
 						setMatched = condense( setMatched );
 					}
-	
+
 					// Add matches to results
 					push.apply( results, setMatched );
-	
+
 					// Seedless set matches succeeding multiple successful matchers stipulate sorting
 					if ( outermost && !seed && setMatched.length > 0 &&
 						( matchedCount + setMatchers.length ) > 1 ) {
-	
+
 						Sizzle.uniqueSort( results );
 					}
 				}
-	
+
 				// Override manipulation of globals by nested matchers
 				if ( outermost ) {
 					dirruns = dirrunsUnique;
 					outermostContext = contextBackup;
 				}
-	
+
 				return unmatched;
 			};
-	
+
 		return bySet ?
 			markFunction( superMatcher ) :
 			superMatcher;
 	}
-	
+
 	compile = Sizzle.compile = function( selector, match /* Internal Use Only */ ) {
 		var i,
 			setMatchers = [],
 			elementMatchers = [],
 			cached = compilerCache[ selector + " " ];
-	
+
 		if ( !cached ) {
 			// Generate a function of recursive functions that can be used to check each element
 			if ( !match ) {
@@ -11641,16 +11601,16 @@
 					elementMatchers.push( cached );
 				}
 			}
-	
+
 			// Cache the compiled function
 			cached = compilerCache( selector, matcherFromGroupMatchers( elementMatchers, setMatchers ) );
-	
+
 			// Save selector and tokenization
 			cached.selector = selector;
 		}
 		return cached;
 	};
-	
+
 	/**
 	 * A low-level selection function that works with Sizzle's compiled
 	 *  selector functions
@@ -11664,35 +11624,35 @@
 		var i, tokens, token, type, find,
 			compiled = typeof selector === "function" && selector,
 			match = !seed && tokenize( (selector = compiled.selector || selector) );
-	
+
 		results = results || [];
-	
+
 		// Try to minimize operations if there is no seed and only one group
 		if ( match.length === 1 ) {
-	
+
 			// Take a shortcut and set the context if the root selector is an ID
 			tokens = match[0] = match[0].slice( 0 );
 			if ( tokens.length > 2 && (token = tokens[0]).type === "ID" &&
 					support.getById && context.nodeType === 9 && documentIsHTML &&
 					Expr.relative[ tokens[1].type ] ) {
-	
+
 				context = ( Expr.find["ID"]( token.matches[0].replace(runescape, funescape), context ) || [] )[0];
 				if ( !context ) {
 					return results;
-	
+
 				// Precompiled matchers will still verify ancestry, so step up a level
 				} else if ( compiled ) {
 					context = context.parentNode;
 				}
-	
+
 				selector = selector.slice( tokens.shift().value.length );
 			}
-	
+
 			// Fetch a seed set for right-to-left matching
 			i = matchExpr["needsContext"].test( selector ) ? 0 : tokens.length;
 			while ( i-- ) {
 				token = tokens[i];
-	
+
 				// Abort if we hit a combinator
 				if ( Expr.relative[ (type = token.type) ] ) {
 					break;
@@ -11703,7 +11663,7 @@
 						token.matches[0].replace( runescape, funescape ),
 						rsibling.test( tokens[0].type ) && testContext( context.parentNode ) || context
 					)) ) {
-	
+
 						// If seed is empty or no tokens remain, we can return early
 						tokens.splice( i, 1 );
 						selector = seed.length && toSelector( tokens );
@@ -11711,13 +11671,13 @@
 							push.apply( results, seed );
 							return results;
 						}
-	
+
 						break;
 					}
 				}
 			}
 		}
-	
+
 		// Compile and execute a filtering function if one is not provided
 		// Provide `match` to avoid retokenization if we modified the selector above
 		( compiled || compile( selector, match ) )(
@@ -11729,26 +11689,26 @@
 		);
 		return results;
 	};
-	
+
 	// One-time assignments
-	
+
 	// Sort stability
 	support.sortStable = expando.split("").sort( sortOrder ).join("") === expando;
-	
+
 	// Support: Chrome 14-35+
 	// Always assume duplicates if they aren't passed to the comparison function
 	support.detectDuplicates = !!hasDuplicate;
-	
+
 	// Initialize against the default document
 	setDocument();
-	
+
 	// Support: Webkit<537.32 - Safari 6.0.3/Chrome 25 (fixed in Chrome 27)
 	// Detached nodes confoundingly follow *each other*
 	support.sortDetached = assert(function( div1 ) {
 		// Should return 1, but returns 4 (following)
 		return div1.compareDocumentPosition( document.createElement("div") ) & 1;
 	});
-	
+
 	// Support: IE<8
 	// Prevent attribute/property "interpolation"
 	// http://msdn.microsoft.com/en-us/library/ms536429%28VS.85%29.aspx
@@ -11762,7 +11722,7 @@
 			}
 		});
 	}
-	
+
 	// Support: IE<9
 	// Use defaultValue in place of getAttribute("value")
 	if ( !support.attributes || !assert(function( div ) {
@@ -11776,7 +11736,7 @@
 			}
 		});
 	}
-	
+
 	// Support: IE<9
 	// Use getAttributeNode to fetch booleans when getAttribute lies
 	if ( !assert(function( div ) {
@@ -11792,13 +11752,13 @@
 			}
 		});
 	}
-	
+
 	return Sizzle;
-	
+
 	})( window );
-	
-	
-	
+
+
+
 	jQuery.find = Sizzle;
 	jQuery.expr = Sizzle.selectors;
 	jQuery.expr[":"] = jQuery.expr.pseudos;
@@ -11806,17 +11766,17 @@
 	jQuery.text = Sizzle.getText;
 	jQuery.isXMLDoc = Sizzle.isXML;
 	jQuery.contains = Sizzle.contains;
-	
-	
-	
+
+
+
 	var rneedsContext = jQuery.expr.match.needsContext;
-	
+
 	var rsingleTag = (/^<(\w+)\s*\/?>(?:<\/\1>|)$/);
-	
-	
-	
+
+
+
 	var risSimple = /^.[^:#\[\.,]*$/;
-	
+
 	// Implement the identical functionality for filter and not
 	function winnow( elements, qualifier, not ) {
 		if ( jQuery.isFunction( qualifier ) ) {
@@ -11824,50 +11784,50 @@
 				/* jshint -W018 */
 				return !!qualifier.call( elem, i, elem ) !== not;
 			});
-	
+
 		}
-	
+
 		if ( qualifier.nodeType ) {
 			return jQuery.grep( elements, function( elem ) {
 				return ( elem === qualifier ) !== not;
 			});
-	
+
 		}
-	
+
 		if ( typeof qualifier === "string" ) {
 			if ( risSimple.test( qualifier ) ) {
 				return jQuery.filter( qualifier, elements, not );
 			}
-	
+
 			qualifier = jQuery.filter( qualifier, elements );
 		}
-	
+
 		return jQuery.grep( elements, function( elem ) {
 			return ( indexOf.call( qualifier, elem ) >= 0 ) !== not;
 		});
 	}
-	
+
 	jQuery.filter = function( expr, elems, not ) {
 		var elem = elems[ 0 ];
-	
+
 		if ( not ) {
 			expr = ":not(" + expr + ")";
 		}
-	
+
 		return elems.length === 1 && elem.nodeType === 1 ?
 			jQuery.find.matchesSelector( elem, expr ) ? [ elem ] : [] :
 			jQuery.find.matches( expr, jQuery.grep( elems, function( elem ) {
 				return elem.nodeType === 1;
 			}));
 	};
-	
+
 	jQuery.fn.extend({
 		find: function( selector ) {
 			var i,
 				len = this.length,
 				ret = [],
 				self = this;
-	
+
 			if ( typeof selector !== "string" ) {
 				return this.pushStack( jQuery( selector ).filter(function() {
 					for ( i = 0; i < len; i++ ) {
@@ -11877,11 +11837,11 @@
 					}
 				}) );
 			}
-	
+
 			for ( i = 0; i < len; i++ ) {
 				jQuery.find( selector, self[ i ], ret );
 			}
-	
+
 			// Needed because $( selector, context ) becomes $( context ).find( selector )
 			ret = this.pushStack( len > 1 ? jQuery.unique( ret ) : ret );
 			ret.selector = this.selector ? this.selector + " " + selector : selector;
@@ -11896,7 +11856,7 @@
 		is: function( selector ) {
 			return !!winnow(
 				this,
-	
+
 				// If this is a positional/relative selector, check membership in the returned set
 				// so $("p:first").is("p:last") won't return true for a doc with two "p".
 				typeof selector === "string" && rneedsContext.test( selector ) ?
@@ -11906,44 +11866,44 @@
 			).length;
 		}
 	});
-	
-	
+
+
 	// Initialize a jQuery object
-	
-	
+
+
 	// A central reference to the root jQuery(document)
 	var rootjQuery,
-	
+
 		// A simple way to check for HTML strings
 		// Prioritize #id over <tag> to avoid XSS via location.hash (#9521)
 		// Strict HTML recognition (#11290: must start with <)
 		rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
-	
+
 		init = jQuery.fn.init = function( selector, context ) {
 			var match, elem;
-	
+
 			// HANDLE: $(""), $(null), $(undefined), $(false)
 			if ( !selector ) {
 				return this;
 			}
-	
+
 			// Handle HTML strings
 			if ( typeof selector === "string" ) {
 				if ( selector[0] === "<" && selector[ selector.length - 1 ] === ">" && selector.length >= 3 ) {
 					// Assume that strings that start and end with <> are HTML and skip the regex check
 					match = [ null, selector, null ];
-	
+
 				} else {
 					match = rquickExpr.exec( selector );
 				}
-	
+
 				// Match html or make sure no context is specified for #id
 				if ( match && (match[1] || !context) ) {
-	
+
 					// HANDLE: $(html) -> $(array)
 					if ( match[1] ) {
 						context = context instanceof jQuery ? context[0] : context;
-	
+
 						// Option to run scripts is true for back-compat
 						// Intentionally let the error be thrown if parseHTML is not present
 						jQuery.merge( this, jQuery.parseHTML(
@@ -11951,27 +11911,27 @@
 							context && context.nodeType ? context.ownerDocument || context : document,
 							true
 						) );
-	
+
 						// HANDLE: $(html, props)
 						if ( rsingleTag.test( match[1] ) && jQuery.isPlainObject( context ) ) {
 							for ( match in context ) {
 								// Properties of context are called as methods if possible
 								if ( jQuery.isFunction( this[ match ] ) ) {
 									this[ match ]( context[ match ] );
-	
+
 								// ...and otherwise set as attributes
 								} else {
 									this.attr( match, context[ match ] );
 								}
 							}
 						}
-	
+
 						return this;
-	
+
 					// HANDLE: $(#id)
 					} else {
 						elem = document.getElementById( match[2] );
-	
+
 						// Support: Blackberry 4.6
 						// gEBID returns nodes no longer in the document (#6963)
 						if ( elem && elem.parentNode ) {
@@ -11979,28 +11939,28 @@
 							this.length = 1;
 							this[0] = elem;
 						}
-	
+
 						this.context = document;
 						this.selector = selector;
 						return this;
 					}
-	
+
 				// HANDLE: $(expr, $(...))
 				} else if ( !context || context.jquery ) {
 					return ( context || rootjQuery ).find( selector );
-	
+
 				// HANDLE: $(expr, context)
 				// (which is just equivalent to: $(context).find(expr)
 				} else {
 					return this.constructor( context ).find( selector );
 				}
-	
+
 			// HANDLE: $(DOMElement)
 			} else if ( selector.nodeType ) {
 				this.context = this[0] = selector;
 				this.length = 1;
 				return this;
-	
+
 			// HANDLE: $(function)
 			// Shortcut for document ready
 			} else if ( jQuery.isFunction( selector ) ) {
@@ -12009,22 +11969,22 @@
 					// Execute immediately if ready is not present
 					selector( jQuery );
 			}
-	
+
 			if ( selector.selector !== undefined ) {
 				this.selector = selector.selector;
 				this.context = selector.context;
 			}
-	
+
 			return jQuery.makeArray( selector, this );
 		};
-	
+
 	// Give the init function the jQuery prototype for later instantiation
 	init.prototype = jQuery.fn;
-	
+
 	// Initialize central reference
 	rootjQuery = jQuery( document );
-	
-	
+
+
 	var rparentsprev = /^(?:parents|prev(?:Until|All))/,
 		// Methods guaranteed to produce a unique set when starting from a unique set
 		guaranteedUnique = {
@@ -12033,12 +11993,12 @@
 			next: true,
 			prev: true
 		};
-	
+
 	jQuery.extend({
 		dir: function( elem, dir, until ) {
 			var matched = [],
 				truncate = until !== undefined;
-	
+
 			while ( (elem = elem[ dir ]) && elem.nodeType !== 9 ) {
 				if ( elem.nodeType === 1 ) {
 					if ( truncate && jQuery( elem ).is( until ) ) {
@@ -12049,25 +12009,25 @@
 			}
 			return matched;
 		},
-	
+
 		sibling: function( n, elem ) {
 			var matched = [];
-	
+
 			for ( ; n; n = n.nextSibling ) {
 				if ( n.nodeType === 1 && n !== elem ) {
 					matched.push( n );
 				}
 			}
-	
+
 			return matched;
 		}
 	});
-	
+
 	jQuery.fn.extend({
 		has: function( target ) {
 			var targets = jQuery( target, this ),
 				l = targets.length;
-	
+
 			return this.filter(function() {
 				var i = 0;
 				for ( ; i < l; i++ ) {
@@ -12077,7 +12037,7 @@
 				}
 			});
 		},
-	
+
 		closest: function( selectors, context ) {
 			var cur,
 				i = 0,
@@ -12086,47 +12046,47 @@
 				pos = rneedsContext.test( selectors ) || typeof selectors !== "string" ?
 					jQuery( selectors, context || this.context ) :
 					0;
-	
+
 			for ( ; i < l; i++ ) {
 				for ( cur = this[i]; cur && cur !== context; cur = cur.parentNode ) {
 					// Always skip document fragments
 					if ( cur.nodeType < 11 && (pos ?
 						pos.index(cur) > -1 :
-	
+
 						// Don't pass non-elements to Sizzle
 						cur.nodeType === 1 &&
 							jQuery.find.matchesSelector(cur, selectors)) ) {
-	
+
 						matched.push( cur );
 						break;
 					}
 				}
 			}
-	
+
 			return this.pushStack( matched.length > 1 ? jQuery.unique( matched ) : matched );
 		},
-	
+
 		// Determine the position of an element within the set
 		index: function( elem ) {
-	
+
 			// No argument, return index in parent
 			if ( !elem ) {
 				return ( this[ 0 ] && this[ 0 ].parentNode ) ? this.first().prevAll().length : -1;
 			}
-	
+
 			// Index in selector
 			if ( typeof elem === "string" ) {
 				return indexOf.call( jQuery( elem ), this[ 0 ] );
 			}
-	
+
 			// Locate the position of the desired element
 			return indexOf.call( this,
-	
+
 				// If it receives a jQuery object, the first element is used
 				elem.jquery ? elem[ 0 ] : elem
 			);
 		},
-	
+
 		add: function( selector, context ) {
 			return this.pushStack(
 				jQuery.unique(
@@ -12134,19 +12094,19 @@
 				)
 			);
 		},
-	
+
 		addBack: function( selector ) {
 			return this.add( selector == null ?
 				this.prevObject : this.prevObject.filter(selector)
 			);
 		}
 	});
-	
+
 	function sibling( cur, dir ) {
 		while ( (cur = cur[dir]) && cur.nodeType !== 1 ) {}
 		return cur;
 	}
-	
+
 	jQuery.each({
 		parent: function( elem ) {
 			var parent = elem.parentNode;
@@ -12188,37 +12148,37 @@
 	}, function( name, fn ) {
 		jQuery.fn[ name ] = function( until, selector ) {
 			var matched = jQuery.map( this, fn, until );
-	
+
 			if ( name.slice( -5 ) !== "Until" ) {
 				selector = until;
 			}
-	
+
 			if ( selector && typeof selector === "string" ) {
 				matched = jQuery.filter( selector, matched );
 			}
-	
+
 			if ( this.length > 1 ) {
 				// Remove duplicates
 				if ( !guaranteedUnique[ name ] ) {
 					jQuery.unique( matched );
 				}
-	
+
 				// Reverse order for parents* and prev-derivatives
 				if ( rparentsprev.test( name ) ) {
 					matched.reverse();
 				}
 			}
-	
+
 			return this.pushStack( matched );
 		};
 	});
 	var rnotwhite = (/\S+/g);
-	
-	
-	
+
+
+
 	// String to Object options format cache
 	var optionsCache = {};
-	
+
 	// Convert String-formatted options into Object-formatted ones and store in cache
 	function createOptions( options ) {
 		var object = optionsCache[ options ] = {};
@@ -12227,7 +12187,7 @@
 		});
 		return object;
 	}
-	
+
 	/*
 	 * Create a callback list using the following parameters:
 	 *
@@ -12251,13 +12211,13 @@
 	 *
 	 */
 	jQuery.Callbacks = function( options ) {
-	
+
 		// Convert options from String-formatted to Object-formatted if needed
 		// (we check in cache first)
 		options = typeof options === "string" ?
 			( optionsCache[ options ] || createOptions( options ) ) :
 			jQuery.extend( {}, options );
-	
+
 		var // Last fire value (for non-forgettable lists)
 			memory,
 			// Flag to know if list was already fired
@@ -12410,13 +12370,13 @@
 					return !!fired;
 				}
 			};
-	
+
 		return self;
 	};
-	
-	
+
+
 	jQuery.extend({
-	
+
 		Deferred: function( func ) {
 			var tuples = [
 					// action, add listener, listener list, final state
@@ -12461,28 +12421,28 @@
 					}
 				},
 				deferred = {};
-	
+
 			// Keep pipe for back-compat
 			promise.pipe = promise.then;
-	
+
 			// Add list-specific methods
 			jQuery.each( tuples, function( i, tuple ) {
 				var list = tuple[ 2 ],
 					stateString = tuple[ 3 ];
-	
+
 				// promise[ done | fail | progress ] = list.add
 				promise[ tuple[1] ] = list.add;
-	
+
 				// Handle state
 				if ( stateString ) {
 					list.add(function() {
 						// state = [ resolved | rejected ]
 						state = stateString;
-	
+
 					// [ reject_list | resolve_list ].disable; progress_list.lock
 					}, tuples[ i ^ 1 ][ 2 ].disable, tuples[ 2 ][ 2 ].lock );
 				}
-	
+
 				// deferred[ resolve | reject | notify ]
 				deferred[ tuple[0] ] = function() {
 					deferred[ tuple[0] + "With" ]( this === deferred ? promise : this, arguments );
@@ -12490,31 +12450,31 @@
 				};
 				deferred[ tuple[0] + "With" ] = list.fireWith;
 			});
-	
+
 			// Make the deferred a promise
 			promise.promise( deferred );
-	
+
 			// Call given func if any
 			if ( func ) {
 				func.call( deferred, deferred );
 			}
-	
+
 			// All done!
 			return deferred;
 		},
-	
+
 		// Deferred helper
 		when: function( subordinate /* , ..., subordinateN */ ) {
 			var i = 0,
 				resolveValues = slice.call( arguments ),
 				length = resolveValues.length,
-	
+
 				// the count of uncompleted subordinates
 				remaining = length !== 1 || ( subordinate && jQuery.isFunction( subordinate.promise ) ) ? length : 0,
-	
+
 				// the master Deferred. If resolveValues consist of only a single Deferred, just use that.
 				deferred = remaining === 1 ? subordinate : jQuery.Deferred(),
-	
+
 				// Update function for both resolve and progress values
 				updateFunc = function( i, contexts, values ) {
 					return function( value ) {
@@ -12527,9 +12487,9 @@
 						}
 					};
 				},
-	
+
 				progressValues, progressContexts, resolveContexts;
-	
+
 			// Add listeners to Deferred subordinates; treat others as resolved
 			if ( length > 1 ) {
 				progressValues = new Array( length );
@@ -12546,35 +12506,35 @@
 					}
 				}
 			}
-	
+
 			// If we're not waiting on anything, resolve the master
 			if ( !remaining ) {
 				deferred.resolveWith( resolveContexts, resolveValues );
 			}
-	
+
 			return deferred.promise();
 		}
 	});
-	
-	
+
+
 	// The deferred used on DOM ready
 	var readyList;
-	
+
 	jQuery.fn.ready = function( fn ) {
 		// Add the callback
 		jQuery.ready.promise().done( fn );
-	
+
 		return this;
 	};
-	
+
 	jQuery.extend({
 		// Is the DOM ready to be used? Set to true once it occurs.
 		isReady: false,
-	
+
 		// A counter to track how many items to wait for before
 		// the ready event fires. See #6781
 		readyWait: 1,
-	
+
 		// Hold (or release) the ready event
 		holdReady: function( hold ) {
 			if ( hold ) {
@@ -12583,26 +12543,26 @@
 				jQuery.ready( true );
 			}
 		},
-	
+
 		// Handle when the DOM is ready
 		ready: function( wait ) {
-	
+
 			// Abort if there are pending holds or we're already ready
 			if ( wait === true ? --jQuery.readyWait : jQuery.isReady ) {
 				return;
 			}
-	
+
 			// Remember that the DOM is ready
 			jQuery.isReady = true;
-	
+
 			// If a normal DOM Ready event fired, decrement, and wait if need be
 			if ( wait !== true && --jQuery.readyWait > 0 ) {
 				return;
 			}
-	
+
 			// If there are functions bound, to execute
 			readyList.resolveWith( document, [ jQuery ] );
-	
+
 			// Trigger any bound ready events
 			if ( jQuery.fn.triggerHandler ) {
 				jQuery( document ).triggerHandler( "ready" );
@@ -12610,7 +12570,7 @@
 			}
 		}
 	});
-	
+
 	/**
 	 * The ready event handler and self cleanup method
 	 */
@@ -12619,65 +12579,65 @@
 		window.removeEventListener( "load", completed, false );
 		jQuery.ready();
 	}
-	
+
 	jQuery.ready.promise = function( obj ) {
 		if ( !readyList ) {
-	
+
 			readyList = jQuery.Deferred();
-	
+
 			// Catch cases where $(document).ready() is called after the browser event has already occurred.
 			// We once tried to use readyState "interactive" here, but it caused issues like the one
 			// discovered by ChrisS here: http://bugs.jquery.com/ticket/12282#comment:15
 			if ( document.readyState === "complete" ) {
 				// Handle it asynchronously to allow scripts the opportunity to delay ready
 				setTimeout( jQuery.ready );
-	
+
 			} else {
-	
+
 				// Use the handy event callback
 				document.addEventListener( "DOMContentLoaded", completed, false );
-	
+
 				// A fallback to window.onload, that will always work
 				window.addEventListener( "load", completed, false );
 			}
 		}
 		return readyList.promise( obj );
 	};
-	
+
 	// Kick off the DOM ready check even if the user does not
 	jQuery.ready.promise();
-	
-	
-	
-	
+
+
+
+
 	// Multifunctional method to get and set values of a collection
 	// The value/s can optionally be executed if it's a function
 	var access = jQuery.access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		var i = 0,
 			len = elems.length,
 			bulk = key == null;
-	
+
 		// Sets many values
 		if ( jQuery.type( key ) === "object" ) {
 			chainable = true;
 			for ( i in key ) {
 				jQuery.access( elems, fn, i, key[i], true, emptyGet, raw );
 			}
-	
+
 		// Sets one value
 		} else if ( value !== undefined ) {
 			chainable = true;
-	
+
 			if ( !jQuery.isFunction( value ) ) {
 				raw = true;
 			}
-	
+
 			if ( bulk ) {
 				// Bulk operations run against the entire set
 				if ( raw ) {
 					fn.call( elems, value );
 					fn = null;
-	
+
 				// ...except when executing function values
 				} else {
 					bulk = fn;
@@ -12686,24 +12646,24 @@
 					};
 				}
 			}
-	
+
 			if ( fn ) {
 				for ( ; i < len; i++ ) {
 					fn( elems[i], key, raw ? value : value.call( elems[i], i, fn( elems[i], key ) ) );
 				}
 			}
 		}
-	
+
 		return chainable ?
 			elems :
-	
+
 			// Gets
 			bulk ?
 				fn.call( elems ) :
 				len ? fn( elems[0], key ) : emptyGet;
 	};
-	
-	
+
+
 	/**
 	 * Determines whether an object can have data
 	 */
@@ -12717,8 +12677,8 @@
 		/* jshint -W018 */
 		return owner.nodeType === 1 || owner.nodeType === 9 || !( +owner.nodeType );
 	};
-	
-	
+
+
 	function Data() {
 		// Support: Android<4,
 		// Old WebKit does not have Object.preventExtensions/freeze method,
@@ -12728,13 +12688,13 @@
 				return {};
 			}
 		});
-	
+
 		this.expando = jQuery.expando + Data.uid++;
 	}
-	
+
 	Data.uid = 1;
 	Data.accepts = jQuery.acceptData;
-	
+
 	Data.prototype = {
 		key: function( owner ) {
 			// We can accept data for non-element nodes in modern browsers,
@@ -12743,20 +12703,20 @@
 			if ( !Data.accepts( owner ) ) {
 				return 0;
 			}
-	
+
 			var descriptor = {},
 				// Check if the owner object already has a cache key
 				unlock = owner[ this.expando ];
-	
+
 			// If not, create one
 			if ( !unlock ) {
 				unlock = Data.uid++;
-	
+
 				// Secure it in a non-enumerable, non-writable property
 				try {
 					descriptor[ this.expando ] = { value: unlock };
 					Object.defineProperties( owner, descriptor );
-	
+
 				// Support: Android<4
 				// Fallback to a less secure definition
 				} catch ( e ) {
@@ -12764,12 +12724,12 @@
 					jQuery.extend( owner, descriptor );
 				}
 			}
-	
+
 			// Ensure the cache object
 			if ( !this.cache[ unlock ] ) {
 				this.cache[ unlock ] = {};
 			}
-	
+
 			return unlock;
 		},
 		set: function( owner, data, value ) {
@@ -12779,11 +12739,11 @@
 				// and set the unlock as though an owner entry had always existed
 				unlock = this.key( owner ),
 				cache = this.cache[ unlock ];
-	
+
 			// Handle: [ owner, key, value ] args
 			if ( typeof data === "string" ) {
 				cache[ data ] = value;
-	
+
 			// Handle: [ owner, { properties } ] args
 			} else {
 				// Fresh assignments by object are shallow copied
@@ -12804,7 +12764,7 @@
 			// allowing direct access to the newly created
 			// empty data object. A valid owner object must be provided.
 			var cache = this.cache[ this.key( owner ) ];
-	
+
 			return key === undefined ?
 				cache : cache[ key ];
 		},
@@ -12823,13 +12783,13 @@
 			//
 			if ( key === undefined ||
 					((key && typeof key === "string") && value === undefined) ) {
-	
+
 				stored = this.get( owner, key );
-	
+
 				return stored !== undefined ?
 					stored : this.get( owner, jQuery.camelCase(key) );
 			}
-	
+
 			// [*]When the key is not a string, or both a key and value
 			// are specified, set or extend (existing objects) with either:
 			//
@@ -12837,7 +12797,7 @@
 			//   2. A key and value
 			//
 			this.set( owner, key, value );
-	
+
 			// Since the "set" path can have two possible entry points
 			// return the expected data based on which path was taken[*]
 			return value !== undefined ? value : key;
@@ -12846,10 +12806,10 @@
 			var i, name, camel,
 				unlock = this.key( owner ),
 				cache = this.cache[ unlock ];
-	
+
 			if ( key === undefined ) {
 				this.cache[ unlock ] = {};
-	
+
 			} else {
 				// Support array or space separated string of keys
 				if ( jQuery.isArray( key ) ) {
@@ -12873,7 +12833,7 @@
 							[ name ] : ( name.match( rnotwhite ) || [] );
 					}
 				}
-	
+
 				i = name.length;
 				while ( i-- ) {
 					delete cache[ name[ i ] ];
@@ -12892,11 +12852,11 @@
 		}
 	};
 	var data_priv = new Data();
-	
+
 	var data_user = new Data();
-	
-	
-	
+
+
+
 	//	Implementation Summary
 	//
 	//	1. Enforce API surface and semantic compatibility with 1.9.x branch
@@ -12906,19 +12866,19 @@
 	//	4. _Never_ expose "private" data to user code (TODO: Drop _data, _removeData)
 	//	5. Avoid exposing implementation details on user objects (eg. expando properties)
 	//	6. Provide a clear path for implementation upgrade to WeakMap in 2014
-	
+
 	var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
 		rmultiDash = /([A-Z])/g;
-	
+
 	function dataAttr( elem, key, data ) {
 		var name;
-	
+
 		// If nothing was found internally, try to fetch any
 		// data from the HTML5 data-* attribute
 		if ( data === undefined && elem.nodeType === 1 ) {
 			name = "data-" + key.replace( rmultiDash, "-$1" ).toLowerCase();
 			data = elem.getAttribute( name );
-	
+
 			if ( typeof data === "string" ) {
 				try {
 					data = data === "true" ? true :
@@ -12929,7 +12889,7 @@
 						rbrace.test( data ) ? jQuery.parseJSON( data ) :
 						data;
 				} catch( e ) {}
-	
+
 				// Make sure we set the data so it isn't changed later
 				data_user.set( elem, key, data );
 			} else {
@@ -12938,46 +12898,46 @@
 		}
 		return data;
 	}
-	
+
 	jQuery.extend({
 		hasData: function( elem ) {
 			return data_user.hasData( elem ) || data_priv.hasData( elem );
 		},
-	
+
 		data: function( elem, name, data ) {
 			return data_user.access( elem, name, data );
 		},
-	
+
 		removeData: function( elem, name ) {
 			data_user.remove( elem, name );
 		},
-	
+
 		// TODO: Now that all calls to _data and _removeData have been replaced
 		// with direct calls to data_priv methods, these can be deprecated.
 		_data: function( elem, name, data ) {
 			return data_priv.access( elem, name, data );
 		},
-	
+
 		_removeData: function( elem, name ) {
 			data_priv.remove( elem, name );
 		}
 	});
-	
+
 	jQuery.fn.extend({
 		data: function( key, value ) {
 			var i, name, data,
 				elem = this[ 0 ],
 				attrs = elem && elem.attributes;
-	
+
 			// Gets all values
 			if ( key === undefined ) {
 				if ( this.length ) {
 					data = data_user.get( elem );
-	
+
 					if ( elem.nodeType === 1 && !data_priv.get( elem, "hasDataAttrs" ) ) {
 						i = attrs.length;
 						while ( i-- ) {
-	
+
 							// Support: IE11+
 							// The attrs elements can be null (#14894)
 							if ( attrs[ i ] ) {
@@ -12991,21 +12951,21 @@
 						data_priv.set( elem, "hasDataAttrs", true );
 					}
 				}
-	
+
 				return data;
 			}
-	
+
 			// Sets multiple values
 			if ( typeof key === "object" ) {
 				return this.each(function() {
 					data_user.set( this, key );
 				});
 			}
-	
+
 			return access( this, function( value ) {
 				var data,
 					camelKey = jQuery.camelCase( key );
-	
+
 				// The calling jQuery object (element matches) is not empty
 				// (and therefore has an element appears at this[ 0 ]) and the
 				// `value` parameter was not undefined. An empty jQuery object
@@ -13018,36 +12978,36 @@
 					if ( data !== undefined ) {
 						return data;
 					}
-	
+
 					// Attempt to get data from the cache
 					// with the key camelized
 					data = data_user.get( elem, camelKey );
 					if ( data !== undefined ) {
 						return data;
 					}
-	
+
 					// Attempt to "discover" the data in
 					// HTML5 custom data-* attrs
 					data = dataAttr( elem, camelKey, undefined );
 					if ( data !== undefined ) {
 						return data;
 					}
-	
+
 					// We tried really hard, but the data doesn't exist.
 					return;
 				}
-	
+
 				// Set the data...
 				this.each(function() {
 					// First, attempt to store a copy or reference of any
 					// data that might've been store with a camelCased key.
 					var data = data_user.get( this, camelKey );
-	
+
 					// For HTML5 data-* attribute interop, we have to
 					// store property names with dashes in a camelCase form.
 					// This might not apply to all properties...*
 					data_user.set( this, camelKey, value );
-	
+
 					// *... In the case of properties that might _actually_
 					// have dashes, we need to also store a copy of that
 					// unchanged property.
@@ -13057,23 +13017,23 @@
 				});
 			}, null, value, arguments.length > 1, null, true );
 		},
-	
+
 		removeData: function( key ) {
 			return this.each(function() {
 				data_user.remove( this, key );
 			});
 		}
 	});
-	
-	
+
+
 	jQuery.extend({
 		queue: function( elem, type, data ) {
 			var queue;
-	
+
 			if ( elem ) {
 				type = ( type || "fx" ) + "queue";
 				queue = data_priv.get( elem, type );
-	
+
 				// Speed up dequeue by getting out quickly if this is just a lookup
 				if ( data ) {
 					if ( !queue || jQuery.isArray( data ) ) {
@@ -13085,10 +13045,10 @@
 				return queue || [];
 			}
 		},
-	
+
 		dequeue: function( elem, type ) {
 			type = type || "fx";
-	
+
 			var queue = jQuery.queue( elem, type ),
 				startLength = queue.length,
 				fn = queue.shift(),
@@ -13096,31 +13056,31 @@
 				next = function() {
 					jQuery.dequeue( elem, type );
 				};
-	
+
 			// If the fx queue is dequeued, always remove the progress sentinel
 			if ( fn === "inprogress" ) {
 				fn = queue.shift();
 				startLength--;
 			}
-	
+
 			if ( fn ) {
-	
+
 				// Add a progress sentinel to prevent the fx queue from being
 				// automatically dequeued
 				if ( type === "fx" ) {
 					queue.unshift( "inprogress" );
 				}
-	
+
 				// Clear up the last queue stop function
 				delete hooks.stop;
 				fn.call( elem, next, hooks );
 			}
-	
+
 			if ( !startLength && hooks ) {
 				hooks.empty.fire();
 			}
 		},
-	
+
 		// Not public - generate a queueHooks object, or return the current one
 		_queueHooks: function( elem, type ) {
 			var key = type + "queueHooks";
@@ -13131,29 +13091,29 @@
 			});
 		}
 	});
-	
+
 	jQuery.fn.extend({
 		queue: function( type, data ) {
 			var setter = 2;
-	
+
 			if ( typeof type !== "string" ) {
 				data = type;
 				type = "fx";
 				setter--;
 			}
-	
+
 			if ( arguments.length < setter ) {
 				return jQuery.queue( this[0], type );
 			}
-	
+
 			return data === undefined ?
 				this :
 				this.each(function() {
 					var queue = jQuery.queue( this, type, data );
-	
+
 					// Ensure a hooks for this queue
 					jQuery._queueHooks( this, type );
-	
+
 					if ( type === "fx" && queue[0] !== "inprogress" ) {
 						jQuery.dequeue( this, type );
 					}
@@ -13180,13 +13140,13 @@
 						defer.resolveWith( elements, [ elements ] );
 					}
 				};
-	
+
 			if ( typeof type !== "string" ) {
 				obj = type;
 				type = undefined;
 			}
 			type = type || "fx";
-	
+
 			while ( i-- ) {
 				tmp = data_priv.get( elements[ i ], type + "queueHooks" );
 				if ( tmp && tmp.empty ) {
@@ -13199,25 +13159,25 @@
 		}
 	});
 	var pnum = (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/).source;
-	
+
 	var cssExpand = [ "Top", "Right", "Bottom", "Left" ];
-	
+
 	var isHidden = function( elem, el ) {
 			// isHidden might be called from jQuery#filter function;
 			// in that case, element will be second argument
 			elem = el || elem;
 			return jQuery.css( elem, "display" ) === "none" || !jQuery.contains( elem.ownerDocument, elem );
 		};
-	
+
 	var rcheckableType = (/^(?:checkbox|radio)$/i);
-	
-	
-	
+
+
+
 	(function() {
 		var fragment = document.createDocumentFragment(),
 			div = fragment.appendChild( document.createElement( "div" ) ),
 			input = document.createElement( "input" );
-	
+
 		// Support: Safari<=5.1
 		// Check state lost if the name is set (#11217)
 		// Support: Windows Web Apps (WWA)
@@ -13225,77 +13185,77 @@
 		input.setAttribute( "type", "radio" );
 		input.setAttribute( "checked", "checked" );
 		input.setAttribute( "name", "t" );
-	
+
 		div.appendChild( input );
-	
+
 		// Support: Safari<=5.1, Android<4.2
 		// Older WebKit doesn't clone checked state correctly in fragments
 		support.checkClone = div.cloneNode( true ).cloneNode( true ).lastChild.checked;
-	
+
 		// Support: IE<=11+
 		// Make sure textarea (and checkbox) defaultValue is properly cloned
 		div.innerHTML = "<textarea>x</textarea>";
 		support.noCloneChecked = !!div.cloneNode( true ).lastChild.defaultValue;
 	})();
 	var strundefined = typeof undefined;
-	
-	
-	
+
+
+
 	support.focusinBubbles = "onfocusin" in window;
-	
-	
+
+
 	var
 		rkeyEvent = /^key/,
 		rmouseEvent = /^(?:mouse|pointer|contextmenu)|click/,
 		rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
 		rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
-	
+
 	function returnTrue() {
 		return true;
 	}
-	
+
 	function returnFalse() {
 		return false;
 	}
-	
+
 	function safeActiveElement() {
 		try {
 			return document.activeElement;
 		} catch ( err ) { }
 	}
-	
+
 	/*
 	 * Helper functions for managing events -- not part of the public interface.
 	 * Props to Dean Edwards' addEvent library for many of the ideas.
 	 */
 	jQuery.event = {
-	
+
 		global: {},
-	
+
 		add: function( elem, types, handler, data, selector ) {
-	
+
 			var handleObjIn, eventHandle, tmp,
 				events, t, handleObj,
 				special, handlers, type, namespaces, origType,
 				elemData = data_priv.get( elem );
-	
+
 			// Don't attach events to noData or text/comment nodes (but allow plain objects)
 			if ( !elemData ) {
 				return;
 			}
-	
+
 			// Caller can pass in an object of custom data in lieu of the handler
 			if ( handler.handler ) {
 				handleObjIn = handler;
 				handler = handleObjIn.handler;
 				selector = handleObjIn.selector;
 			}
-	
+
 			// Make sure that the handler has a unique ID, used to find/remove it later
 			if ( !handler.guid ) {
 				handler.guid = jQuery.guid++;
 			}
-	
+
 			// Init the element's event structure and main handler, if this is the first
 			if ( !(events = elemData.events) ) {
 				events = elemData.events = {};
@@ -13308,7 +13268,7 @@
 						jQuery.event.dispatch.apply( elem, arguments ) : undefined;
 				};
 			}
-	
+
 			// Handle multiple events separated by a space
 			types = ( types || "" ).match( rnotwhite ) || [ "" ];
 			t = types.length;
@@ -13316,21 +13276,21 @@
 				tmp = rtypenamespace.exec( types[t] ) || [];
 				type = origType = tmp[1];
 				namespaces = ( tmp[2] || "" ).split( "." ).sort();
-	
+
 				// There *must* be a type, no attaching namespace-only handlers
 				if ( !type ) {
 					continue;
 				}
-	
+
 				// If event changes its type, use the special event handlers for the changed type
 				special = jQuery.event.special[ type ] || {};
-	
+
 				// If selector defined, determine special event api type, otherwise given type
 				type = ( selector ? special.delegateType : special.bindType ) || type;
-	
+
 				// Update special based on newly reset type
 				special = jQuery.event.special[ type ] || {};
-	
+
 				// handleObj is passed to all event handlers
 				handleObj = jQuery.extend({
 					type: type,
@@ -13342,12 +13302,12 @@
 					needsContext: selector && jQuery.expr.match.needsContext.test( selector ),
 					namespace: namespaces.join(".")
 				}, handleObjIn );
-	
+
 				// Init the event handler queue if we're the first
 				if ( !(handlers = events[ type ]) ) {
 					handlers = events[ type ] = [];
 					handlers.delegateCount = 0;
-	
+
 					// Only use addEventListener if the special events handler returns false
 					if ( !special.setup || special.setup.call( elem, data, namespaces, eventHandle ) === false ) {
 						if ( elem.addEventListener ) {
@@ -13355,40 +13315,40 @@
 						}
 					}
 				}
-	
+
 				if ( special.add ) {
 					special.add.call( elem, handleObj );
-	
+
 					if ( !handleObj.handler.guid ) {
 						handleObj.handler.guid = handler.guid;
 					}
 				}
-	
+
 				// Add to the element's handler list, delegates in front
 				if ( selector ) {
 					handlers.splice( handlers.delegateCount++, 0, handleObj );
 				} else {
 					handlers.push( handleObj );
 				}
-	
+
 				// Keep track of which events have ever been used, for event optimization
 				jQuery.event.global[ type ] = true;
 			}
-	
+
 		},
-	
+
 		// Detach an event or set of events from an element
 		remove: function( elem, types, handler, selector, mappedTypes ) {
-	
+
 			var j, origCount, tmp,
 				events, t, handleObj,
 				special, handlers, type, namespaces, origType,
 				elemData = data_priv.hasData( elem ) && data_priv.get( elem );
-	
+
 			if ( !elemData || !(events = elemData.events) ) {
 				return;
 			}
-	
+
 			// Once for each type.namespace in types; type may be omitted
 			types = ( types || "" ).match( rnotwhite ) || [ "" ];
 			t = types.length;
@@ -13396,7 +13356,7 @@
 				tmp = rtypenamespace.exec( types[t] ) || [];
 				type = origType = tmp[1];
 				namespaces = ( tmp[2] || "" ).split( "." ).sort();
-	
+
 				// Unbind all events (on this namespace, if provided) for the element
 				if ( !type ) {
 					for ( type in events ) {
@@ -13404,23 +13364,23 @@
 					}
 					continue;
 				}
-	
+
 				special = jQuery.event.special[ type ] || {};
 				type = ( selector ? special.delegateType : special.bindType ) || type;
 				handlers = events[ type ] || [];
 				tmp = tmp[2] && new RegExp( "(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)" );
-	
+
 				// Remove matching events
 				origCount = j = handlers.length;
 				while ( j-- ) {
 					handleObj = handlers[ j ];
-	
+
 					if ( ( mappedTypes || origType === handleObj.origType ) &&
 						( !handler || handler.guid === handleObj.guid ) &&
 						( !tmp || tmp.test( handleObj.namespace ) ) &&
 						( !selector || selector === handleObj.selector || selector === "**" && handleObj.selector ) ) {
 						handlers.splice( j, 1 );
-	
+
 						if ( handleObj.selector ) {
 							handlers.delegateCount--;
 						}
@@ -13429,44 +13389,44 @@
 						}
 					}
 				}
-	
+
 				// Remove generic event handler if we removed something and no more handlers exist
 				// (avoids potential for endless recursion during removal of special event handlers)
 				if ( origCount && !handlers.length ) {
 					if ( !special.teardown || special.teardown.call( elem, namespaces, elemData.handle ) === false ) {
 						jQuery.removeEvent( elem, type, elemData.handle );
 					}
-	
+
 					delete events[ type ];
 				}
 			}
-	
+
 			// Remove the expando if it's no longer used
 			if ( jQuery.isEmptyObject( events ) ) {
 				delete elemData.handle;
 				data_priv.remove( elem, "events" );
 			}
 		},
-	
+
 		trigger: function( event, data, elem, onlyHandlers ) {
-	
+
 			var i, cur, tmp, bubbleType, ontype, handle, special,
 				eventPath = [ elem || document ],
 				type = hasOwn.call( event, "type" ) ? event.type : event,
 				namespaces = hasOwn.call( event, "namespace" ) ? event.namespace.split(".") : [];
-	
+
 			cur = tmp = elem = elem || document;
-	
+
 			// Don't do events on text and comment nodes
 			if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
 				return;
 			}
-	
+
 			// focus/blur morphs to focusin/out; ensure we're not firing them right now
 			if ( rfocusMorph.test( type + jQuery.event.triggered ) ) {
 				return;
 			}
-	
+
 			if ( type.indexOf(".") >= 0 ) {
 				// Namespaced trigger; create a regexp to match event type in handle()
 				namespaces = type.split(".");
@@ -13474,40 +13434,40 @@
 				namespaces.sort();
 			}
 			ontype = type.indexOf(":") < 0 && "on" + type;
-	
+
 			// Caller can pass in a jQuery.Event object, Object, or just an event type string
 			event = event[ jQuery.expando ] ?
 				event :
 				new jQuery.Event( type, typeof event === "object" && event );
-	
+
 			// Trigger bitmask: & 1 for native handlers; & 2 for jQuery (always true)
 			event.isTrigger = onlyHandlers ? 2 : 3;
 			event.namespace = namespaces.join(".");
 			event.namespace_re = event.namespace ?
 				new RegExp( "(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)" ) :
 				null;
-	
+
 			// Clean up the event in case it is being reused
 			event.result = undefined;
 			if ( !event.target ) {
 				event.target = elem;
 			}
-	
+
 			// Clone any incoming data and prepend the event, creating the handler arg list
 			data = data == null ?
 				[ event ] :
 				jQuery.makeArray( data, [ event ] );
-	
+
 			// Allow special events to draw outside the lines
 			special = jQuery.event.special[ type ] || {};
 			if ( !onlyHandlers && special.trigger && special.trigger.apply( elem, data ) === false ) {
 				return;
 			}
-	
+
 			// Determine event propagation path in advance, per W3C events spec (#9951)
 			// Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
 			if ( !onlyHandlers && !special.noBubble && !jQuery.isWindow( elem ) ) {
-	
+
 				bubbleType = special.delegateType || type;
 				if ( !rfocusMorph.test( bubbleType + type ) ) {
 					cur = cur.parentNode;
@@ -13516,27 +13476,27 @@
 					eventPath.push( cur );
 					tmp = cur;
 				}
-	
+
 				// Only add window if we got to document (e.g., not plain obj or detached DOM)
 				if ( tmp === (elem.ownerDocument || document) ) {
 					eventPath.push( tmp.defaultView || tmp.parentWindow || window );
 				}
 			}
-	
+
 			// Fire handlers on the event path
 			i = 0;
 			while ( (cur = eventPath[i++]) && !event.isPropagationStopped() ) {
-	
+
 				event.type = i > 1 ?
 					bubbleType :
 					special.bindType || type;
-	
+
 				// jQuery handler
 				handle = ( data_priv.get( cur, "events" ) || {} )[ event.type ] && data_priv.get( cur, "handle" );
 				if ( handle ) {
 					handle.apply( cur, data );
 				}
-	
+
 				// Native handler
 				handle = ontype && cur[ ontype ];
 				if ( handle && handle.apply && jQuery.acceptData( cur ) ) {
@@ -13547,80 +13507,80 @@
 				}
 			}
 			event.type = type;
-	
+
 			// If nobody prevented the default action, do it now
 			if ( !onlyHandlers && !event.isDefaultPrevented() ) {
-	
+
 				if ( (!special._default || special._default.apply( eventPath.pop(), data ) === false) &&
 					jQuery.acceptData( elem ) ) {
-	
+
 					// Call a native DOM method on the target with the same name name as the event.
 					// Don't do default actions on window, that's where global variables be (#6170)
 					if ( ontype && jQuery.isFunction( elem[ type ] ) && !jQuery.isWindow( elem ) ) {
-	
+
 						// Don't re-trigger an onFOO event when we call its FOO() method
 						tmp = elem[ ontype ];
-	
+
 						if ( tmp ) {
 							elem[ ontype ] = null;
 						}
-	
+
 						// Prevent re-triggering of the same event, since we already bubbled it above
 						jQuery.event.triggered = type;
 						elem[ type ]();
 						jQuery.event.triggered = undefined;
-	
+
 						if ( tmp ) {
 							elem[ ontype ] = tmp;
 						}
 					}
 				}
 			}
-	
+
 			return event.result;
 		},
-	
+
 		dispatch: function( event ) {
-	
+
 			// Make a writable jQuery.Event from the native event object
 			event = jQuery.event.fix( event );
-	
+
 			var i, j, ret, matched, handleObj,
 				handlerQueue = [],
 				args = slice.call( arguments ),
 				handlers = ( data_priv.get( this, "events" ) || {} )[ event.type ] || [],
 				special = jQuery.event.special[ event.type ] || {};
-	
+
 			// Use the fix-ed jQuery.Event rather than the (read-only) native event
 			args[0] = event;
 			event.delegateTarget = this;
-	
+
 			// Call the preDispatch hook for the mapped type, and let it bail if desired
 			if ( special.preDispatch && special.preDispatch.call( this, event ) === false ) {
 				return;
 			}
-	
+
 			// Determine handlers
 			handlerQueue = jQuery.event.handlers.call( this, event, handlers );
-	
+
 			// Run delegates first; they may want to stop propagation beneath us
 			i = 0;
 			while ( (matched = handlerQueue[ i++ ]) && !event.isPropagationStopped() ) {
 				event.currentTarget = matched.elem;
-	
+
 				j = 0;
 				while ( (handleObj = matched.handlers[ j++ ]) && !event.isImmediatePropagationStopped() ) {
-	
+
 					// Triggered event must either 1) have no namespace, or 2) have namespace(s)
 					// a subset or equal to those in the bound event (both can have no namespace).
 					if ( !event.namespace_re || event.namespace_re.test( handleObj.namespace ) ) {
-	
+
 						event.handleObj = handleObj;
 						event.data = handleObj.data;
-	
+
 						ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler )
 								.apply( matched.elem, args );
-	
+
 						if ( ret !== undefined ) {
 							if ( (event.result = ret) === false ) {
 								event.preventDefault();
@@ -13630,37 +13590,37 @@
 					}
 				}
 			}
-	
+
 			// Call the postDispatch hook for the mapped type
 			if ( special.postDispatch ) {
 				special.postDispatch.call( this, event );
 			}
-	
+
 			return event.result;
 		},
-	
+
 		handlers: function( event, handlers ) {
 			var i, matches, sel, handleObj,
 				handlerQueue = [],
 				delegateCount = handlers.delegateCount,
 				cur = event.target;
-	
+
 			// Find delegate handlers
 			// Black-hole SVG <use> instance trees (#13180)
 			// Avoid non-left-click bubbling in Firefox (#3861)
 			if ( delegateCount && cur.nodeType && (!event.button || event.type !== "click") ) {
-	
+
 				for ( ; cur !== this; cur = cur.parentNode || this ) {
-	
+
 					// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
 					if ( cur.disabled !== true || event.type !== "click" ) {
 						matches = [];
 						for ( i = 0; i < delegateCount; i++ ) {
 							handleObj = handlers[ i ];
-	
+
 							// Don't conflict with Object.prototype properties (#13203)
 							sel = handleObj.selector + " ";
-	
+
 							if ( matches[ sel ] === undefined ) {
 								matches[ sel ] = handleObj.needsContext ?
 									jQuery( sel, this ).index( cur ) >= 0 :
@@ -13676,70 +13636,70 @@
 					}
 				}
 			}
-	
+
 			// Add the remaining (directly-bound) handlers
 			if ( delegateCount < handlers.length ) {
 				handlerQueue.push({ elem: this, handlers: handlers.slice( delegateCount ) });
 			}
-	
+
 			return handlerQueue;
 		},
-	
+
 		// Includes some event props shared by KeyEvent and MouseEvent
 		props: "altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which".split(" "),
-	
+
 		fixHooks: {},
-	
+
 		keyHooks: {
 			props: "char charCode key keyCode".split(" "),
 			filter: function( event, original ) {
-	
+
 				// Add which for key events
 				if ( event.which == null ) {
 					event.which = original.charCode != null ? original.charCode : original.keyCode;
 				}
-	
+
 				return event;
 			}
 		},
-	
+
 		mouseHooks: {
 			props: "button buttons clientX clientY offsetX offsetY pageX pageY screenX screenY toElement".split(" "),
 			filter: function( event, original ) {
 				var eventDoc, doc, body,
 					button = original.button;
-	
+
 				// Calculate pageX/Y if missing and clientX/Y available
 				if ( event.pageX == null && original.clientX != null ) {
 					eventDoc = event.target.ownerDocument || document;
 					doc = eventDoc.documentElement;
 					body = eventDoc.body;
-	
+
 					event.pageX = original.clientX + ( doc && doc.scrollLeft || body && body.scrollLeft || 0 ) - ( doc && doc.clientLeft || body && body.clientLeft || 0 );
 					event.pageY = original.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
 				}
-	
+
 				// Add which for click: 1 === left; 2 === middle; 3 === right
 				// Note: button is not normalized, so don't use it
 				if ( !event.which && button !== undefined ) {
 					event.which = ( button & 1 ? 1 : ( button & 2 ? 3 : ( button & 4 ? 2 : 0 ) ) );
 				}
-	
+
 				return event;
 			}
 		},
-	
+
 		fix: function( event ) {
 			if ( event[ jQuery.expando ] ) {
 				return event;
 			}
-	
+
 			// Create a writable copy of the event object and normalize some properties
 			var i, prop, copy,
 				type = event.type,
 				originalEvent = event,
 				fixHook = this.fixHooks[ type ];
-	
+
 			if ( !fixHook ) {
 				this.fixHooks[ type ] = fixHook =
 					rmouseEvent.test( type ) ? this.mouseHooks :
@@ -13747,30 +13707,30 @@
 					{};
 			}
 			copy = fixHook.props ? this.props.concat( fixHook.props ) : this.props;
-	
+
 			event = new jQuery.Event( originalEvent );
-	
+
 			i = copy.length;
 			while ( i-- ) {
 				prop = copy[ i ];
 				event[ prop ] = originalEvent[ prop ];
 			}
-	
+
 			// Support: Cordova 2.5 (WebKit) (#13255)
 			// All events should have a target; Cordova deviceready doesn't
 			if ( !event.target ) {
 				event.target = document;
 			}
-	
+
 			// Support: Safari 6.0+, Chrome<28
 			// Target should not be a text node (#504, #13143)
 			if ( event.target.nodeType === 3 ) {
 				event.target = event.target.parentNode;
 			}
-	
+
 			return fixHook.filter ? fixHook.filter( event, originalEvent ) : event;
 		},
-	
+
 		special: {
 			load: {
 				// Prevent triggered image.load events from bubbling to window.load
@@ -13803,16 +13763,16 @@
 						return false;
 					}
 				},
-	
+
 				// For cross-browser consistency, don't fire native .click() on links
 				_default: function( event ) {
 					return jQuery.nodeName( event.target, "a" );
 				}
 			},
-	
+
 			beforeunload: {
 				postDispatch: function( event ) {
-	
+
 					// Support: Firefox 20+
 					// Firefox doesn't alert if the returnValue field is not set.
 					if ( event.result !== undefined && event.originalEvent ) {
@@ -13821,7 +13781,7 @@
 				}
 			}
 		},
-	
+
 		simulate: function( type, elem, event, bubble ) {
 			// Piggyback on a donor event to simulate a different one.
 			// Fake originalEvent to avoid donor's stopPropagation, but if the
@@ -13845,24 +13805,24 @@
 			}
 		}
 	};
-	
+
 	jQuery.removeEvent = function( elem, type, handle ) {
 		if ( elem.removeEventListener ) {
 			elem.removeEventListener( type, handle, false );
 		}
 	};
-	
+
 	jQuery.Event = function( src, props ) {
 		// Allow instantiation without the 'new' keyword
 		if ( !(this instanceof jQuery.Event) ) {
 			return new jQuery.Event( src, props );
 		}
-	
+
 		// Event object
 		if ( src && src.type ) {
 			this.originalEvent = src;
 			this.type = src.type;
-	
+
 			// Events bubbling up the document may have been marked as prevented
 			// by a handler lower down the tree; reflect the correct value.
 			this.isDefaultPrevented = src.defaultPrevented ||
@@ -13871,62 +13831,62 @@
 					src.returnValue === false ?
 				returnTrue :
 				returnFalse;
-	
+
 		// Event type
 		} else {
 			this.type = src;
 		}
-	
+
 		// Put explicitly provided properties onto the event object
 		if ( props ) {
 			jQuery.extend( this, props );
 		}
-	
+
 		// Create a timestamp if incoming event doesn't have one
 		this.timeStamp = src && src.timeStamp || jQuery.now();
-	
+
 		// Mark it as fixed
 		this[ jQuery.expando ] = true;
 	};
-	
+
 	// jQuery.Event is based on DOM3 Events as specified by the ECMAScript Language Binding
 	// http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
 	jQuery.Event.prototype = {
 		isDefaultPrevented: returnFalse,
 		isPropagationStopped: returnFalse,
 		isImmediatePropagationStopped: returnFalse,
-	
+
 		preventDefault: function() {
 			var e = this.originalEvent;
-	
+
 			this.isDefaultPrevented = returnTrue;
-	
+
 			if ( e && e.preventDefault ) {
 				e.preventDefault();
 			}
 		},
 		stopPropagation: function() {
 			var e = this.originalEvent;
-	
+
 			this.isPropagationStopped = returnTrue;
-	
+
 			if ( e && e.stopPropagation ) {
 				e.stopPropagation();
 			}
 		},
 		stopImmediatePropagation: function() {
 			var e = this.originalEvent;
-	
+
 			this.isImmediatePropagationStopped = returnTrue;
-	
+
 			if ( e && e.stopImmediatePropagation ) {
 				e.stopImmediatePropagation();
 			}
-	
+
 			this.stopPropagation();
 		}
 	};
-	
+
 	// Create mouseenter/leave events using mouseover/out and event-time checks
 	// Support: Chrome 15+
 	jQuery.each({
@@ -13938,13 +13898,13 @@
 		jQuery.event.special[ orig ] = {
 			delegateType: fix,
 			bindType: fix,
-	
+
 			handle: function( event ) {
 				var ret,
 					target = this,
 					related = event.relatedTarget,
 					handleObj = event.handleObj;
-	
+
 				// For mousenter/leave call the handler if related is outside the target.
 				// NB: No relatedTarget if the mouse left/entered the browser window
 				if ( !related || (related !== target && !jQuery.contains( target, related )) ) {
@@ -13956,22 +13916,22 @@
 			}
 		};
 	});
-	
+
 	// Support: Firefox, Chrome, Safari
 	// Create "bubbling" focus and blur events
 	if ( !support.focusinBubbles ) {
 		jQuery.each({ focus: "focusin", blur: "focusout" }, function( orig, fix ) {
-	
+
 			// Attach a single capturing handler on the document while someone wants focusin/focusout
 			var handler = function( event ) {
 					jQuery.event.simulate( fix, event.target, jQuery.event.fix( event ), true );
 				};
-	
+
 			jQuery.event.special[ fix ] = {
 				setup: function() {
 					var doc = this.ownerDocument || this,
 						attaches = data_priv.access( doc, fix );
-	
+
 					if ( !attaches ) {
 						doc.addEventListener( orig, handler, true );
 					}
@@ -13980,11 +13940,11 @@
 				teardown: function() {
 					var doc = this.ownerDocument || this,
 						attaches = data_priv.access( doc, fix ) - 1;
-	
+
 					if ( !attaches ) {
 						doc.removeEventListener( orig, handler, true );
 						data_priv.remove( doc, fix );
-	
+
 					} else {
 						data_priv.access( doc, fix, attaches );
 					}
@@ -13992,12 +13952,12 @@
 			};
 		});
 	}
-	
+
 	jQuery.fn.extend({
-	
+
 		on: function( types, selector, data, fn, /*INTERNAL*/ one ) {
 			var origFn, type;
-	
+
 			// Types can be a map of types/handlers
 			if ( typeof types === "object" ) {
 				// ( types-Object, selector, data )
@@ -14011,7 +13971,7 @@
 				}
 				return this;
 			}
-	
+
 			if ( data == null && fn == null ) {
 				// ( types, fn )
 				fn = selector;
@@ -14033,7 +13993,7 @@
 			} else if ( !fn ) {
 				return this;
 			}
-	
+
 			if ( one === 1 ) {
 				origFn = fn;
 				fn = function( event ) {
@@ -14082,7 +14042,7 @@
 				jQuery.event.remove( this, types, fn, selector );
 			});
 		},
-	
+
 		trigger: function( type, data ) {
 			return this.each(function() {
 				jQuery.event.trigger( type, data, this );
@@ -14095,8 +14055,8 @@
 			}
 		}
 	});
-	
-	
+
+
 	var
 		rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
 		rtagName = /<([\w:]+)/,
@@ -14107,38 +14067,38 @@
 		rscriptType = /^$|\/(?:java|ecma)script/i,
 		rscriptTypeMasked = /^true\/(.*)/,
 		rcleanScript = /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g,
-	
+
 		// We have to close these tags to support XHTML (#13200)
 		wrapMap = {
-	
+
 			// Support: IE9
 			option: [ 1, "<select multiple='multiple'>", "</select>" ],
-	
+
 			thead: [ 1, "<table>", "</table>" ],
 			col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
 			tr: [ 2, "<table><tbody>", "</tbody></table>" ],
 			td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
-	
+
 			_default: [ 0, "", "" ]
 		};
-	
+
 	// Support: IE9
 	wrapMap.optgroup = wrapMap.option;
-	
+
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
-	
+
 	// Support: 1.x compatibility
 	// Manipulating tables requires a tbody
 	function manipulationTarget( elem, content ) {
 		return jQuery.nodeName( elem, "table" ) &&
 			jQuery.nodeName( content.nodeType !== 11 ? content : content.firstChild, "tr" ) ?
-	
+
 			elem.getElementsByTagName("tbody")[0] ||
 				elem.appendChild( elem.ownerDocument.createElement("tbody") ) :
 			elem;
 	}
-	
+
 	// Replace/restore the type attribute of script elements for safe DOM manipulation
 	function disableScript( elem ) {
 		elem.type = (elem.getAttribute("type") !== null) + "/" + elem.type;
@@ -14146,45 +14106,45 @@
 	}
 	function restoreScript( elem ) {
 		var match = rscriptTypeMasked.exec( elem.type );
-	
+
 		if ( match ) {
 			elem.type = match[ 1 ];
 		} else {
 			elem.removeAttribute("type");
 		}
-	
+
 		return elem;
 	}
-	
+
 	// Mark scripts as having already been evaluated
 	function setGlobalEval( elems, refElements ) {
 		var i = 0,
 			l = elems.length;
-	
+
 		for ( ; i < l; i++ ) {
 			data_priv.set(
 				elems[ i ], "globalEval", !refElements || data_priv.get( refElements[ i ], "globalEval" )
 			);
 		}
 	}
-	
+
 	function cloneCopyEvent( src, dest ) {
 		var i, l, type, pdataOld, pdataCur, udataOld, udataCur, events;
-	
+
 		if ( dest.nodeType !== 1 ) {
 			return;
 		}
-	
+
 		// 1. Copy private data: events, handlers, etc.
 		if ( data_priv.hasData( src ) ) {
 			pdataOld = data_priv.access( src );
 			pdataCur = data_priv.set( dest, pdataOld );
 			events = pdataOld.events;
-	
+
 			if ( events ) {
 				delete pdataCur.handle;
 				pdataCur.events = {};
-	
+
 				for ( type in events ) {
 					for ( i = 0, l = events[ type ].length; i < l; i++ ) {
 						jQuery.event.add( dest, type, events[ type ][ i ] );
@@ -14192,65 +14152,65 @@
 				}
 			}
 		}
-	
+
 		// 2. Copy user data
 		if ( data_user.hasData( src ) ) {
 			udataOld = data_user.access( src );
 			udataCur = jQuery.extend( {}, udataOld );
-	
+
 			data_user.set( dest, udataCur );
 		}
 	}
-	
+
 	function getAll( context, tag ) {
 		var ret = context.getElementsByTagName ? context.getElementsByTagName( tag || "*" ) :
 				context.querySelectorAll ? context.querySelectorAll( tag || "*" ) :
 				[];
-	
+
 		return tag === undefined || tag && jQuery.nodeName( context, tag ) ?
 			jQuery.merge( [ context ], ret ) :
 			ret;
 	}
-	
+
 	// Fix IE bugs, see support tests
 	function fixInput( src, dest ) {
 		var nodeName = dest.nodeName.toLowerCase();
-	
+
 		// Fails to persist the checked state of a cloned checkbox or radio button.
 		if ( nodeName === "input" && rcheckableType.test( src.type ) ) {
 			dest.checked = src.checked;
-	
+
 		// Fails to return the selected option to the default selected state when cloning options
 		} else if ( nodeName === "input" || nodeName === "textarea" ) {
 			dest.defaultValue = src.defaultValue;
 		}
 	}
-	
+
 	jQuery.extend({
 		clone: function( elem, dataAndEvents, deepDataAndEvents ) {
 			var i, l, srcElements, destElements,
 				clone = elem.cloneNode( true ),
 				inPage = jQuery.contains( elem.ownerDocument, elem );
-	
+
 			// Fix IE cloning issues
 			if ( !support.noCloneChecked && ( elem.nodeType === 1 || elem.nodeType === 11 ) &&
 					!jQuery.isXMLDoc( elem ) ) {
-	
+
 				// We eschew Sizzle here for performance reasons: http://jsperf.com/getall-vs-sizzle/2
 				destElements = getAll( clone );
 				srcElements = getAll( elem );
-	
+
 				for ( i = 0, l = srcElements.length; i < l; i++ ) {
 					fixInput( srcElements[ i ], destElements[ i ] );
 				}
 			}
-	
+
 			// Copy the events from the original to the clone
 			if ( dataAndEvents ) {
 				if ( deepDataAndEvents ) {
 					srcElements = srcElements || getAll( elem );
 					destElements = destElements || getAll( clone );
-	
+
 					for ( i = 0, l = srcElements.length; i < l; i++ ) {
 						cloneCopyEvent( srcElements[ i ], destElements[ i ] );
 					}
@@ -14258,89 +14218,89 @@
 					cloneCopyEvent( elem, clone );
 				}
 			}
-	
+
 			// Preserve script evaluation history
 			destElements = getAll( clone, "script" );
 			if ( destElements.length > 0 ) {
 				setGlobalEval( destElements, !inPage && getAll( elem, "script" ) );
 			}
-	
+
 			// Return the cloned set
 			return clone;
 		},
-	
+
 		buildFragment: function( elems, context, scripts, selection ) {
 			var elem, tmp, tag, wrap, contains, j,
 				fragment = context.createDocumentFragment(),
 				nodes = [],
 				i = 0,
 				l = elems.length;
-	
+
 			for ( ; i < l; i++ ) {
 				elem = elems[ i ];
-	
+
 				if ( elem || elem === 0 ) {
-	
+
 					// Add nodes directly
 					if ( jQuery.type( elem ) === "object" ) {
 						// Support: QtWebKit, PhantomJS
 						// push.apply(_, arraylike) throws on ancient WebKit
 						jQuery.merge( nodes, elem.nodeType ? [ elem ] : elem );
-	
+
 					// Convert non-html into a text node
 					} else if ( !rhtml.test( elem ) ) {
 						nodes.push( context.createTextNode( elem ) );
-	
+
 					// Convert html into DOM nodes
 					} else {
 						tmp = tmp || fragment.appendChild( context.createElement("div") );
-	
+
 						// Deserialize a standard representation
 						tag = ( rtagName.exec( elem ) || [ "", "" ] )[ 1 ].toLowerCase();
 						wrap = wrapMap[ tag ] || wrapMap._default;
 						tmp.innerHTML = wrap[ 1 ] + elem.replace( rxhtmlTag, "<$1></$2>" ) + wrap[ 2 ];
-	
+
 						// Descend through wrappers to the right content
 						j = wrap[ 0 ];
 						while ( j-- ) {
 							tmp = tmp.lastChild;
 						}
-	
+
 						// Support: QtWebKit, PhantomJS
 						// push.apply(_, arraylike) throws on ancient WebKit
 						jQuery.merge( nodes, tmp.childNodes );
-	
+
 						// Remember the top-level container
 						tmp = fragment.firstChild;
-	
+
 						// Ensure the created nodes are orphaned (#12392)
 						tmp.textContent = "";
 					}
 				}
 			}
-	
+
 			// Remove wrapper from fragment
 			fragment.textContent = "";
-	
+
 			i = 0;
 			while ( (elem = nodes[ i++ ]) ) {
-	
+
 				// #4087 - If origin and destination elements are the same, and this is
 				// that element, do not do anything
 				if ( selection && jQuery.inArray( elem, selection ) !== -1 ) {
 					continue;
 				}
-	
+
 				contains = jQuery.contains( elem.ownerDocument, elem );
-	
+
 				// Append to fragment
 				tmp = getAll( fragment.appendChild( elem ), "script" );
-	
+
 				// Preserve script evaluation history
 				if ( contains ) {
 					setGlobalEval( tmp );
 				}
-	
+
 				// Capture executables
 				if ( scripts ) {
 					j = 0;
@@ -14351,25 +14311,25 @@
 					}
 				}
 			}
-	
+
 			return fragment;
 		},
-	
+
 		cleanData: function( elems ) {
 			var data, elem, type, key,
 				special = jQuery.event.special,
 				i = 0;
-	
+
 			for ( ; (elem = elems[ i ]) !== undefined; i++ ) {
 				if ( jQuery.acceptData( elem ) ) {
 					key = elem[ data_priv.expando ];
-	
+
 					if ( key && (data = data_priv.cache[ key ]) ) {
 						if ( data.events ) {
 							for ( type in data.events ) {
 								if ( special[ type ] ) {
 									jQuery.event.remove( elem, type );
-	
+
 								// This is a shortcut to avoid jQuery.event.remove's overhead
 								} else {
 									jQuery.removeEvent( elem, type, data.handle );
@@ -14387,7 +14347,7 @@
 			}
 		}
 	});
-	
+
 	jQuery.fn.extend({
 		text: function( value ) {
 			return access( this, function( value ) {
@@ -14400,7 +14360,7 @@
 					});
 			}, null, value, arguments.length );
 		},
-	
+
 		append: function() {
 			return this.domManip( arguments, function( elem ) {
 				if ( this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9 ) {
@@ -14409,7 +14369,7 @@
 				}
 			});
 		},
-	
+
 		prepend: function() {
 			return this.domManip( arguments, function( elem ) {
 				if ( this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9 ) {
@@ -14418,7 +14378,7 @@
 				}
 			});
 		},
-	
+
 		before: function() {
 			return this.domManip( arguments, function( elem ) {
 				if ( this.parentNode ) {
@@ -14426,7 +14386,7 @@
 				}
 			});
 		},
-	
+
 		after: function() {
 			return this.domManip( arguments, function( elem ) {
 				if ( this.parentNode ) {
@@ -14434,17 +14394,17 @@
 				}
 			});
 		},
-	
+
 		remove: function( selector, keepData /* Internal Use Only */ ) {
 			var elem,
 				elems = selector ? jQuery.filter( selector, this ) : this,
 				i = 0;
-	
+
 			for ( ; (elem = elems[i]) != null; i++ ) {
 				if ( !keepData && elem.nodeType === 1 ) {
 					jQuery.cleanData( getAll( elem ) );
 				}
-	
+
 				if ( elem.parentNode ) {
 					if ( keepData && jQuery.contains( elem.ownerDocument, elem ) ) {
 						setGlobalEval( getAll( elem, "script" ) );
@@ -14452,103 +14412,103 @@
 					elem.parentNode.removeChild( elem );
 				}
 			}
-	
+
 			return this;
 		},
-	
+
 		empty: function() {
 			var elem,
 				i = 0;
-	
+
 			for ( ; (elem = this[i]) != null; i++ ) {
 				if ( elem.nodeType === 1 ) {
-	
+
 					// Prevent memory leaks
 					jQuery.cleanData( getAll( elem, false ) );
-	
+
 					// Remove any remaining nodes
 					elem.textContent = "";
 				}
 			}
-	
+
 			return this;
 		},
-	
+
 		clone: function( dataAndEvents, deepDataAndEvents ) {
 			dataAndEvents = dataAndEvents == null ? false : dataAndEvents;
 			deepDataAndEvents = deepDataAndEvents == null ? dataAndEvents : deepDataAndEvents;
-	
+
 			return this.map(function() {
 				return jQuery.clone( this, dataAndEvents, deepDataAndEvents );
 			});
 		},
-	
+
 		html: function( value ) {
 			return access( this, function( value ) {
 				var elem = this[ 0 ] || {},
 					i = 0,
 					l = this.length;
-	
+
 				if ( value === undefined && elem.nodeType === 1 ) {
 					return elem.innerHTML;
 				}
-	
+
 				// See if we can take a shortcut and just use innerHTML
 				if ( typeof value === "string" && !rnoInnerhtml.test( value ) &&
 					!wrapMap[ ( rtagName.exec( value ) || [ "", "" ] )[ 1 ].toLowerCase() ] ) {
-	
+
 					value = value.replace( rxhtmlTag, "<$1></$2>" );
-	
+
 					try {
 						for ( ; i < l; i++ ) {
 							elem = this[ i ] || {};
-	
+
 							// Remove element nodes and prevent memory leaks
 							if ( elem.nodeType === 1 ) {
 								jQuery.cleanData( getAll( elem, false ) );
 								elem.innerHTML = value;
 							}
 						}
-	
+
 						elem = 0;
-	
+
 					// If using innerHTML throws an exception, use the fallback method
 					} catch( e ) {}
 				}
-	
+
 				if ( elem ) {
 					this.empty().append( value );
 				}
 			}, null, value, arguments.length );
 		},
-	
+
 		replaceWith: function() {
 			var arg = arguments[ 0 ];
-	
+
 			// Make the changes, replacing each context element with the new content
 			this.domManip( arguments, function( elem ) {
 				arg = this.parentNode;
-	
+
 				jQuery.cleanData( getAll( this ) );
-	
+
 				if ( arg ) {
 					arg.replaceChild( elem, this );
 				}
 			});
-	
+
 			// Force removal if there was no new content (e.g., from empty arguments)
 			return arg && (arg.length || arg.nodeType) ? this : this.remove();
 		},
-	
+
 		detach: function( selector ) {
 			return this.remove( selector, true );
 		},
-	
+
 		domManip: function( args, callback ) {
-	
+
 			// Flatten any nested arrays
 			args = concat.apply( [], args );
-	
+
 			var fragment, first, scripts, hasScripts, node, doc,
 				i = 0,
 				l = this.length,
@@ -14556,7 +14516,7 @@
 				iNoClone = l - 1,
 				value = args[ 0 ],
 				isFunction = jQuery.isFunction( value );
-	
+
 			// We can't cloneNode fragments that contain checked, in WebKit
 			if ( isFunction ||
 					( l > 1 && typeof value === "string" &&
@@ -14569,27 +14529,27 @@
 					self.domManip( args, callback );
 				});
 			}
-	
+
 			if ( l ) {
 				fragment = jQuery.buildFragment( args, this[ 0 ].ownerDocument, false, this );
 				first = fragment.firstChild;
-	
+
 				if ( fragment.childNodes.length === 1 ) {
 					fragment = first;
 				}
-	
+
 				if ( first ) {
 					scripts = jQuery.map( getAll( fragment, "script" ), disableScript );
 					hasScripts = scripts.length;
-	
+
 					// Use the original fragment for the last item instead of the first because it can end up
 					// being emptied incorrectly in certain situations (#8070).
 					for ( ; i < l; i++ ) {
 						node = fragment;
-	
+
 						if ( i !== iNoClone ) {
 							node = jQuery.clone( node, true, true );
-	
+
 							// Keep references to cloned scripts for later restoration
 							if ( hasScripts ) {
 								// Support: QtWebKit
@@ -14597,22 +14557,22 @@
 								jQuery.merge( scripts, getAll( node, "script" ) );
 							}
 						}
-	
+
 						callback.call( this[ i ], node, i );
 					}
-	
+
 					if ( hasScripts ) {
 						doc = scripts[ scripts.length - 1 ].ownerDocument;
-	
+
 						// Reenable scripts
 						jQuery.map( scripts, restoreScript );
-	
+
 						// Evaluate executable scripts on first document insertion
 						for ( i = 0; i < hasScripts; i++ ) {
 							node = scripts[ i ];
 							if ( rscriptType.test( node.type || "" ) &&
 								!data_priv.access( node, "globalEval" ) && jQuery.contains( doc, node ) ) {
-	
+
 								if ( node.src ) {
 									// Optional AJAX dependency, but won't run scripts if not present
 									if ( jQuery._evalUrl ) {
@@ -14626,11 +14586,11 @@
 					}
 				}
 			}
-	
+
 			return this;
 		}
 	});
-	
+
 	jQuery.each({
 		appendTo: "append",
 		prependTo: "prepend",
@@ -14644,24 +14604,24 @@
 				insert = jQuery( selector ),
 				last = insert.length - 1,
 				i = 0;
-	
+
 			for ( ; i <= last; i++ ) {
 				elems = i === last ? this : this.clone( true );
 				jQuery( insert[ i ] )[ original ]( elems );
-	
+
 				// Support: QtWebKit
 				// .get() because push.apply(_, arraylike) throws
 				push.apply( ret, elems.get() );
 			}
-	
+
 			return this.pushStack( ret );
 		};
 	});
-	
-	
+
+
 	var iframe,
 		elemdisplay = {};
-	
+
 	/**
 	 * Retrieve the actual display of a element
 	 * @param {String} name nodeName of the element
@@ -14671,21 +14631,21 @@
 	function actualDisplay( name, doc ) {
 		var style,
 			elem = jQuery( doc.createElement( name ) ).appendTo( doc.body ),
-	
+
 			// getDefaultComputedStyle might be reliably used only on attached element
 			display = window.getDefaultComputedStyle && ( style = window.getDefaultComputedStyle( elem[ 0 ] ) ) ?
-	
+
 				// Use of this method is a temporary fix (more like optimization) until something better comes along,
 				// since it was removed from specification and supported only in FF
 				style.display : jQuery.css( elem[ 0 ], "display" );
-	
+
 		// We don't have any data stored on the element,
 		// so use "detach" method as fast way to get rid of the element
 		elem.detach();
-	
+
 		return display;
 	}
-	
+
 	/**
 	 * Try to determine the default display value of an element
 	 * @param {String} nodeName
@@ -14693,37 +14653,37 @@
 	function defaultDisplay( nodeName ) {
 		var doc = document,
 			display = elemdisplay[ nodeName ];
-	
+
 		if ( !display ) {
 			display = actualDisplay( nodeName, doc );
-	
+
 			// If the simple way fails, read from inside an iframe
 			if ( display === "none" || !display ) {
-	
+
 				// Use the already-created iframe if possible
 				iframe = (iframe || jQuery( "<iframe frameborder='0' width='0' height='0'/>" )).appendTo( doc.documentElement );
-	
+
 				// Always write a new HTML skeleton so Webkit and Firefox don't choke on reuse
 				doc = iframe[ 0 ].contentDocument;
-	
+
 				// Support: IE
 				doc.write();
 				doc.close();
-	
+
 				display = actualDisplay( nodeName, doc );
 				iframe.detach();
 			}
-	
+
 			// Store the correct default display
 			elemdisplay[ nodeName ] = display;
 		}
-	
+
 		return display;
 	}
 	var rmargin = (/^margin/);
-	
+
 	var rnumnonpx = new RegExp( "^(" + pnum + ")(?!px)[a-z%]+$", "i" );
-	
+
 	var getStyles = function( elem ) {
 			// Support: IE<=11+, Firefox<=30+ (#15098, #14150)
 			// IE throws on elements created in popups
@@ -14731,60 +14691,60 @@
 			if ( elem.ownerDocument.defaultView.opener ) {
 				return elem.ownerDocument.defaultView.getComputedStyle( elem, null );
 			}
-	
+
 			return window.getComputedStyle( elem, null );
 		};
-	
-	
-	
+
+
+
 	function curCSS( elem, name, computed ) {
 		var width, minWidth, maxWidth, ret,
 			style = elem.style;
-	
+
 		computed = computed || getStyles( elem );
-	
+
 		// Support: IE9
 		// getPropertyValue is only needed for .css('filter') (#12537)
 		if ( computed ) {
 			ret = computed.getPropertyValue( name ) || computed[ name ];
 		}
-	
+
 		if ( computed ) {
-	
+
 			if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {
 				ret = jQuery.style( elem, name );
 			}
-	
+
 			// Support: iOS < 6
 			// A tribute to the "awesome hack by Dean Edwards"
 			// iOS < 6 (at least) returns percentage for a larger set of values, but width seems to be reliably pixels
 			// this is against the CSSOM draft spec: http://dev.w3.org/csswg/cssom/#resolved-values
 			if ( rnumnonpx.test( ret ) && rmargin.test( name ) ) {
-	
+
 				// Remember the original values
 				width = style.width;
 				minWidth = style.minWidth;
 				maxWidth = style.maxWidth;
-	
+
 				// Put in the new values to get a computed value out
 				style.minWidth = style.maxWidth = style.width = ret;
 				ret = computed.width;
-	
+
 				// Revert the changed values
 				style.width = width;
 				style.minWidth = minWidth;
 				style.maxWidth = maxWidth;
 			}
 		}
-	
+
 		return ret !== undefined ?
 			// Support: IE
 			// IE returns zIndex value as an integer.
 			ret + "" :
 			ret;
 	}
-	
-	
+
+
 	function addGetHookIf( conditionFn, hookFn ) {
 		// Define the hook, we'll check on the first run if it's really needed.
 		return {
@@ -14795,34 +14755,34 @@
 					delete this.get;
 					return;
 				}
-	
+
 				// Hook needed; redefine it so that the support test is not executed again.
 				return (this.get = hookFn).apply( this, arguments );
 			}
 		};
 	}
-	
-	
+
+
 	(function() {
 		var pixelPositionVal, boxSizingReliableVal,
 			docElem = document.documentElement,
 			container = document.createElement( "div" ),
 			div = document.createElement( "div" );
-	
+
 		if ( !div.style ) {
 			return;
 		}
-	
+
 		// Support: IE9-11+
 		// Style of cloned element affects source element cloned (#8908)
 		div.style.backgroundClip = "content-box";
 		div.cloneNode( true ).style.backgroundClip = "";
 		support.clearCloneStyle = div.style.backgroundClip === "content-box";
-	
+
 		container.style.cssText = "border:0;width:0;height:0;top:0;left:-9999px;margin-top:1px;" +
 			"position:absolute";
 		container.appendChild( div );
-	
+
 		// Executing both pixelPosition & boxSizingReliable tests require only one layout
 		// so they're executed at the same time to save the second computation.
 		function computePixelPositionAndBoxSizingReliable() {
@@ -14834,20 +14794,20 @@
 				"border:1px;padding:1px;width:4px;position:absolute";
 			div.innerHTML = "";
 			docElem.appendChild( container );
-	
+
 			var divStyle = window.getComputedStyle( div, null );
 			pixelPositionVal = divStyle.top !== "1%";
 			boxSizingReliableVal = divStyle.width === "4px";
-	
+
 			docElem.removeChild( container );
 		}
-	
+
 		// Support: node.js jsdom
 		// Don't assume that getComputedStyle is a property of the global object
 		if ( window.getComputedStyle ) {
 			jQuery.extend( support, {
 				pixelPosition: function() {
-	
+
 					// This test is executed only once but we still do memoizing
 					// since we can use the boxSizingReliable pre-computing.
 					// No need to check if the test was already performed, though.
@@ -14861,7 +14821,7 @@
 					return boxSizingReliableVal;
 				},
 				reliableMarginRight: function() {
-	
+
 					// Support: Android 2.3
 					// Check if div with explicit width and no margin-right incorrectly
 					// gets computed margin-right based on width of container. (#3333)
@@ -14869,7 +14829,7 @@
 					// This support function is only executed once so no memoizing is needed.
 					var ret,
 						marginDiv = div.appendChild( document.createElement( "div" ) );
-	
+
 					// Reset CSS: box-sizing; display; margin; border; padding
 					marginDiv.style.cssText = div.style.cssText =
 						// Support: Firefox<29, Android 2.3
@@ -14879,79 +14839,79 @@
 					marginDiv.style.marginRight = marginDiv.style.width = "0";
 					div.style.width = "1px";
 					docElem.appendChild( container );
-	
+
 					ret = !parseFloat( window.getComputedStyle( marginDiv, null ).marginRight );
-	
+
 					docElem.removeChild( container );
 					div.removeChild( marginDiv );
-	
+
 					return ret;
 				}
 			});
 		}
 	})();
-	
-	
+
+
 	// A method for quickly swapping in/out CSS properties to get correct calculations.
 	jQuery.swap = function( elem, options, callback, args ) {
 		var ret, name,
 			old = {};
-	
+
 		// Remember the old values, and insert the new ones
 		for ( name in options ) {
 			old[ name ] = elem.style[ name ];
 			elem.style[ name ] = options[ name ];
 		}
-	
+
 		ret = callback.apply( elem, args || [] );
-	
+
 		// Revert the old values
 		for ( name in options ) {
 			elem.style[ name ] = old[ name ];
 		}
-	
+
 		return ret;
 	};
-	
-	
+
+
 	var
 		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
 		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
 		rdisplayswap = /^(none|table(?!-c[ea]).+)/,
 		rnumsplit = new RegExp( "^(" + pnum + ")(.*)$", "i" ),
 		rrelNum = new RegExp( "^([+-])=(" + pnum + ")", "i" ),
-	
+
 		cssShow = { position: "absolute", visibility: "hidden", display: "block" },
 		cssNormalTransform = {
 			letterSpacing: "0",
 			fontWeight: "400"
 		},
-	
+
 		cssPrefixes = [ "Webkit", "O", "Moz", "ms" ];
-	
+
 	// Return a css property mapped to a potentially vendor prefixed property
 	function vendorPropName( style, name ) {
-	
+
 		// Shortcut for names that are not vendor prefixed
 		if ( name in style ) {
 			return name;
 		}
-	
+
 		// Check for vendor prefixed names
 		var capName = name[0].toUpperCase() + name.slice(1),
 			origName = name,
 			i = cssPrefixes.length;
-	
+
 		while ( i-- ) {
 			name = cssPrefixes[ i ] + capName;
 			if ( name in style ) {
 				return name;
 			}
 		}
-	
+
 		return origName;
 	}
-	
+
 	function setPositiveNumber( elem, value, subtract ) {
 		var matches = rnumsplit.exec( value );
 		return matches ?
@@ -14959,28 +14919,28 @@
 			Math.max( 0, matches[ 1 ] - ( subtract || 0 ) ) + ( matches[ 2 ] || "px" ) :
 			value;
 	}
-	
+
 	function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {
 		var i = extra === ( isBorderBox ? "border" : "content" ) ?
 			// If we already have the right measurement, avoid augmentation
 			4 :
 			// Otherwise initialize for horizontal or vertical properties
 			name === "width" ? 1 : 0,
-	
+
 			val = 0;
-	
+
 		for ( ; i < 4; i += 2 ) {
 			// Both box models exclude margin, so add it if we want it
 			if ( extra === "margin" ) {
 				val += jQuery.css( elem, extra + cssExpand[ i ], true, styles );
 			}
-	
+
 			if ( isBorderBox ) {
 				// border-box includes padding, so remove it if we want content
 				if ( extra === "content" ) {
 					val -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
 				}
-	
+
 				// At this point, extra isn't border nor margin, so remove border
 				if ( extra !== "margin" ) {
 					val -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
@@ -14988,25 +14948,25 @@
 			} else {
 				// At this point, extra isn't content, so add padding
 				val += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
-	
+
 				// At this point, extra isn't content nor padding, so add border
 				if ( extra !== "padding" ) {
 					val += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 				}
 			}
 		}
-	
+
 		return val;
 	}
-	
+
 	function getWidthOrHeight( elem, name, extra ) {
-	
+
 		// Start with offset property, which is equivalent to the border-box value
 		var valueIsBorderBox = true,
 			val = name === "width" ? elem.offsetWidth : elem.offsetHeight,
 			styles = getStyles( elem ),
 			isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
-	
+
 		// Some non-html elements return undefined for offsetWidth, so check for null/undefined
 		// svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
 		// MathML - https://bugzilla.mozilla.org/show_bug.cgi?id=491668
@@ -15016,21 +14976,21 @@
 			if ( val < 0 || val == null ) {
 				val = elem.style[ name ];
 			}
-	
+
 			// Computed unit is not pixels. Stop here and return.
 			if ( rnumnonpx.test(val) ) {
 				return val;
 			}
-	
+
 			// Check for style in case a browser which returns unreliable values
 			// for getComputedStyle silently falls back to the reliable elem.style
 			valueIsBorderBox = isBorderBox &&
 				( support.boxSizingReliable() || val === elem.style[ name ] );
-	
+
 			// Normalize "", auto, and prepare for extra
 			val = parseFloat( val ) || 0;
 		}
-	
+
 		// Use the active box-sizing model to add/subtract irrelevant styles
 		return ( val +
 			augmentWidthOrHeight(
@@ -15042,19 +15002,19 @@
 			)
 		) + "px";
 	}
-	
+
 	function showHide( elements, show ) {
 		var display, elem, hidden,
 			values = [],
 			index = 0,
 			length = elements.length;
-	
+
 		for ( ; index < length; index++ ) {
 			elem = elements[ index ];
 			if ( !elem.style ) {
 				continue;
 			}
-	
+
 			values[ index ] = data_priv.get( elem, "olddisplay" );
 			display = elem.style.display;
 			if ( show ) {
@@ -15063,7 +15023,7 @@
 				if ( !values[ index ] && display === "none" ) {
 					elem.style.display = "";
 				}
-	
+
 				// Set elements which have been overridden with display: none
 				// in a stylesheet to whatever the default browser style is
 				// for such an element
@@ -15072,13 +15032,13 @@
 				}
 			} else {
 				hidden = isHidden( elem );
-	
+
 				if ( display !== "none" || !hidden ) {
 					data_priv.set( elem, "olddisplay", hidden ? display : jQuery.css( elem, "display" ) );
 				}
 			}
 		}
-	
+
 		// Set the display of most of the elements in a second loop
 		// to avoid the constant reflow
 		for ( index = 0; index < length; index++ ) {
@@ -15090,19 +15050,19 @@
 				elem.style.display = show ? values[ index ] || "" : "none";
 			}
 		}
-	
+
 		return elements;
 	}
-	
+
 	jQuery.extend({
-	
+
 		// Add in style property hooks for overriding the default
 		// behavior of getting and setting a style property
 		cssHooks: {
 			opacity: {
 				get: function( elem, computed ) {
 					if ( computed ) {
-	
+
 						// We should always get a number back from opacity
 						var ret = curCSS( elem, "opacity" );
 						return ret === "" ? "1" : ret;
@@ -15110,7 +15070,7 @@
 				}
 			}
 		},
-	
+
 		// Don't automatically add "px" to these possibly-unitless properties
 		cssNumber: {
 			"columnCount": true,
@@ -15126,99 +15086,99 @@
 			"zIndex": true,
 			"zoom": true
 		},
-	
+
 		// Add in properties whose names you wish to fix before
 		// setting or getting the value
 		cssProps: {
 			"float": "cssFloat"
 		},
-	
+
 		// Get and set the style property on a DOM Node
 		style: function( elem, name, value, extra ) {
-	
+
 			// Don't set styles on text and comment nodes
 			if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 || !elem.style ) {
 				return;
 			}
-	
+
 			// Make sure that we're working with the right name
 			var ret, type, hooks,
 				origName = jQuery.camelCase( name ),
 				style = elem.style;
-	
+
 			name = jQuery.cssProps[ origName ] || ( jQuery.cssProps[ origName ] = vendorPropName( style, origName ) );
-	
+
 			// Gets hook for the prefixed version, then unprefixed version
 			hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
-	
+
 			// Check if we're setting a value
 			if ( value !== undefined ) {
 				type = typeof value;
-	
+
 				// Convert "+=" or "-=" to relative numbers (#7345)
 				if ( type === "string" && (ret = rrelNum.exec( value )) ) {
 					value = ( ret[1] + 1 ) * ret[2] + parseFloat( jQuery.css( elem, name ) );
 					// Fixes bug #9237
 					type = "number";
 				}
-	
+
 				// Make sure that null and NaN values aren't set (#7116)
 				if ( value == null || value !== value ) {
 					return;
 				}
-	
+
 				// If a number, add 'px' to the (except for certain CSS properties)
 				if ( type === "number" && !jQuery.cssNumber[ origName ] ) {
 					value += "px";
 				}
-	
+
 				// Support: IE9-11+
 				// background-* props affect original clone's values
 				if ( !support.clearCloneStyle && value === "" && name.indexOf( "background" ) === 0 ) {
 					style[ name ] = "inherit";
 				}
-	
+
 				// If a hook was provided, use that value, otherwise just set the specified value
 				if ( !hooks || !("set" in hooks) || (value = hooks.set( elem, value, extra )) !== undefined ) {
 					style[ name ] = value;
 				}
-	
+
 			} else {
 				// If a hook was provided get the non-computed value from there
 				if ( hooks && "get" in hooks && (ret = hooks.get( elem, false, extra )) !== undefined ) {
 					return ret;
 				}
-	
+
 				// Otherwise just get the value from the style object
 				return style[ name ];
 			}
 		},
-	
+
 		css: function( elem, name, extra, styles ) {
 			var val, num, hooks,
 				origName = jQuery.camelCase( name );
-	
+
 			// Make sure that we're working with the right name
 			name = jQuery.cssProps[ origName ] || ( jQuery.cssProps[ origName ] = vendorPropName( elem.style, origName ) );
-	
+
 			// Try prefixed name followed by the unprefixed name
 			hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
-	
+
 			// If a hook was provided get the computed value from there
 			if ( hooks && "get" in hooks ) {
 				val = hooks.get( elem, true, extra );
 			}
-	
+
 			// Otherwise, if a way to get the computed value exists, use that
 			if ( val === undefined ) {
 				val = curCSS( elem, name, styles );
 			}
-	
+
 			// Convert "normal" to computed value
 			if ( val === "normal" && name in cssNormalTransform ) {
 				val = cssNormalTransform[ name ];
 			}
-	
+
 			// Make numeric if forced or a qualifier was provided and val looks numeric
 			if ( extra === "" || extra ) {
 				num = parseFloat( val );
@@ -15227,12 +15187,12 @@
 			return val;
 		}
 	});
-	
+
 	jQuery.each([ "height", "width" ], function( i, name ) {
 		jQuery.cssHooks[ name ] = {
 			get: function( elem, computed, extra ) {
 				if ( computed ) {
-	
+
 					// Certain elements can have dimension info if we invisibly show them
 					// but it must have a current display style that would benefit
 					return rdisplayswap.test( jQuery.css( elem, "display" ) ) && elem.offsetWidth === 0 ?
@@ -15242,7 +15202,7 @@
 						getWidthOrHeight( elem, name, extra );
 				}
 			},
-	
+
 			set: function( elem, value, extra ) {
 				var styles = extra && getStyles( elem );
 				return setPositiveNumber( elem, value, extra ?
@@ -15257,7 +15217,7 @@
 			}
 		};
 	});
-	
+
 	// Support: Android 2.3
 	jQuery.cssHooks.marginRight = addGetHookIf( support.reliableMarginRight,
 		function( elem, computed ) {
@@ -15267,7 +15227,7 @@
 			}
 		}
 	);
-	
+
 	// These hooks are used by animate to expand properties
 	jQuery.each({
 		margin: "",
@@ -15278,42 +15238,42 @@
 			expand: function( value ) {
 				var i = 0,
 					expanded = {},
-	
+
 					// Assumes a single number if not a string
 					parts = typeof value === "string" ? value.split(" ") : [ value ];
-	
+
 				for ( ; i < 4; i++ ) {
 					expanded[ prefix + cssExpand[ i ] + suffix ] =
 						parts[ i ] || parts[ i - 2 ] || parts[ 0 ];
 				}
-	
+
 				return expanded;
 			}
 		};
-	
+
 		if ( !rmargin.test( prefix ) ) {
 			jQuery.cssHooks[ prefix + suffix ].set = setPositiveNumber;
 		}
 	});
-	
+
 	jQuery.fn.extend({
 		css: function( name, value ) {
 			return access( this, function( elem, name, value ) {
 				var styles, len,
 					map = {},
 					i = 0;
-	
+
 				if ( jQuery.isArray( name ) ) {
 					styles = getStyles( elem );
 					len = name.length;
-	
+
 					for ( ; i < len; i++ ) {
 						map[ name[ i ] ] = jQuery.css( elem, name[ i ], false, styles );
 					}
-	
+
 					return map;
 				}
-	
+
 				return value !== undefined ?
 					jQuery.style( elem, name, value ) :
 					jQuery.css( elem, name );
@@ -15329,7 +15289,7 @@
 			if ( typeof state === "boolean" ) {
 				return state ? this.show() : this.hide();
 			}
-	
+
 			return this.each(function() {
 				if ( isHidden( this ) ) {
 					jQuery( this ).show();
@@ -15339,13 +15299,13 @@
 			});
 		}
 	});
-	
-	
+
+
 	function Tween( elem, options, prop, end, easing ) {
 		return new Tween.prototype.init( elem, options, prop, end, easing );
 	}
 	jQuery.Tween = Tween;
-	
+
 	Tween.prototype = {
 		constructor: Tween,
 		init: function( elem, options, prop, end, easing, unit ) {
@@ -15359,7 +15319,7 @@
 		},
 		cur: function() {
 			var hooks = Tween.propHooks[ this.prop ];
-	
+
 			return hooks && hooks.get ?
 				hooks.get( this ) :
 				Tween.propHooks._default.get( this );
@@ -15367,7 +15327,7 @@
 		run: function( percent ) {
 			var eased,
 				hooks = Tween.propHooks[ this.prop ];
-	
+
 			if ( this.options.duration ) {
 				this.pos = eased = jQuery.easing[ this.easing ](
 					percent, this.options.duration * percent, 0, 1, this.options.duration
@@ -15376,11 +15336,11 @@
 				this.pos = eased = percent;
 			}
 			this.now = ( this.end - this.start ) * eased + this.start;
-	
+
 			if ( this.options.step ) {
 				this.options.step.call( this.elem, this.now, this );
 			}
-	
+
 			if ( hooks && hooks.set ) {
 				hooks.set( this );
 			} else {
@@ -15389,19 +15349,19 @@
 			return this;
 		}
 	};
-	
+
 	Tween.prototype.init.prototype = Tween.prototype;
-	
+
 	Tween.propHooks = {
 		_default: {
 			get: function( tween ) {
 				var result;
-	
+
 				if ( tween.elem[ tween.prop ] != null &&
 					(!tween.elem.style || tween.elem.style[ tween.prop ] == null) ) {
 					return tween.elem[ tween.prop ];
 				}
-	
+
 				// Passing an empty string as a 3rd parameter to .css will automatically
 				// attempt a parseFloat and fallback to a string if the parse fails.
 				// Simple values such as "10px" are parsed to Float;
@@ -15424,7 +15384,7 @@
 			}
 		}
 	};
-	
+
 	// Support: IE9
 	// Panic based approach to setting things on disconnected nodes
 	Tween.propHooks.scrollTop = Tween.propHooks.scrollLeft = {
@@ -15434,7 +15394,7 @@
 			}
 		}
 	};
-	
+
 	jQuery.easing = {
 		linear: function( p ) {
 			return p;
@@ -15443,15 +15403,15 @@
 			return 0.5 - Math.cos( p * Math.PI ) / 2;
 		}
 	};
-	
+
 	jQuery.fx = Tween.prototype.init;
-	
+
 	// Back Compat <1.8 extension point
 	jQuery.fx.step = {};
-	
-	
-	
-	
+
+
+
+
 	var
 		fxNow, timerId,
 		rfxtypes = /^(?:toggle|show|hide)$/,
@@ -15464,37 +15424,37 @@
 					target = tween.cur(),
 					parts = rfxnum.exec( value ),
 					unit = parts && parts[ 3 ] || ( jQuery.cssNumber[ prop ] ? "" : "px" ),
-	
+
 					// Starting value computation is required for potential unit mismatches
 					start = ( jQuery.cssNumber[ prop ] || unit !== "px" && +target ) &&
 						rfxnum.exec( jQuery.css( tween.elem, prop ) ),
 					scale = 1,
 					maxIterations = 20;
-	
+
 				if ( start && start[ 3 ] !== unit ) {
 					// Trust units reported by jQuery.css
 					unit = unit || start[ 3 ];
-	
+
 					// Make sure we update the tween properties later on
 					parts = parts || [];
-	
+
 					// Iteratively approximate from a nonzero starting point
 					start = +target || 1;
-	
+
 					do {
 						// If previous iteration zeroed out, double until we get *something*.
 						// Use string for doubling so we don't accidentally see scale as unchanged below
 						scale = scale || ".5";
-	
+
 						// Adjust and apply
 						start = start / scale;
 						jQuery.style( tween.elem, prop, start + unit );
-	
+
 					// Update scale, tolerating zero or NaN from tween.cur(),
 					// break the loop if scale is unchanged or perfect, or if we've just had enough
 					} while ( scale !== (scale = tween.cur() / target) && scale !== 1 && --maxIterations );
 				}
-	
+
 				// Update tween properties
 				if ( parts ) {
 					start = tween.start = +start || +target || 0;
@@ -15504,11 +15464,11 @@
 						start + ( parts[ 1 ] + 1 ) * parts[ 2 ] :
 						+parts[ 2 ];
 				}
-	
+
 				return tween;
 			} ]
 		};
-	
+
 	// Animations created synchronously will run synchronously
 	function createFxNow() {
 		setTimeout(function() {
@@ -15516,13 +15476,13 @@
 		});
 		return ( fxNow = jQuery.now() );
 	}
-	
+
 	// Generate parameters to create a standard animation
 	function genFx( type, includeWidth ) {
 		var which,
 			i = 0,
 			attrs = { height: type };
-	
+
 		// If we include width, step value is 1 to do all cssExpand values,
 		// otherwise step value is 2 to skip over Left and Right
 		includeWidth = includeWidth ? 1 : 0;
@@ -15530,14 +15490,14 @@
 			which = cssExpand[ i ];
 			attrs[ "margin" + which ] = attrs[ "padding" + which ] = type;
 		}
-	
+
 		if ( includeWidth ) {
 			attrs.opacity = attrs.width = type;
 		}
-	
+
 		return attrs;
 	}
-	
+
 	function createTween( value, prop, animation ) {
 		var tween,
 			collection = ( tweeners[ prop ] || [] ).concat( tweeners[ "*" ] ),
@@ -15545,13 +15505,13 @@
 			length = collection.length;
 		for ( ; index < length; index++ ) {
 			if ( (tween = collection[ index ].call( animation, prop, value )) ) {
-	
+
 				// We're done with this property
 				return tween;
 			}
 		}
 	}
-	
+
 	function defaultPrefilter( elem, props, opts ) {
 		/* jshint validthis: true */
 		var prop, value, toggle, tween, hooks, oldfire, display, checkDisplay,
@@ -15560,7 +15520,7 @@
 			style = elem.style,
 			hidden = elem.nodeType && isHidden( elem ),
 			dataShow = data_priv.get( elem, "fxshow" );
-	
+
 		// Handle queue: false promises
 		if ( !opts.queue ) {
 			hooks = jQuery._queueHooks( elem, "fx" );
@@ -15574,7 +15534,7 @@
 				};
 			}
 			hooks.unqueued++;
-	
+
 			anim.always(function() {
 				// Ensure the complete handler is called before this completes
 				anim.always(function() {
@@ -15585,7 +15545,7 @@
 				});
 			});
 		}
-	
+
 		// Height/width overflow pass
 		if ( elem.nodeType === 1 && ( "height" in props || "width" in props ) ) {
 			// Make sure that nothing sneaks out
@@ -15593,20 +15553,20 @@
 			// change the overflow attribute when overflowX and
 			// overflowY are set to the same value
 			opts.overflow = [ style.overflow, style.overflowX, style.overflowY ];
-	
+
 			// Set display property to inline-block for height/width
 			// animations on inline elements that are having width/height animated
 			display = jQuery.css( elem, "display" );
-	
+
 			// Test default display if display is currently "none"
 			checkDisplay = display === "none" ?
 				data_priv.get( elem, "olddisplay" ) || defaultDisplay( elem.nodeName ) : display;
-	
+
 			if ( checkDisplay === "inline" && jQuery.css( elem, "float" ) === "none" ) {
 				style.display = "inline-block";
 			}
 		}
-	
+
 		if ( opts.overflow ) {
 			style.overflow = "hidden";
 			anim.always(function() {
@@ -15615,7 +15575,7 @@
 				style.overflowY = opts.overflow[ 2 ];
 			});
 		}
-	
+
 		// show/hide pass
 		for ( prop in props ) {
 			value = props[ prop ];
@@ -15623,7 +15583,7 @@
 				delete props[ prop ];
 				toggle = toggle || value === "toggle";
 				if ( value === ( hidden ? "hide" : "show" ) ) {
-	
+
 					// If there is dataShow left over from a stopped hide or show and we are going to proceed with show, we should pretend to be hidden
 					if ( value === "show" && dataShow && dataShow[ prop ] !== undefined ) {
 						hidden = true;
@@ -15632,13 +15592,13 @@
 					}
 				}
 				orig[ prop ] = dataShow && dataShow[ prop ] || jQuery.style( elem, prop );
-	
+
 			// Any non-fx value stops us from restoring the original display value
 			} else {
 				display = undefined;
 			}
 		}
-	
+
 		if ( !jQuery.isEmptyObject( orig ) ) {
 			if ( dataShow ) {
 				if ( "hidden" in dataShow ) {
@@ -15647,7 +15607,7 @@
 			} else {
 				dataShow = data_priv.access( elem, "fxshow", {} );
 			}
-	
+
 			// Store state if its toggle - enables .stop().toggle() to "reverse"
 			if ( toggle ) {
 				dataShow.hidden = !hidden;
@@ -15661,7 +15621,7 @@
 			}
 			anim.done(function() {
 				var prop;
-	
+
 				data_priv.remove( elem, "fxshow" );
 				for ( prop in orig ) {
 					jQuery.style( elem, prop, orig[ prop ] );
@@ -15669,7 +15629,7 @@
 			});
 			for ( prop in orig ) {
 				tween = createTween( hidden ? dataShow[ prop ] : 0, prop, anim );
-	
+
 				if ( !( prop in dataShow ) ) {
 					dataShow[ prop ] = tween.start;
 					if ( hidden ) {
@@ -15678,16 +15638,16 @@
 					}
 				}
 			}
-	
+
 		// If this is a noop like .hide().hide(), restore an overwritten display value
 		} else if ( (display === "none" ? defaultDisplay( elem.nodeName ) : display) === "inline" ) {
 			style.display = display;
 		}
 	}
-	
+
 	function propFilter( props, specialEasing ) {
 		var index, name, easing, value, hooks;
-	
+
 		// camelCase, specialEasing and expand cssHook pass
 		for ( index in props ) {
 			name = jQuery.camelCase( index );
@@ -15697,17 +15657,17 @@
 				easing = value[ 1 ];
 				value = props[ index ] = value[ 0 ];
 			}
-	
+
 			if ( index !== name ) {
 				props[ name ] = value;
 				delete props[ index ];
 			}
-	
+
 			hooks = jQuery.cssHooks[ name ];
 			if ( hooks && "expand" in hooks ) {
 				value = hooks.expand( value );
 				delete props[ name ];
-	
+
 				// Not quite $.extend, this won't overwrite existing keys.
 				// Reusing 'index' because we have the correct "name"
 				for ( index in value ) {
@@ -15721,7 +15681,7 @@
 			}
 		}
 	}
-	
+
 	function Animation( elem, properties, options ) {
 		var result,
 			stopped,
@@ -15743,13 +15703,13 @@
 					percent = 1 - temp,
 					index = 0,
 					length = animation.tweens.length;
-	
+
 				for ( ; index < length ; index++ ) {
 					animation.tweens[ index ].run( percent );
 				}
-	
+
 				deferred.notifyWith( elem, [ animation, percent, remaining ]);
-	
+
 				if ( percent < 1 && length ) {
 					return remaining;
 				} else {
@@ -15784,7 +15744,7 @@
 					for ( ; index < length ; index++ ) {
 						animation.tweens[ index ].run( 1 );
 					}
-	
+
 					// Resolve when we played the last frame; otherwise, reject
 					if ( gotoEnd ) {
 						deferred.resolveWith( elem, [ animation, gotoEnd ] );
@@ -15795,22 +15755,22 @@
 				}
 			}),
 			props = animation.props;
-	
+
 		propFilter( props, animation.opts.specialEasing );
-	
+
 		for ( ; index < length ; index++ ) {
 			result = animationPrefilters[ index ].call( animation, elem, props, animation.opts );
 			if ( result ) {
 				return result;
 			}
 		}
-	
+
 		jQuery.map( props, createTween, animation );
-	
+
 		if ( jQuery.isFunction( animation.opts.start ) ) {
 			animation.opts.start.call( elem, animation );
 		}
-	
+
 		jQuery.fx.timer(
 			jQuery.extend( tick, {
 				elem: elem,
@@ -15818,16 +15778,16 @@
 				queue: animation.opts.queue
 			})
 		);
-	
+
 		// attach callbacks from options
 		return animation.progress( animation.opts.progress )
 			.done( animation.opts.done, animation.opts.complete )
 			.fail( animation.opts.fail )
 			.always( animation.opts.always );
 	}
-	
+
 	jQuery.Animation = jQuery.extend( Animation, {
-	
+
 		tweener: function( props, callback ) {
 			if ( jQuery.isFunction( props ) ) {
 				callback = props;
@@ -15835,18 +15795,18 @@
 			} else {
 				props = props.split(" ");
 			}
-	
+
 			var prop,
 				index = 0,
 				length = props.length;
-	
+
 			for ( ; index < length ; index++ ) {
 				prop = props[ index ];
 				tweeners[ prop ] = tweeners[ prop ] || [];
 				tweeners[ prop ].unshift( callback );
 			}
 		},
-	
+
 		prefilter: function( callback, prepend ) {
 			if ( prepend ) {
 				animationPrefilters.unshift( callback );
@@ -15855,7 +15815,7 @@
 			}
 		}
 	});
-	
+
 	jQuery.speed = function( speed, easing, fn ) {
 		var opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
 			complete: fn || !fn && easing ||
@@ -15863,37 +15823,37 @@
 			duration: speed,
 			easing: fn && easing || easing && !jQuery.isFunction( easing ) && easing
 		};
-	
+
 		opt.duration = jQuery.fx.off ? 0 : typeof opt.duration === "number" ? opt.duration :
 			opt.duration in jQuery.fx.speeds ? jQuery.fx.speeds[ opt.duration ] : jQuery.fx.speeds._default;
-	
+
 		// Normalize opt.queue - true/undefined/null -> "fx"
 		if ( opt.queue == null || opt.queue === true ) {
 			opt.queue = "fx";
 		}
-	
+
 		// Queueing
 		opt.old = opt.complete;
-	
+
 		opt.complete = function() {
 			if ( jQuery.isFunction( opt.old ) ) {
 				opt.old.call( this );
 			}
-	
+
 			if ( opt.queue ) {
 				jQuery.dequeue( this, opt.queue );
 			}
 		};
-	
+
 		return opt;
 	};
-	
+
 	jQuery.fn.extend({
 		fadeTo: function( speed, to, easing, callback ) {
-	
+
 			// Show any hidden elements after setting opacity to 0
 			return this.filter( isHidden ).css( "opacity", 0 ).show()
-	
+
 				// Animate to the value specified
 				.end().animate({ opacity: to }, speed, easing, callback );
 		},
@@ -15903,14 +15863,14 @@
 				doAnimation = function() {
 					// Operate on a copy of prop so per-property easing won't be lost
 					var anim = Animation( this, jQuery.extend( {}, prop ), optall );
-	
+
 					// Empty animations, or finishing resolves immediately
 					if ( empty || data_priv.get( this, "finish" ) ) {
 						anim.stop( true );
 					}
 				};
 				doAnimation.finish = doAnimation;
-	
+
 			return empty || optall.queue === false ?
 				this.each( doAnimation ) :
 				this.queue( optall.queue, doAnimation );
@@ -15921,7 +15881,7 @@
 				delete hooks.stop;
 				stop( gotoEnd );
 			};
-	
+
 			if ( typeof type !== "string" ) {
 				gotoEnd = clearQueue;
 				clearQueue = type;
@@ -15930,13 +15890,13 @@
 			if ( clearQueue && type !== false ) {
 				this.queue( type || "fx", [] );
 			}
-	
+
 			return this.each(function() {
 				var dequeue = true,
 					index = type != null && type + "queueHooks",
 					timers = jQuery.timers,
 					data = data_priv.get( this );
-	
+
 				if ( index ) {
 					if ( data[ index ] && data[ index ].stop ) {
 						stopQueue( data[ index ] );
@@ -15948,7 +15908,7 @@
 						}
 					}
 				}
-	
+
 				for ( index = timers.length; index--; ) {
 					if ( timers[ index ].elem === this && (type == null || timers[ index ].queue === type) ) {
 						timers[ index ].anim.stop( gotoEnd );
@@ -15956,7 +15916,7 @@
 						timers.splice( index, 1 );
 					}
 				}
-	
+
 				// Start the next in the queue if the last step wasn't forced.
 				// Timers currently will call their complete callbacks, which
 				// will dequeue but only if they were gotoEnd.
@@ -15976,17 +15936,17 @@
 					hooks = data[ type + "queueHooks" ],
 					timers = jQuery.timers,
 					length = queue ? queue.length : 0;
-	
+
 				// Enable finishing flag on private data
 				data.finish = true;
-	
+
 				// Empty the queue first
 				jQuery.queue( this, type, [] );
-	
+
 				if ( hooks && hooks.stop ) {
 					hooks.stop.call( this, true );
 				}
-	
+
 				// Look for any active animations, and finish them
 				for ( index = timers.length; index--; ) {
 					if ( timers[ index ].elem === this && timers[ index ].queue === type ) {
@@ -15994,20 +15954,20 @@
 						timers.splice( index, 1 );
 					}
 				}
-	
+
 				// Look for any animations in the old queue and finish them
 				for ( index = 0; index < length; index++ ) {
 					if ( queue[ index ] && queue[ index ].finish ) {
 						queue[ index ].finish.call( this );
 					}
 				}
-	
+
 				// Turn off finishing flag
 				delete data.finish;
 			});
 		}
 	});
-	
+
 	jQuery.each([ "toggle", "show", "hide" ], function( i, name ) {
 		var cssFn = jQuery.fn[ name ];
 		jQuery.fn[ name ] = function( speed, easing, callback ) {
@@ -16016,7 +15976,7 @@
 				this.animate( genFx( name, true ), speed, easing, callback );
 		};
 	});
-	
+
 	// Generate shortcuts for custom animations
 	jQuery.each({
 		slideDown: genFx("show"),
@@ -16030,15 +15990,15 @@
 			return this.animate( props, speed, easing, callback );
 		};
 	});
-	
+
 	jQuery.timers = [];
 	jQuery.fx.tick = function() {
 		var timer,
 			i = 0,
 			timers = jQuery.timers;
-	
+
 		fxNow = jQuery.now();
-	
+
 		for ( ; i < timers.length; i++ ) {
 			timer = timers[ i ];
 			// Checks the timer has not already been removed
@@ -16046,13 +16006,13 @@
 				timers.splice( i--, 1 );
 			}
 		}
-	
+
 		if ( !timers.length ) {
 			jQuery.fx.stop();
 		}
 		fxNow = undefined;
 	};
-	
+
 	jQuery.fx.timer = function( timer ) {
 		jQuery.timers.push( timer );
 		if ( timer() ) {
@@ -16061,34 +16021,34 @@
 			jQuery.timers.pop();
 		}
 	};
-	
+
 	jQuery.fx.interval = 13;
-	
+
 	jQuery.fx.start = function() {
 		if ( !timerId ) {
 			timerId = setInterval( jQuery.fx.tick, jQuery.fx.interval );
 		}
 	};
-	
+
 	jQuery.fx.stop = function() {
 		clearInterval( timerId );
 		timerId = null;
 	};
-	
+
 	jQuery.fx.speeds = {
 		slow: 600,
 		fast: 200,
 		// Default speed
 		_default: 400
 	};
-	
-	
+
+
 	// Based off of the plugin by Clint Helfers, with permission.
 	// http://blindsignals.com/index.php/2009/07/jquery-delay/
 	jQuery.fn.delay = function( time, type ) {
 		time = jQuery.fx ? jQuery.fx.speeds[ time ] || time : time;
 		type = type || "fx";
-	
+
 		return this.queue( type, function( next, hooks ) {
 			var timeout = setTimeout( next, time );
 			hooks.stop = function() {
@@ -16096,28 +16056,28 @@
 			};
 		});
 	};
-	
-	
+
+
 	(function() {
 		var input = document.createElement( "input" ),
 			select = document.createElement( "select" ),
 			opt = select.appendChild( document.createElement( "option" ) );
-	
+
 		input.type = "checkbox";
-	
+
 		// Support: iOS<=5.1, Android<=4.2+
 		// Default value for a checkbox should be "on"
 		support.checkOn = input.value !== "";
-	
+
 		// Support: IE<=11+
 		// Must access selectedIndex to make default options select
 		support.optSelected = opt.selected;
-	
+
 		// Support: Android<=2.3
 		// Options inside disabled selects are incorrectly marked as disabled
 		select.disabled = true;
 		support.optDisabled = !opt.disabled;
-	
+
 		// Support: IE<=11+
 		// An input loses its value after becoming a radio
 		input = document.createElement( "input" );
@@ -16125,38 +16085,38 @@
 		input.type = "radio";
 		support.radioValue = input.value === "t";
 	})();
-	
-	
+
+
 	var nodeHook, boolHook,
 		attrHandle = jQuery.expr.attrHandle;
-	
+
 	jQuery.fn.extend({
 		attr: function( name, value ) {
 			return access( this, jQuery.attr, name, value, arguments.length > 1 );
 		},
-	
+
 		removeAttr: function( name ) {
 			return this.each(function() {
 				jQuery.removeAttr( this, name );
 			});
 		}
 	});
-	
+
 	jQuery.extend({
 		attr: function( elem, name, value ) {
 			var hooks, ret,
 				nType = elem.nodeType;
-	
+
 			// don't get/set attributes on text, comment and attribute nodes
 			if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {
 				return;
 			}
-	
+
 			// Fallback to prop when attributes are not supported
 			if ( typeof elem.getAttribute === strundefined ) {
 				return jQuery.prop( elem, name, value );
 			}
-	
+
 			// All attributes are lowercase
 			// Grab necessary hook if one is defined
 			if ( nType !== 1 || !jQuery.isXMLDoc( elem ) ) {
@@ -16164,53 +16124,53 @@
 				hooks = jQuery.attrHooks[ name ] ||
 					( jQuery.expr.match.bool.test( name ) ? boolHook : nodeHook );
 			}
-	
+
 			if ( value !== undefined ) {
-	
+
 				if ( value === null ) {
 					jQuery.removeAttr( elem, name );
-	
+
 				} else if ( hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ) {
 					return ret;
-	
+
 				} else {
 					elem.setAttribute( name, value + "" );
 					return value;
 				}
-	
+
 			} else if ( hooks && "get" in hooks && (ret = hooks.get( elem, name )) !== null ) {
 				return ret;
-	
+
 			} else {
 				ret = jQuery.find.attr( elem, name );
-	
+
 				// Non-existent attributes return null, we normalize to undefined
 				return ret == null ?
 					undefined :
 					ret;
 			}
 		},
-	
+
 		removeAttr: function( elem, value ) {
 			var name, propName,
 				i = 0,
 				attrNames = value && value.match( rnotwhite );
-	
+
 			if ( attrNames && elem.nodeType === 1 ) {
 				while ( (name = attrNames[i++]) ) {
 					propName = jQuery.propFix[ name ] || name;
-	
+
 					// Boolean attributes get special treatment (#10870)
 					if ( jQuery.expr.match.bool.test( name ) ) {
 						// Set corresponding property to false
 						elem[ propName ] = false;
 					}
-	
+
 					elem.removeAttribute( name );
 				}
 			}
 		},
-	
+
 		attrHooks: {
 			type: {
 				set: function( elem, value ) {
@@ -16227,7 +16187,7 @@
 			}
 		}
 	});
-	
+
 	// Hooks for boolean attributes
 	boolHook = {
 		set: function( elem, value, name ) {
@@ -16242,7 +16202,7 @@
 	};
 	jQuery.each( jQuery.expr.match.bool.source.match( /\w+/g ), function( i, name ) {
 		var getter = attrHandle[ name ] || jQuery.find.attr;
-	
+
 		attrHandle[ name ] = function( elem, name, isXML ) {
 			var ret, handle;
 			if ( !isXML ) {
@@ -16257,59 +16217,59 @@
 			return ret;
 		};
 	});
-	
-	
-	
-	
+
+
+
+
 	var rfocusable = /^(?:input|select|textarea|button)$/i;
-	
+
 	jQuery.fn.extend({
 		prop: function( name, value ) {
 			return access( this, jQuery.prop, name, value, arguments.length > 1 );
 		},
-	
+
 		removeProp: function( name ) {
 			return this.each(function() {
 				delete this[ jQuery.propFix[ name ] || name ];
 			});
 		}
 	});
-	
+
 	jQuery.extend({
 		propFix: {
 			"for": "htmlFor",
 			"class": "className"
 		},
-	
+
 		prop: function( elem, name, value ) {
 			var ret, hooks, notxml,
 				nType = elem.nodeType;
-	
+
 			// Don't get/set properties on text, comment and attribute nodes
 			if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {
 				return;
 			}
-	
+
 			notxml = nType !== 1 || !jQuery.isXMLDoc( elem );
-	
+
 			if ( notxml ) {
 				// Fix name and attach hooks
 				name = jQuery.propFix[ name ] || name;
 				hooks = jQuery.propHooks[ name ];
 			}
-	
+
 			if ( value !== undefined ) {
 				return hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ?
 					ret :
 					( elem[ name ] = value );
-	
+
 			} else {
 				return hooks && "get" in hooks && (ret = hooks.get( elem, name )) !== null ?
 					ret :
 					elem[ name ];
 			}
 		},
-	
+
 		propHooks: {
 			tabIndex: {
 				get: function( elem ) {
@@ -16320,7 +16280,7 @@
 			}
 		}
 	});
-	
+
 	if ( !support.optSelected ) {
 		jQuery.propHooks.selected = {
 			get: function( elem ) {
@@ -16332,7 +16292,7 @@
 			}
 		};
 	}
-	
+
 	jQuery.each([
 		"tabIndex",
 		"readOnly",
@@ -16347,36 +16307,36 @@
 	], function() {
 		jQuery.propFix[ this.toLowerCase() ] = this;
 	});
-	
-	
-	
-	
+
+
+
+
 	var rclass = /[\t\r\n\f]/g;
-	
+
 	jQuery.fn.extend({
 		addClass: function( value ) {
 			var classes, elem, cur, clazz, j, finalValue,
 				proceed = typeof value === "string" && value,
 				i = 0,
 				len = this.length;
-	
+
 			if ( jQuery.isFunction( value ) ) {
 				return this.each(function( j ) {
 					jQuery( this ).addClass( value.call( this, j, this.className ) );
 				});
 			}
-	
+
 			if ( proceed ) {
 				// The disjunction here is for better compressibility (see removeClass)
 				classes = ( value || "" ).match( rnotwhite ) || [];
-	
+
 				for ( ; i < len; i++ ) {
 					elem = this[ i ];
 					cur = elem.nodeType === 1 && ( elem.className ?
 						( " " + elem.className + " " ).replace( rclass, " " ) :
 						" "
 					);
-	
+
 					if ( cur ) {
 						j = 0;
 						while ( (clazz = classes[j++]) ) {
@@ -16384,7 +16344,7 @@
 								cur += clazz + " ";
 							}
 						}
-	
+
 						// only assign if different to avoid unneeded rendering.
 						finalValue = jQuery.trim( cur );
 						if ( elem.className !== finalValue ) {
@@ -16393,16 +16353,16 @@
 					}
 				}
 			}
-	
+
 			return this;
 		},
-	
+
 		removeClass: function( value ) {
 			var classes, elem, cur, clazz, j, finalValue,
 				proceed = arguments.length === 0 || typeof value === "string" && value,
 				i = 0,
 				len = this.length;
-	
+
 			if ( jQuery.isFunction( value ) ) {
 				return this.each(function( j ) {
 					jQuery( this ).removeClass( value.call( this, j, this.className ) );
@@ -16410,7 +16370,7 @@
 			}
 			if ( proceed ) {
 				classes = ( value || "" ).match( rnotwhite ) || [];
-	
+
 				for ( ; i < len; i++ ) {
 					elem = this[ i ];
 					// This expression is here for better compressibility (see addClass)
@@ -16418,7 +16378,7 @@
 						( " " + elem.className + " " ).replace( rclass, " " ) :
 						""
 					);
-	
+
 					if ( cur ) {
 						j = 0;
 						while ( (clazz = classes[j++]) ) {
@@ -16427,7 +16387,7 @@
 								cur = cur.replace( " " + clazz + " ", " " );
 							}
 						}
-	
+
 						// Only assign if different to avoid unneeded rendering.
 						finalValue = value ? jQuery.trim( cur ) : "";
 						if ( elem.className !== finalValue ) {
@@ -16436,23 +16396,23 @@
 					}
 				}
 			}
-	
+
 			return this;
 		},
-	
+
 		toggleClass: function( value, stateVal ) {
 			var type = typeof value;
-	
+
 			if ( typeof stateVal === "boolean" && type === "string" ) {
 				return stateVal ? this.addClass( value ) : this.removeClass( value );
 			}
-	
+
 			if ( jQuery.isFunction( value ) ) {
 				return this.each(function( i ) {
 					jQuery( this ).toggleClass( value.call(this, i, this.className, stateVal), stateVal );
 				});
 			}
-	
+
 			return this.each(function() {
 				if ( type === "string" ) {
 					// Toggle individual class names
@@ -16460,7 +16420,7 @@
 						i = 0,
 						self = jQuery( this ),
 						classNames = value.match( rnotwhite ) || [];
-	
+
 					while ( (className = classNames[ i++ ]) ) {
 						// Check each className given, space separated list
 						if ( self.hasClass( className ) ) {
@@ -16469,14 +16429,14 @@
 							self.addClass( className );
 						}
 					}
-	
+
 				// Toggle whole class name
 				} else if ( type === strundefined || type === "boolean" ) {
 					if ( this.className ) {
 						// store className if set
 						data_priv.set( this, "__className__", this.className );
 					}
-	
+
 					// If the element has a class name or if we're passed `false`,
 					// then remove the whole classname (if there was one, the above saved it).
 					// Otherwise bring back whatever was previously saved (if anything),
@@ -16485,7 +16445,7 @@
 				}
 			});
 		},
-	
+
 		hasClass: function( selector ) {
 			var className = " " + selector + " ",
 				i = 0,
@@ -16495,71 +16455,71 @@
 					return true;
 				}
 			}
-	
+
 			return false;
 		}
 	});
-	
-	
-	
-	
+
+
+
+
 	var rreturn = /\r/g;
-	
+
 	jQuery.fn.extend({
 		val: function( value ) {
 			var hooks, ret, isFunction,
 				elem = this[0];
-	
+
 			if ( !arguments.length ) {
 				if ( elem ) {
 					hooks = jQuery.valHooks[ elem.type ] || jQuery.valHooks[ elem.nodeName.toLowerCase() ];
-	
+
 					if ( hooks && "get" in hooks && (ret = hooks.get( elem, "value" )) !== undefined ) {
 						return ret;
 					}
-	
+
 					ret = elem.value;
-	
+
 					return typeof ret === "string" ?
 						// Handle most common string cases
 						ret.replace(rreturn, "") :
 						// Handle cases where value is null/undef or number
 						ret == null ? "" : ret;
 				}
-	
+
 				return;
 			}
-	
+
 			isFunction = jQuery.isFunction( value );
-	
+
 			return this.each(function( i ) {
 				var val;
-	
+
 				if ( this.nodeType !== 1 ) {
 					return;
 				}
-	
+
 				if ( isFunction ) {
 					val = value.call( this, i, jQuery( this ).val() );
 				} else {
 					val = value;
 				}
-	
+
 				// Treat null/undefined as ""; convert numbers to string
 				if ( val == null ) {
 					val = "";
-	
+
 				} else if ( typeof val === "number" ) {
 					val += "";
-	
+
 				} else if ( jQuery.isArray( val ) ) {
 					val = jQuery.map( val, function( value ) {
 						return value == null ? "" : value + "";
 					});
 				}
-	
+
 				hooks = jQuery.valHooks[ this.type ] || jQuery.valHooks[ this.nodeName.toLowerCase() ];
-	
+
 				// If set returns undefined, fall back to normal setting
 				if ( !hooks || !("set" in hooks) || hooks.set( this, val, "value" ) === undefined ) {
 					this.value = val;
@@ -16567,7 +16527,7 @@
 			});
 		}
 	});
-	
+
 	jQuery.extend({
 		valHooks: {
 			option: {
@@ -16591,46 +16551,46 @@
 						i = index < 0 ?
 							max :
 							one ? index : 0;
-	
+
 					// Loop through all the selected options
 					for ( ; i < max; i++ ) {
 						option = options[ i ];
-	
+
 						// IE6-9 doesn't update selected after form reset (#2551)
 						if ( ( option.selected || i === index ) &&
 								// Don't return options that are disabled or in a disabled optgroup
 								( support.optDisabled ? !option.disabled : option.getAttribute( "disabled" ) === null ) &&
 								( !option.parentNode.disabled || !jQuery.nodeName( option.parentNode, "optgroup" ) ) ) {
-	
+
 							// Get the specific value for the option
 							value = jQuery( option ).val();
-	
+
 							// We don't need an array for one selects
 							if ( one ) {
 								return value;
 							}
-	
+
 							// Multi-Selects return an array
 							values.push( value );
 						}
 					}
-	
+
 					return values;
 				},
-	
+
 				set: function( elem, value ) {
 					var optionSet, option,
 						options = elem.options,
 						values = jQuery.makeArray( value ),
 						i = options.length;
-	
+
 					while ( i-- ) {
 						option = options[ i ];
 						if ( (option.selected = jQuery.inArray( option.value, values ) >= 0) ) {
 							optionSet = true;
 						}
 					}
-	
+
 					// Force browsers to behave consistently when non-matching value is set
 					if ( !optionSet ) {
 						elem.selectedIndex = -1;
@@ -16640,7 +16600,7 @@
 			}
 		}
 	});
-	
+
 	// Radios and checkboxes getter/setter
 	jQuery.each([ "radio", "checkbox" ], function() {
 		jQuery.valHooks[ this ] = {
@@ -16656,17 +16616,17 @@
 			};
 		}
 	});
-	
-	
-	
-	
+
+
+
+
 	// Return jQuery for attributes-only inclusion
-	
-	
+
+
 	jQuery.each( ("blur focus focusin focusout load resize scroll unload click dblclick " +
 		"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
 		"change select submit keydown keypress keyup error contextmenu").split(" "), function( i, name ) {
-	
+
 		// Handle event binding
 		jQuery.fn[ name ] = function( data, fn ) {
 			return arguments.length > 0 ?
@@ -16674,19 +16634,19 @@
 				this.trigger( name );
 		};
 	});
-	
+
 	jQuery.fn.extend({
 		hover: function( fnOver, fnOut ) {
 			return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
 		},
-	
+
 		bind: function( types, data, fn ) {
 			return this.on( types, null, data, fn );
 		},
 		unbind: function( types, fn ) {
 			return this.off( types, null, fn );
 		},
-	
+
 		delegate: function( selector, types, data, fn ) {
 			return this.on( types, selector, data, fn );
 		},
@@ -16695,28 +16655,28 @@
 			return arguments.length === 1 ? this.off( selector, "**" ) : this.off( types, selector || "**", fn );
 		}
 	});
-	
-	
+
+
 	var nonce = jQuery.now();
-	
+
 	var rquery = (/\?/);
-	
-	
-	
+
+
+
 	// Support: Android 2.3
 	// Workaround failure to string-cast null input
 	jQuery.parseJSON = function( data ) {
 		return JSON.parse( data + "" );
 	};
-	
-	
+
+
 	// Cross-browser xml parsing
 	jQuery.parseXML = function( data ) {
 		var xml, tmp;
 		if ( !data || typeof data !== "string" ) {
 			return null;
 		}
-	
+
 		// Support: IE9
 		try {
 			tmp = new DOMParser();
@@ -16724,14 +16684,14 @@
 		} catch ( e ) {
 			xml = undefined;
 		}
-	
+
 		if ( !xml || xml.getElementsByTagName( "parsererror" ).length ) {
 			jQuery.error( "Invalid XML: " + data );
 		}
 		return xml;
 	};
-	
-	
+
+
 	var
 		rhash = /#.*$/,
 		rts = /([?&])_=[^&]*/,
@@ -16741,7 +16701,7 @@
 		rnoContent = /^(?:GET|HEAD)$/,
 		rprotocol = /^\/\//,
 		rurl = /^([\w.+-]+:)(?:\/\/(?:[^\/?#]*@|)([^\/?#:]*)(?::(\d+)|)|)/,
-	
+
 		/* Prefilters
 		 * 1) They are useful to introduce custom dataTypes (see ajax/jsonp.js for an example)
 		 * 2) These are called:
@@ -16752,38 +16712,38 @@
 		 * 5) execution will start with transport dataType and THEN continue down to "*" if needed
 		 */
 		prefilters = {},
-	
+
 		/* Transports bindings
 		 * 1) key is the dataType
 		 * 2) the catchall symbol "*" can be used
 		 * 3) selection will start with transport dataType and THEN go to "*" if needed
 		 */
 		transports = {},
-	
+
 		// Avoid comment-prolog char sequence (#10098); must appease lint and evade compression
 		allTypes = "*/".concat( "*" ),
-	
+
 		// Document location
 		ajaxLocation = window.location.href,
-	
+
 		// Segment location into parts
 		ajaxLocParts = rurl.exec( ajaxLocation.toLowerCase() ) || [];
-	
+
 	// Base "constructor" for jQuery.ajaxPrefilter and jQuery.ajaxTransport
 	function addToPrefiltersOrTransports( structure ) {
-	
+
 		// dataTypeExpression is optional and defaults to "*"
 		return function( dataTypeExpression, func ) {
-	
+
 			if ( typeof dataTypeExpression !== "string" ) {
 				func = dataTypeExpression;
 				dataTypeExpression = "*";
 			}
-	
+
 			var dataType,
 				i = 0,
 				dataTypes = dataTypeExpression.toLowerCase().match( rnotwhite ) || [];
-	
+
 			if ( jQuery.isFunction( func ) ) {
 				// For each dataType in the dataTypeExpression
 				while ( (dataType = dataTypes[i++]) ) {
@@ -16791,7 +16751,7 @@
 					if ( dataType[0] === "+" ) {
 						dataType = dataType.slice( 1 ) || "*";
 						(structure[ dataType ] = structure[ dataType ] || []).unshift( func );
-	
+
 					// Otherwise append
 					} else {
 						(structure[ dataType ] = structure[ dataType ] || []).push( func );
@@ -16800,13 +16760,13 @@
 			}
 		};
 	}
-	
+
 	// Base inspection function for prefilters and transports
 	function inspectPrefiltersOrTransports( structure, options, originalOptions, jqXHR ) {
-	
+
 		var inspected = {},
 			seekingTransport = ( structure === transports );
-	
+
 		function inspect( dataType ) {
 			var selected;
 			inspected[ dataType ] = true;
@@ -16822,17 +16782,17 @@
 			});
 			return selected;
 		}
-	
+
 		return inspect( options.dataTypes[ 0 ] ) || !inspected[ "*" ] && inspect( "*" );
 	}
-	
+
 	// A special extend for ajax options
 	// that takes "flat" options (not to be deep extended)
 	// Fixes #9887
 	function ajaxExtend( target, src ) {
 		var key, deep,
 			flatOptions = jQuery.ajaxSettings.flatOptions || {};
-	
+
 		for ( key in src ) {
 			if ( src[ key ] !== undefined ) {
 				( flatOptions[ key ] ? target : ( deep || (deep = {}) ) )[ key ] = src[ key ];
@@ -16841,20 +16801,20 @@
 		if ( deep ) {
 			jQuery.extend( true, target, deep );
 		}
-	
+
 		return target;
 	}
-	
+
 	/* Handles responses to an ajax request:
 	 * - finds the right dataType (mediates between content-type and expected dataType)
 	 * - returns the corresponding response
 	 */
 	function ajaxHandleResponses( s, jqXHR, responses ) {
-	
+
 		var ct, type, finalDataType, firstDataType,
 			contents = s.contents,
 			dataTypes = s.dataTypes;
-	
+
 		// Remove auto dataType and get content-type in the process
 		while ( dataTypes[ 0 ] === "*" ) {
 			dataTypes.shift();
@@ -16862,7 +16822,7 @@
 				ct = s.mimeType || jqXHR.getResponseHeader("Content-Type");
 			}
 		}
-	
+
 		// Check if we're dealing with a known content-type
 		if ( ct ) {
 			for ( type in contents ) {
@@ -16872,7 +16832,7 @@
 				}
 			}
 		}
-	
+
 		// Check to see if we have a response for the expected dataType
 		if ( dataTypes[ 0 ] in responses ) {
 			finalDataType = dataTypes[ 0 ];
@@ -16890,7 +16850,7 @@
 			// Or just use first one
 			finalDataType = finalDataType || firstDataType;
 		}
-	
+
 		// If we found a dataType
 		// We add the dataType to the list if needed
 		// and return the corresponding response
@@ -16901,7 +16861,7 @@
 			return responses[ finalDataType ];
 		}
 	}
-	
+
 	/* Chain conversions given the request and the original response
 	 * Also sets the responseXXX fields on the jqXHR instance
 	 */
@@ -16910,52 +16870,52 @@
 			converters = {},
 			// Work with a copy of dataTypes in case we need to modify it for conversion
 			dataTypes = s.dataTypes.slice();
-	
+
 		// Create converters map with lowercased keys
 		if ( dataTypes[ 1 ] ) {
 			for ( conv in s.converters ) {
 				converters[ conv.toLowerCase() ] = s.converters[ conv ];
 			}
 		}
-	
+
 		current = dataTypes.shift();
-	
+
 		// Convert to each sequential dataType
 		while ( current ) {
-	
+
 			if ( s.responseFields[ current ] ) {
 				jqXHR[ s.responseFields[ current ] ] = response;
 			}
-	
+
 			// Apply the dataFilter if provided
 			if ( !prev && isSuccess && s.dataFilter ) {
 				response = s.dataFilter( response, s.dataType );
 			}
-	
+
 			prev = current;
 			current = dataTypes.shift();
-	
+
 			if ( current ) {
-	
+
 			// There's only work to do if current dataType is non-auto
 				if ( current === "*" ) {
-	
+
 					current = prev;
-	
+
 				// Convert response if prev dataType is non-auto and differs from current
 				} else if ( prev !== "*" && prev !== current ) {
-	
+
 					// Seek a direct converter
 					conv = converters[ prev + " " + current ] || converters[ "* " + current ];
-	
+
 					// If none found, seek a pair
 					if ( !conv ) {
 						for ( conv2 in converters ) {
-	
+
 							// If conv2 outputs current
 							tmp = conv2.split( " " );
 							if ( tmp[ 1 ] === current ) {
-	
+
 								// If prev can be converted to accepted input
 								conv = converters[ prev + " " + tmp[ 0 ] ] ||
 									converters[ "* " + tmp[ 0 ] ];
@@ -16963,7 +16923,7 @@
 									// Condense equivalence converters
 									if ( conv === true ) {
 										conv = converters[ conv2 ];
-	
+
 									// Otherwise, insert the intermediate dataType
 									} else if ( converters[ conv2 ] !== true ) {
 										current = tmp[ 0 ];
@@ -16974,10 +16934,10 @@
 							}
 						}
 					}
-	
+
 					// Apply converter (if not an equivalence)
 					if ( conv !== true ) {
-	
+
 						// Unless errors are allowed to bubble, catch and return them
 						if ( conv && s[ "throws" ] ) {
 							response = conv( response );
@@ -16992,19 +16952,19 @@
 				}
 			}
 		}
-	
+
 		return { state: "success", data: response };
 	}
-	
+
 	jQuery.extend({
-	
+
 		// Counter for holding the number of active queries
 		active: 0,
-	
+
 		// Last-Modified header cache for next request
 		lastModified: {},
 		etag: {},
-	
+
 		ajaxSettings: {
 			url: ajaxLocation,
 			type: "GET",
@@ -17024,7 +16984,7 @@
 			traditional: false,
 			headers: {},
 			*/
-	
+
 			accepts: {
 				"*": allTypes,
 				text: "text/plain",
@@ -17032,36 +16992,36 @@
 				xml: "application/xml, text/xml",
 				json: "application/json, text/javascript"
 			},
-	
+
 			contents: {
 				xml: /xml/,
 				html: /html/,
 				json: /json/
 			},
-	
+
 			responseFields: {
 				xml: "responseXML",
 				text: "responseText",
 				json: "responseJSON"
 			},
-	
+
 			// Data converters
 			// Keys separate source (or catchall "*") and destination types with a single space
 			converters: {
-	
+
 				// Convert anything to text
 				"* text": String,
-	
+
 				// Text to html (true = no transformation)
 				"text html": true,
-	
+
 				// Evaluate text as a json expression
 				"text json": jQuery.parseJSON,
-	
+
 				// Parse text as xml
 				"text xml": jQuery.parseXML
 			},
-	
+
 			// For options that shouldn't be deep extended:
 			// you can add your own custom options here if
 			// and when you create one that shouldn't be
@@ -17071,35 +17031,35 @@
 				context: true
 			}
 		},
-	
+
 		// Creates a full fledged settings object into target
 		// with both ajaxSettings and settings fields.
 		// If target is omitted, writes into ajaxSettings.
 		ajaxSetup: function( target, settings ) {
 			return settings ?
-	
+
 				// Building a settings object
 				ajaxExtend( ajaxExtend( target, jQuery.ajaxSettings ), settings ) :
-	
+
 				// Extending ajaxSettings
 				ajaxExtend( jQuery.ajaxSettings, target );
 		},
-	
+
 		ajaxPrefilter: addToPrefiltersOrTransports( prefilters ),
 		ajaxTransport: addToPrefiltersOrTransports( transports ),
-	
+
 		// Main method
 		ajax: function( url, options ) {
-	
+
 			// If url is an object, simulate pre-1.5 signature
 			if ( typeof url === "object" ) {
 				options = url;
 				url = undefined;
 			}
-	
+
 			// Force options to be an object
 			options = options || {};
-	
+
 			var transport,
 				// URL without anti-cache param
 				cacheURL,
@@ -17137,7 +17097,7 @@
 				// Fake xhr
 				jqXHR = {
 					readyState: 0,
-	
+
 					// Builds headers hashtable if needed
 					getResponseHeader: function( key ) {
 						var match;
@@ -17152,12 +17112,12 @@
 						}
 						return match == null ? null : match;
 					},
-	
+
 					// Raw string
 					getAllResponseHeaders: function() {
 						return state === 2 ? responseHeadersString : null;
 					},
-	
+
 					// Caches the header
 					setRequestHeader: function( name, value ) {
 						var lname = name.toLowerCase();
@@ -17167,7 +17127,7 @@
 						}
 						return this;
 					},
-	
+
 					// Overrides response content-type header
 					overrideMimeType: function( type ) {
 						if ( !state ) {
@@ -17175,7 +17135,7 @@
 						}
 						return this;
 					},
-	
+
 					// Status-dependent callbacks
 					statusCode: function( map ) {
 						var code;
@@ -17192,7 +17152,7 @@
 						}
 						return this;
 					},
-	
+
 					// Cancel the request
 					abort: function( statusText ) {
 						var finalText = statusText || strAbort;
@@ -17203,25 +17163,25 @@
 						return this;
 					}
 				};
-	
+
 			// Attach deferreds
 			deferred.promise( jqXHR ).complete = completeDeferred.add;
 			jqXHR.success = jqXHR.done;
 			jqXHR.error = jqXHR.fail;
-	
+
 			// Remove hash character (#7531: and string promotion)
 			// Add protocol if not provided (prefilters might expect it)
 			// Handle falsy url in the settings object (#10093: consistency with old signature)
 			// We also use the url parameter if available
 			s.url = ( ( url || s.url || ajaxLocation ) + "" ).replace( rhash, "" )
 				.replace( rprotocol, ajaxLocParts[ 1 ] + "//" );
-	
+
 			// Alias method option to type as per ticket #12004
 			s.type = options.method || options.type || s.method || s.type;
-	
+
 			// Extract dataTypes list
 			s.dataTypes = jQuery.trim( s.dataType || "*" ).toLowerCase().match( rnotwhite ) || [ "" ];
-	
+
 			// A cross-domain request is in order when we have a protocol:host:port mismatch
 			if ( s.crossDomain == null ) {
 				parts = rurl.exec( s.url.toLowerCase() );
@@ -17231,61 +17191,61 @@
 							( ajaxLocParts[ 3 ] || ( ajaxLocParts[ 1 ] === "http:" ? "80" : "443" ) ) )
 				);
 			}
-	
+
 			// Convert data if not already a string
 			if ( s.data && s.processData && typeof s.data !== "string" ) {
 				s.data = jQuery.param( s.data, s.traditional );
 			}
-	
+
 			// Apply prefilters
 			inspectPrefiltersOrTransports( prefilters, s, options, jqXHR );
-	
+
 			// If request was aborted inside a prefilter, stop there
 			if ( state === 2 ) {
 				return jqXHR;
 			}
-	
+
 			// We can fire global events as of now if asked to
 			// Don't fire events if jQuery.event is undefined in an AMD-usage scenario (#15118)
 			fireGlobals = jQuery.event && s.global;
-	
+
 			// Watch for a new set of requests
 			if ( fireGlobals && jQuery.active++ === 0 ) {
 				jQuery.event.trigger("ajaxStart");
 			}
-	
+
 			// Uppercase the type
 			s.type = s.type.toUpperCase();
-	
+
 			// Determine if request has content
 			s.hasContent = !rnoContent.test( s.type );
-	
+
 			// Save the URL in case we're toying with the If-Modified-Since
 			// and/or If-None-Match header later on
 			cacheURL = s.url;
-	
+
 			// More options handling for requests with no content
 			if ( !s.hasContent ) {
-	
+
 				// If data is available, append data to url
 				if ( s.data ) {
 					cacheURL = ( s.url += ( rquery.test( cacheURL ) ? "&" : "?" ) + s.data );
 					// #9682: remove data so that it's not used in an eventual retry
 					delete s.data;
 				}
-	
+
 				// Add anti-cache in url if needed
 				if ( s.cache === false ) {
 					s.url = rts.test( cacheURL ) ?
-	
+
 						// If there is already a '_' parameter, set its value
 						cacheURL.replace( rts, "$1_=" + nonce++ ) :
-	
+
 						// Otherwise add one to the end
 						cacheURL + ( rquery.test( cacheURL ) ? "&" : "?" ) + "_=" + nonce++;
 				}
 			}
-	
+
 			// Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
 			if ( s.ifModified ) {
 				if ( jQuery.lastModified[ cacheURL ] ) {
@@ -17295,12 +17255,12 @@
 					jqXHR.setRequestHeader( "If-None-Match", jQuery.etag[ cacheURL ] );
 				}
 			}
-	
+
 			// Set the correct header, if data is being sent
 			if ( s.data && s.hasContent && s.contentType !== false || options.contentType ) {
 				jqXHR.setRequestHeader( "Content-Type", s.contentType );
 			}
-	
+
 			// Set the Accepts header for the server, depending on the dataType
 			jqXHR.setRequestHeader(
 				"Accept",
@@ -17308,35 +17268,35 @@
 					s.accepts[ s.dataTypes[0] ] + ( s.dataTypes[ 0 ] !== "*" ? ", " + allTypes + "; q=0.01" : "" ) :
 					s.accepts[ "*" ]
 			);
-	
+
 			// Check for headers option
 			for ( i in s.headers ) {
 				jqXHR.setRequestHeader( i, s.headers[ i ] );
 			}
-	
+
 			// Allow custom headers/mimetypes and early abort
 			if ( s.beforeSend && ( s.beforeSend.call( callbackContext, jqXHR, s ) === false || state === 2 ) ) {
 				// Abort if not done already and return
 				return jqXHR.abort();
 			}
-	
+
 			// Aborting is no longer a cancellation
 			strAbort = "abort";
-	
+
 			// Install callbacks on deferreds
 			for ( i in { success: 1, error: 1, complete: 1 } ) {
 				jqXHR[ i ]( s[ i ] );
 			}
-	
+
 			// Get transport
 			transport = inspectPrefiltersOrTransports( transports, s, options, jqXHR );
-	
+
 			// If no transport, we auto-abort
 			if ( !transport ) {
 				done( -1, "No Transport" );
 			} else {
 				jqXHR.readyState = 1;
-	
+
 				// Send global event
 				if ( fireGlobals ) {
 					globalEventContext.trigger( "ajaxSend", [ jqXHR, s ] );
@@ -17347,7 +17307,7 @@
 						jqXHR.abort("timeout");
 					}, s.timeout );
 				}
-	
+
 				try {
 					state = 1;
 					transport.send( requestHeaders, done );
@@ -17361,49 +17321,49 @@
 					}
 				}
 			}
-	
+
 			// Callback for when everything is done
 			function done( status, nativeStatusText, responses, headers ) {
 				var isSuccess, success, error, response, modified,
 					statusText = nativeStatusText;
-	
+
 				// Called once
 				if ( state === 2 ) {
 					return;
 				}
-	
+
 				// State is "done" now
 				state = 2;
-	
+
 				// Clear timeout if it exists
 				if ( timeoutTimer ) {
 					clearTimeout( timeoutTimer );
 				}
-	
+
 				// Dereference transport for early garbage collection
 				// (no matter how long the jqXHR object will be used)
 				transport = undefined;
-	
+
 				// Cache response headers
 				responseHeadersString = headers || "";
-	
+
 				// Set readyState
 				jqXHR.readyState = status > 0 ? 4 : 0;
-	
+
 				// Determine if successful
 				isSuccess = status >= 200 && status < 300 || status === 304;
-	
+
 				// Get response data
 				if ( responses ) {
 					response = ajaxHandleResponses( s, jqXHR, responses );
 				}
-	
+
 				// Convert no matter what (that way responseXXX fields are always set)
 				response = ajaxConvert( s, response, jqXHR, isSuccess );
-	
+
 				// If successful, handle type chaining
 				if ( isSuccess ) {
-	
+
 					// Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
 					if ( s.ifModified ) {
 						modified = jqXHR.getResponseHeader("Last-Modified");
@@ -17415,15 +17375,15 @@
 							jQuery.etag[ cacheURL ] = modified;
 						}
 					}
-	
+
 					// if no content
 					if ( status === 204 || s.type === "HEAD" ) {
 						statusText = "nocontent";
-	
+
 					// if not modified
 					} else if ( status === 304 ) {
 						statusText = "notmodified";
-	
+
 					// If we have data, let's convert it
 					} else {
 						statusText = response.state;
@@ -17441,30 +17401,30 @@
 						}
 					}
 				}
-	
+
 				// Set data for the fake xhr object
 				jqXHR.status = status;
 				jqXHR.statusText = ( nativeStatusText || statusText ) + "";
-	
+
 				// Success/Error
 				if ( isSuccess ) {
 					deferred.resolveWith( callbackContext, [ success, statusText, jqXHR ] );
 				} else {
 					deferred.rejectWith( callbackContext, [ jqXHR, statusText, error ] );
 				}
-	
+
 				// Status-dependent callbacks
 				jqXHR.statusCode( statusCode );
 				statusCode = undefined;
-	
+
 				if ( fireGlobals ) {
 					globalEventContext.trigger( isSuccess ? "ajaxSuccess" : "ajaxError",
 						[ jqXHR, s, isSuccess ? success : error ] );
 				}
-	
+
 				// Complete
 				completeDeferred.fireWith( callbackContext, [ jqXHR, statusText ] );
-	
+
 				if ( fireGlobals ) {
 					globalEventContext.trigger( "ajaxComplete", [ jqXHR, s ] );
 					// Handle the global AJAX counter
@@ -17473,19 +17433,19 @@
 					}
 				}
 			}
-	
+
 			return jqXHR;
 		},
-	
+
 		getJSON: function( url, data, callback ) {
 			return jQuery.get( url, data, callback, "json" );
 		},
-	
+
 		getScript: function( url, callback ) {
 			return jQuery.get( url, undefined, callback, "script" );
 		}
 	});
-	
+
 	jQuery.each( [ "get", "post" ], function( i, method ) {
 		jQuery[ method ] = function( url, data, callback, type ) {
 			// Shift arguments if data argument was omitted
@@ -17494,7 +17454,7 @@
 				callback = data;
 				data = undefined;
 			}
-	
+
 			return jQuery.ajax({
 				url: url,
 				type: method,
@@ -17504,8 +17464,8 @@
 			});
 		};
 	});
-	
-	
+
+
 	jQuery._evalUrl = function( url ) {
 		return jQuery.ajax({
 			url: url,
@@ -17516,69 +17476,69 @@
 			"throws": true
 		});
 	};
-	
-	
+
+
 	jQuery.fn.extend({
 		wrapAll: function( html ) {
 			var wrap;
-	
+
 			if ( jQuery.isFunction( html ) ) {
 				return this.each(function( i ) {
 					jQuery( this ).wrapAll( html.call(this, i) );
 				});
 			}
-	
+
 			if ( this[ 0 ] ) {
-	
+
 				// The elements to wrap the target around
 				wrap = jQuery( html, this[ 0 ].ownerDocument ).eq( 0 ).clone( true );
-	
+
 				if ( this[ 0 ].parentNode ) {
 					wrap.insertBefore( this[ 0 ] );
 				}
-	
+
 				wrap.map(function() {
 					var elem = this;
-	
+
 					while ( elem.firstElementChild ) {
 						elem = elem.firstElementChild;
 					}
-	
+
 					return elem;
 				}).append( this );
 			}
-	
+
 			return this;
 		},
-	
+
 		wrapInner: function( html ) {
 			if ( jQuery.isFunction( html ) ) {
 				return this.each(function( i ) {
 					jQuery( this ).wrapInner( html.call(this, i) );
 				});
 			}
-	
+
 			return this.each(function() {
 				var self = jQuery( this ),
 					contents = self.contents();
-	
+
 				if ( contents.length ) {
 					contents.wrapAll( html );
-	
+
 				} else {
 					self.append( html );
 				}
 			});
 		},
-	
+
 		wrap: function( html ) {
 			var isFunction = jQuery.isFunction( html );
-	
+
 			return this.each(function( i ) {
 				jQuery( this ).wrapAll( isFunction ? html.call(this, i) : html );
 			});
 		},
-	
+
 		unwrap: function() {
 			return this.parent().each(function() {
 				if ( !jQuery.nodeName( this, "body" ) ) {
@@ -17587,8 +17547,8 @@
 			}).end();
 		}
 	});
-	
-	
+
+
 	jQuery.expr.filters.hidden = function( elem ) {
 		// Support: Opera <= 12.12
 		// Opera reports offsetWidths and offsetHeights less than zero on some elements
@@ -17597,44 +17557,44 @@
 	jQuery.expr.filters.visible = function( elem ) {
 		return !jQuery.expr.filters.hidden( elem );
 	};
-	
-	
-	
-	
+
+
+
+
 	var r20 = /%20/g,
 		rbracket = /\[\]$/,
 		rCRLF = /\r?\n/g,
 		rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
 		rsubmittable = /^(?:input|select|textarea|keygen)/i;
-	
+
 	function buildParams( prefix, obj, traditional, add ) {
 		var name;
-	
+
 		if ( jQuery.isArray( obj ) ) {
 			// Serialize array item.
 			jQuery.each( obj, function( i, v ) {
 				if ( traditional || rbracket.test( prefix ) ) {
 					// Treat each array item as a scalar.
 					add( prefix, v );
-	
+
 				} else {
 					// Item is non-scalar (array or object), encode its numeric index.
 					buildParams( prefix + "[" + ( typeof v === "object" ? i : "" ) + "]", v, traditional, add );
 				}
 			});
-	
+
 		} else if ( !traditional && jQuery.type( obj ) === "object" ) {
 			// Serialize object item.
 			for ( name in obj ) {
 				buildParams( prefix + "[" + name + "]", obj[ name ], traditional, add );
 			}
-	
+
 		} else {
 			// Serialize scalar item.
 			add( prefix, obj );
 		}
 	}
-	
+
 	// Serialize an array of form elements or a set of
 	// key/values into a query string
 	jQuery.param = function( a, traditional ) {
@@ -17645,19 +17605,19 @@
 				value = jQuery.isFunction( value ) ? value() : ( value == null ? "" : value );
 				s[ s.length ] = encodeURIComponent( key ) + "=" + encodeURIComponent( value );
 			};
-	
+
 		// Set traditional to true for jQuery <= 1.3.2 behavior.
 		if ( traditional === undefined ) {
 			traditional = jQuery.ajaxSettings && jQuery.ajaxSettings.traditional;
 		}
-	
+
 		// If an array was passed in, assume that it is an array of form elements.
 		if ( jQuery.isArray( a ) || ( a.jquery && !jQuery.isPlainObject( a ) ) ) {
 			// Serialize the form elements
 			jQuery.each( a, function() {
 				add( this.name, this.value );
 			});
-	
+
 		} else {
 			// If traditional, encode the "old" way (the way 1.3.2 or older
 			// did it), otherwise encode params recursively.
@@ -17665,11 +17625,11 @@
 				buildParams( prefix, a[ prefix ], traditional, add );
 			}
 		}
-	
+
 		// Return the resulting serialization
 		return s.join( "&" ).replace( r20, "+" );
 	};
-	
+
 	jQuery.fn.extend({
 		serialize: function() {
 			return jQuery.param( this.serializeArray() );
@@ -17682,7 +17642,7 @@
 			})
 			.filter(function() {
 				var type = this.type;
-	
+
 				// Use .is( ":disabled" ) so that fieldset[disabled] works
 				return this.name && !jQuery( this ).is( ":disabled" ) &&
 					rsubmittable.test( this.nodeName ) && !rsubmitterTypes.test( type ) &&
@@ -17690,7 +17650,7 @@
 			})
 			.map(function( i, elem ) {
 				var val = jQuery( this ).val();
-	
+
 				return val == null ?
 					null :
 					jQuery.isArray( val ) ?
@@ -17701,14 +17661,14 @@
 			}).get();
 		}
 	});
-	
-	
+
+
 	jQuery.ajaxSettings.xhr = function() {
 		try {
 			return new XMLHttpRequest();
 		} catch( e ) {}
 	};
-	
+
 	var xhrId = 0,
 		xhrCallbacks = {},
 		xhrSuccessStatus = {
@@ -17719,7 +17679,7 @@
 			1223: 204
 		},
 		xhrSupported = jQuery.ajaxSettings.xhr();
-	
+
 	// Support: IE9
 	// Open requests must be manually aborted on unload (#5280)
 	// See https://support.microsoft.com/kb/2856746 for more info
@@ -17730,13 +17690,13 @@
 			}
 		});
 	}
-	
+
 	support.cors = !!xhrSupported && ( "withCredentials" in xhrSupported );
 	support.ajax = xhrSupported = !!xhrSupported;
-	
+
 	jQuery.ajaxTransport(function( options ) {
 		var callback;
-	
+
 		// Cross domain only allowed if supported through XMLHttpRequest
 		if ( support.cors || xhrSupported && !options.crossDomain ) {
 			return {
@@ -17744,21 +17704,21 @@
 					var i,
 						xhr = options.xhr(),
 						id = ++xhrId;
-	
+
 					xhr.open( options.type, options.url, options.async, options.username, options.password );
-	
+
 					// Apply custom fields if provided
 					if ( options.xhrFields ) {
 						for ( i in options.xhrFields ) {
 							xhr[ i ] = options.xhrFields[ i ];
 						}
 					}
-	
+
 					// Override mime type if needed
 					if ( options.mimeType && xhr.overrideMimeType ) {
 						xhr.overrideMimeType( options.mimeType );
 					}
-	
+
 					// X-Requested-With header
 					// For cross-domain requests, seeing as conditions for a preflight are
 					// akin to a jigsaw puzzle, we simply never set it to be sure.
@@ -17767,19 +17727,19 @@
 					if ( !options.crossDomain && !headers["X-Requested-With"] ) {
 						headers["X-Requested-With"] = "XMLHttpRequest";
 					}
-	
+
 					// Set headers
 					for ( i in headers ) {
 						xhr.setRequestHeader( i, headers[ i ] );
 					}
-	
+
 					// Callback
 					callback = function( type ) {
 						return function() {
 							if ( callback ) {
 								delete xhrCallbacks[ id ];
 								callback = xhr.onload = xhr.onerror = null;
-	
+
 								if ( type === "abort" ) {
 									xhr.abort();
 								} else if ( type === "error" ) {
@@ -17804,14 +17764,14 @@
 							}
 						};
 					};
-	
+
 					// Listen to events
 					xhr.onload = callback();
 					xhr.onerror = callback("error");
-	
+
 					// Create the abort callback
 					callback = xhrCallbacks[ id ] = callback("abort");
-	
+
 					try {
 						// Do send the request (this may raise an exception)
 						xhr.send( options.hasContent && options.data || null );
@@ -17822,7 +17782,7 @@
 						}
 					}
 				},
-	
+
 				abort: function() {
 					if ( callback ) {
 						callback();
@@ -17831,10 +17791,10 @@
 			};
 		}
 	});
-	
-	
-	
-	
+
+
+
+
 	// Install script dataType
 	jQuery.ajaxSetup({
 		accepts: {
@@ -17850,7 +17810,7 @@
 			}
 		}
 	});
-	
+
 	// Handle cache's special case and crossDomain
 	jQuery.ajaxPrefilter( "script", function( s ) {
 		if ( s.cache === undefined ) {
@@ -17860,7 +17820,7 @@
 			s.type = "GET";
 		}
 	});
-	
+
 	// Bind script tag hack transport
 	jQuery.ajaxTransport( "script", function( s ) {
 		// This transport only deals with cross domain requests
@@ -17892,13 +17852,13 @@
 			};
 		}
 	});
-	
-	
-	
-	
+
+
+
+
 	var oldCallbacks = [],
 		rjsonp = /(=)\?(?=&|$)|\?\?/;
-	
+
 	// Default jsonp settings
 	jQuery.ajaxSetup({
 		jsonp: "callback",
@@ -17908,31 +17868,31 @@
 			return callback;
 		}
 	});
-	
+
 	// Detect, normalize options and install callbacks for jsonp requests
 	jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
-	
+
 		var callbackName, overwritten, responseContainer,
 			jsonProp = s.jsonp !== false && ( rjsonp.test( s.url ) ?
 				"url" :
 				typeof s.data === "string" && !( s.contentType || "" ).indexOf("application/x-www-form-urlencoded") && rjsonp.test( s.data ) && "data"
 			);
-	
+
 		// Handle iff the expected data type is "jsonp" or we have a parameter to set
 		if ( jsonProp || s.dataTypes[ 0 ] === "jsonp" ) {
-	
+
 			// Get callback name, remembering preexisting value associated with it
 			callbackName = s.jsonpCallback = jQuery.isFunction( s.jsonpCallback ) ?
 				s.jsonpCallback() :
 				s.jsonpCallback;
-	
+
 			// Insert callback into url or form data
 			if ( jsonProp ) {
 				s[ jsonProp ] = s[ jsonProp ].replace( rjsonp, "$1" + callbackName );
 			} else if ( s.jsonp !== false ) {
 				s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s.jsonp + "=" + callbackName;
 			}
-	
+
 			// Use data converter to retrieve json after script execution
 			s.converters["script json"] = function() {
 				if ( !responseContainer ) {
@@ -17940,46 +17900,46 @@
 				}
 				return responseContainer[ 0 ];
 			};
-	
+
 			// force json dataType
 			s.dataTypes[ 0 ] = "json";
-	
+
 			// Install callback
 			overwritten = window[ callbackName ];
 			window[ callbackName ] = function() {
 				responseContainer = arguments;
 			};
-	
+
 			// Clean-up function (fires after converters)
 			jqXHR.always(function() {
 				// Restore preexisting value
 				window[ callbackName ] = overwritten;
-	
+
 				// Save back as free
 				if ( s[ callbackName ] ) {
 					// make sure that re-using the options doesn't screw things around
 					s.jsonpCallback = originalSettings.jsonpCallback;
-	
+
 					// save the callback name for future use
 					oldCallbacks.push( callbackName );
 				}
-	
+
 				// Call if it was a function and we have a response
 				if ( responseContainer && jQuery.isFunction( overwritten ) ) {
 					overwritten( responseContainer[ 0 ] );
 				}
-	
+
 				responseContainer = overwritten = undefined;
 			});
-	
+
 			// Delegate to script
 			return "script";
 		}
 	});
-	
-	
-	
-	
+
+
+
+
 	// data: string of html
 	// context (optional): If specified, the fragment will be created in this context, defaults to document
 	// keepScripts (optional): If true, will include scripts passed in the html string
@@ -17992,28 +17952,28 @@
 			context = false;
 		}
 		context = context || document;
-	
+
 		var parsed = rsingleTag.exec( data ),
 			scripts = !keepScripts && [];
-	
+
 		// Single tag
 		if ( parsed ) {
 			return [ context.createElement( parsed[1] ) ];
 		}
-	
+
 		parsed = jQuery.buildFragment( [ data ], context, scripts );
-	
+
 		if ( scripts && scripts.length ) {
 			jQuery( scripts ).remove();
 		}
-	
+
 		return jQuery.merge( [], parsed.childNodes );
 	};
-	
-	
+
+
 	// Keep a copy of the old load method
 	var _load = jQuery.fn.load;
-	
+
 	/**
 	 * Load a url into a page
 	 */
@@ -18021,140 +17981,140 @@
 		if ( typeof url !== "string" && _load ) {
 			return _load.apply( this, arguments );
 		}
-	
+
 		var selector, type, response,
 			self = this,
 			off = url.indexOf(" ");
-	
+
 		if ( off >= 0 ) {
 			selector = jQuery.trim( url.slice( off ) );
 			url = url.slice( 0, off );
 		}
-	
+
 		// If it's a function
 		if ( jQuery.isFunction( params ) ) {
-	
+
 			// We assume that it's the callback
 			callback = params;
 			params = undefined;
-	
+
 		// Otherwise, build a param string
 		} else if ( params && typeof params === "object" ) {
 			type = "POST";
 		}
-	
+
 		// If we have elements to modify, make the request
 		if ( self.length > 0 ) {
 			jQuery.ajax({
 				url: url,
-	
+
 				// if "type" variable is undefined, then "GET" method will be used
 				type: type,
 				dataType: "html",
 				data: params
 			}).done(function( responseText ) {
-	
+
 				// Save response for use in complete callback
 				response = arguments;
-	
+
 				self.html( selector ?
-	
+
 					// If a selector was specified, locate the right elements in a dummy div
 					// Exclude scripts to avoid IE 'Permission Denied' errors
 					jQuery("<div>").append( jQuery.parseHTML( responseText ) ).find( selector ) :
-	
+
 					// Otherwise use the full result
 					responseText );
-	
+
 			}).complete( callback && function( jqXHR, status ) {
 				self.each( callback, response || [ jqXHR.responseText, status, jqXHR ] );
 			});
 		}
-	
+
 		return this;
 	};
-	
-	
-	
-	
+
+
+
+
 	// Attach a bunch of functions for handling common AJAX events
 	jQuery.each( [ "ajaxStart", "ajaxStop", "ajaxComplete", "ajaxError", "ajaxSuccess", "ajaxSend" ], function( i, type ) {
 		jQuery.fn[ type ] = function( fn ) {
 			return this.on( type, fn );
 		};
 	});
-	
-	
-	
-	
+
+
+
+
 	jQuery.expr.filters.animated = function( elem ) {
 		return jQuery.grep(jQuery.timers, function( fn ) {
 			return elem === fn.elem;
 		}).length;
 	};
-	
-	
-	
-	
+
+
+
+
 	var docElem = window.document.documentElement;
-	
+
 	/**
 	 * Gets a window from an element
 	 */
 	function getWindow( elem ) {
 		return jQuery.isWindow( elem ) ? elem : elem.nodeType === 9 && elem.defaultView;
 	}
-	
+
 	jQuery.offset = {
 		setOffset: function( elem, options, i ) {
 			var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft, calculatePosition,
 				position = jQuery.css( elem, "position" ),
 				curElem = jQuery( elem ),
 				props = {};
-	
+
 			// Set position first, in-case top/left are set even on static elem
 			if ( position === "static" ) {
 				elem.style.position = "relative";
 			}
-	
+
 			curOffset = curElem.offset();
 			curCSSTop = jQuery.css( elem, "top" );
 			curCSSLeft = jQuery.css( elem, "left" );
 			calculatePosition = ( position === "absolute" || position === "fixed" ) &&
 				( curCSSTop + curCSSLeft ).indexOf("auto") > -1;
-	
+
 			// Need to be able to calculate position if either
 			// top or left is auto and position is either absolute or fixed
 			if ( calculatePosition ) {
 				curPosition = curElem.position();
 				curTop = curPosition.top;
 				curLeft = curPosition.left;
-	
+
 			} else {
 				curTop = parseFloat( curCSSTop ) || 0;
 				curLeft = parseFloat( curCSSLeft ) || 0;
 			}
-	
+
 			if ( jQuery.isFunction( options ) ) {
 				options = options.call( elem, i, curOffset );
 			}
-	
+
 			if ( options.top != null ) {
 				props.top = ( options.top - curOffset.top ) + curTop;
 			}
 			if ( options.left != null ) {
 				props.left = ( options.left - curOffset.left ) + curLeft;
 			}
-	
+
 			if ( "using" in options ) {
 				options.using.call( elem, props );
-	
+
 			} else {
 				curElem.css( props );
 			}
 		}
 	};
-	
+
 	jQuery.fn.extend({
 		offset: function( options ) {
 			if ( arguments.length ) {
@@ -18164,23 +18124,23 @@
 						jQuery.offset.setOffset( this, options, i );
 					});
 			}
-	
+
 			var docElem, win,
 				elem = this[ 0 ],
 				box = { top: 0, left: 0 },
 				doc = elem && elem.ownerDocument;
-	
+
 			if ( !doc ) {
 				return;
 			}
-	
+
 			docElem = doc.documentElement;
-	
+
 			// Make sure it's not a disconnected DOM node
 			if ( !jQuery.contains( docElem, elem ) ) {
 				return box;
 			}
-	
+
 			// Support: BlackBerry 5, iOS 3 (original iPhone)
 			// If we don't have gBCR, just use 0,0 rather than error
 			if ( typeof elem.getBoundingClientRect !== strundefined ) {
@@ -18192,81 +18152,81 @@
 				left: box.left + win.pageXOffset - docElem.clientLeft
 			};
 		},
-	
+
 		position: function() {
 			if ( !this[ 0 ] ) {
 				return;
 			}
-	
+
 			var offsetParent, offset,
 				elem = this[ 0 ],
 				parentOffset = { top: 0, left: 0 };
-	
+
 			// Fixed elements are offset from window (parentOffset = {top:0, left: 0}, because it is its only offset parent
 			if ( jQuery.css( elem, "position" ) === "fixed" ) {
 				// Assume getBoundingClientRect is there when computed position is fixed
 				offset = elem.getBoundingClientRect();
-	
+
 			} else {
 				// Get *real* offsetParent
 				offsetParent = this.offsetParent();
-	
+
 				// Get correct offsets
 				offset = this.offset();
 				if ( !jQuery.nodeName( offsetParent[ 0 ], "html" ) ) {
 					parentOffset = offsetParent.offset();
 				}
-	
+
 				// Add offsetParent borders
 				parentOffset.top += jQuery.css( offsetParent[ 0 ], "borderTopWidth", true );
 				parentOffset.left += jQuery.css( offsetParent[ 0 ], "borderLeftWidth", true );
 			}
-	
+
 			// Subtract parent offsets and element margins
 			return {
 				top: offset.top - parentOffset.top - jQuery.css( elem, "marginTop", true ),
 				left: offset.left - parentOffset.left - jQuery.css( elem, "marginLeft", true )
 			};
 		},
-	
+
 		offsetParent: function() {
 			return this.map(function() {
 				var offsetParent = this.offsetParent || docElem;
-	
+
 				while ( offsetParent && ( !jQuery.nodeName( offsetParent, "html" ) && jQuery.css( offsetParent, "position" ) === "static" ) ) {
 					offsetParent = offsetParent.offsetParent;
 				}
-	
+
 				return offsetParent || docElem;
 			});
 		}
 	});
-	
+
 	// Create scrollLeft and scrollTop methods
 	jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( method, prop ) {
 		var top = "pageYOffset" === prop;
-	
+
 		jQuery.fn[ method ] = function( val ) {
 			return access( this, function( elem, method, val ) {
 				var win = getWindow( elem );
-	
+
 				if ( val === undefined ) {
 					return win ? win[ prop ] : elem[ method ];
 				}
-	
+
 				if ( win ) {
 					win.scrollTo(
 						!top ? val : window.pageXOffset,
 						top ? val : window.pageYOffset
 					);
-	
+
 				} else {
 					elem[ method ] = val;
 				}
 			}, method, val, arguments.length, null );
 		};
 	});
-	
+
 	// Support: Safari<7+, Chrome<37+
 	// Add the top/left cssHooks using jQuery.fn.position
 	// Webkit bug: https://bugs.webkit.org/show_bug.cgi?id=29084
@@ -18286,8 +18246,8 @@
 			}
 		);
 	});
-	
-	
+
+
 	// Create innerHeight, innerWidth, height, width, outerHeight and outerWidth methods
 	jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 		jQuery.each( { padding: "inner" + name, content: type, "": "outer" + name }, function( defaultExtra, funcName ) {
@@ -18295,21 +18255,21 @@
 			jQuery.fn[ funcName ] = function( margin, value ) {
 				var chainable = arguments.length && ( defaultExtra || typeof margin !== "boolean" ),
 					extra = defaultExtra || ( margin === true || value === true ? "margin" : "border" );
-	
+
 				return access( this, function( elem, type, value ) {
 					var doc;
-	
+
 					if ( jQuery.isWindow( elem ) ) {
 						// As of 5/8/2012 this will yield incorrect results for Mobile Safari, but there
 						// isn't a whole lot we can do. See pull request at this URL for discussion:
 						// https://github.com/jquery/jquery/pull/764
 						return elem.document.documentElement[ "client" + name ];
 					}
-	
+
 					// Get document width or height
 					if ( elem.nodeType === 9 ) {
 						doc = elem.documentElement;
-	
+
 						// Either scroll[Width/Height] or offset[Width/Height] or client[Width/Height],
 						// whichever is greatest
 						return Math.max(
@@ -18318,29 +18278,29 @@
 							doc[ "client" + name ]
 						);
 					}
-	
+
 					return value === undefined ?
 						// Get width or height on the element, requesting but not forcing parseFloat
 						jQuery.css( elem, type, extra ) :
-	
+
 						// Set width or height on the element
 						jQuery.style( elem, type, value, extra );
 				}, type, chainable ? margin : undefined, chainable, null );
 			};
 		});
 	});
-	
-	
+
+
 	// The number of elements contained in the matched element set
 	jQuery.fn.size = function() {
 		return this.length;
 	};
-	
+
 	jQuery.fn.andSelf = jQuery.fn.addBack;
-	
-	
-	
-	
+
+
+
+
 	// Register as a named AMD module, since jQuery can be concatenated with other
 	// files that may use define, but not via a proper concatenation script that
 	// understands anonymous AMD modules. A named AMD is safest and most robust
@@ -18348,60 +18308,57 @@
 	// derived from file names, and jQuery is normally delivered in a lowercase
 	// file name. Do this after creating the global so that if an AMD module wants
 	// to call noConflict to hide this version of jQuery, it will work.
-	
+
 	// Note that for maximum portability, libraries that are not jQuery should
 	// declare themselves as anonymous modules, and avoid setting a global if an
 	// AMD loader is present. jQuery is a special case. For more information, see
 	// https://github.com/jrburke/requirejs/wiki/Updating-existing-libraries#wiki-anon
-	
+
 	if ( true ) {
 		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() {
 			return jQuery;
 		}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	}
-	
-	
-	
-	
+
+
+
+
 	var
 		// Map over jQuery in case of overwrite
 		_jQuery = window.jQuery,
-	
+
 		// Map over the $ in case of overwrite
 		_$ = window.$;
-	
+
 	jQuery.noConflict = function( deep ) {
 		if ( window.$ === jQuery ) {
 			window.$ = _$;
 		}
-	
+
 		if ( deep && window.jQuery === jQuery ) {
 			window.jQuery = _jQuery;
 		}
-	
+
 		return jQuery;
 	};
-	
+
 	// Expose jQuery and $ identifiers, even in AMD
 	// (#7102#comment:10, https://github.com/jquery/jquery/pull/557)
 	// and CommonJS for browser emulators (#13566)
 	if ( typeof noGlobal === strundefined ) {
 		window.jQuery = window.$ = jQuery;
 	}
-	
-	
-	
-	
+
+
+
+
 	return jQuery;
-	
+
 	}));
 
 
 /***/ },
 /* 14 */
-/*!**************************************************!*\
-  !*** ./~/jquery-mousewheel/jquery.mousewheel.js ***!
-  \**************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -18411,11 +18368,11 @@
 	 * Released under the MIT license
 	 * http://jquery.org/license
 	 */
-	
+
 	(function (factory) {
 	    if ( true ) {
 	        // AMD. Register as an anonymous module.
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! jquery */ 13)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(13)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof exports === 'object') {
 	        // Node/CommonJS style for Browserify
 	        module.exports = factory;
@@ -18424,22 +18381,22 @@
 	        factory(jQuery);
 	    }
 	}(function ($) {
-	
+
 	    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
 	        toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
 	                    ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
 	        slice  = Array.prototype.slice,
 	        nullLowestDeltaTimeout, lowestDelta;
-	
+
 	    if ( $.event.fixHooks ) {
 	        for ( var i = toFix.length; i; ) {
 	            $.event.fixHooks[ toFix[--i] ] = $.event.mouseHooks;
 	        }
 	    }
-	
+
 	    var special = $.event.special.mousewheel = {
 	        version: '3.1.12',
-	
+
 	        setup: function() {
 	            if ( this.addEventListener ) {
 	                for ( var i = toBind.length; i; ) {
@@ -18452,7 +18409,7 @@
 	            $.data(this, 'mousewheel-line-height', special.getLineHeight(this));
 	            $.data(this, 'mousewheel-page-height', special.getPageHeight(this));
 	        },
-	
+
 	        teardown: function() {
 	            if ( this.removeEventListener ) {
 	                for ( var i = toBind.length; i; ) {
@@ -18465,7 +18422,7 @@
 	            $.removeData(this, 'mousewheel-line-height');
 	            $.removeData(this, 'mousewheel-page-height');
 	        },
-	
+
 	        getLineHeight: function(elem) {
 	            var $elem = $(elem),
 	                $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
@@ -18474,28 +18431,28 @@
 	            }
 	            return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
 	        },
-	
+
 	        getPageHeight: function(elem) {
 	            return $(elem).height();
 	        },
-	
+
 	        settings: {
 	            adjustOldDeltas: true, // see shouldAdjustOldDeltas() below
 	            normalizeOffset: true  // calls getBoundingClientRect for each event
 	        }
 	    };
-	
+
 	    $.fn.extend({
 	        mousewheel: function(fn) {
 	            return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
 	        },
-	
+
 	        unmousewheel: function(fn) {
 	            return this.unbind('mousewheel', fn);
 	        }
 	    });
-	
-	
+
+
 	    function handler(event) {
 	        var orgEvent   = event || window.event,
 	            args       = slice.call(arguments, 1),
@@ -18507,22 +18464,22 @@
 	            offsetY    = 0;
 	        event = $.event.fix(orgEvent);
 	        event.type = 'mousewheel';
-	
+
 	        // Old school scrollwheel delta
 	        if ( 'detail'      in orgEvent ) { deltaY = orgEvent.detail * -1;      }
 	        if ( 'wheelDelta'  in orgEvent ) { deltaY = orgEvent.wheelDelta;       }
 	        if ( 'wheelDeltaY' in orgEvent ) { deltaY = orgEvent.wheelDeltaY;      }
 	        if ( 'wheelDeltaX' in orgEvent ) { deltaX = orgEvent.wheelDeltaX * -1; }
-	
+
 	        // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
 	        if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
 	            deltaX = deltaY * -1;
 	            deltaY = 0;
 	        }
-	
+
 	        // Set delta to be deltaY or deltaX if deltaY is 0 for backwards compatabilitiy
 	        delta = deltaY === 0 ? deltaX : deltaY;
-	
+
 	        // New school wheel delta (wheel event)
 	        if ( 'deltaY' in orgEvent ) {
 	            deltaY = orgEvent.deltaY * -1;
@@ -18532,10 +18489,10 @@
 	            deltaX = orgEvent.deltaX;
 	            if ( deltaY === 0 ) { delta  = deltaX * -1; }
 	        }
-	
+
 	        // No change actually happened, no reason to go any further
 	        if ( deltaY === 0 && deltaX === 0 ) { return; }
-	
+
 	        // Need to convert lines and pages to pixels if we aren't already in pixels
 	        // There are three delta modes:
 	        //   * deltaMode 0 is by pixels, nothing to do
@@ -18552,19 +18509,19 @@
 	            deltaY *= pageHeight;
 	            deltaX *= pageHeight;
 	        }
-	
+
 	        // Store lowest absolute delta to normalize the delta values
 	        absDelta = Math.max( Math.abs(deltaY), Math.abs(deltaX) );
-	
+
 	        if ( !lowestDelta || absDelta < lowestDelta ) {
 	            lowestDelta = absDelta;
-	
+
 	            // Adjust older deltas if necessary
 	            if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
 	                lowestDelta /= 40;
 	            }
 	        }
-	
+
 	        // Adjust older deltas if necessary
 	        if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
 	            // Divide all the things by 40!
@@ -18572,19 +18529,19 @@
 	            deltaX /= 40;
 	            deltaY /= 40;
 	        }
-	
+
 	        // Get a whole, normalized value for the deltas
 	        delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
 	        deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
 	        deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
-	
+
 	        // Normalise offsetX and offsetY properties
 	        if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
 	            var boundingRect = this.getBoundingClientRect();
 	            offsetX = event.clientX - boundingRect.left;
 	            offsetY = event.clientY - boundingRect.top;
 	        }
-	
+
 	        // Add information to the event object
 	        event.deltaX = deltaX;
 	        event.deltaY = deltaY;
@@ -18595,24 +18552,24 @@
 	        // Although this is a little odd since we overwrite the deltaX/Y
 	        // properties with normalized deltas.
 	        event.deltaMode = 0;
-	
+
 	        // Add event and delta to the front of the arguments
 	        args.unshift(event, delta, deltaX, deltaY);
-	
+
 	        // Clearout lowestDelta after sometime to better
 	        // handle multiple device types that give different
 	        // a different lowestDelta
 	        // Ex: trackpad = 3 and mouse wheel = 120
 	        if (nullLowestDeltaTimeout) { clearTimeout(nullLowestDeltaTimeout); }
 	        nullLowestDeltaTimeout = setTimeout(nullLowestDelta, 200);
-	
+
 	        return ($.event.dispatch || $.event.handle).apply(this, args);
 	    }
-	
+
 	    function nullLowestDelta() {
 	        lowestDelta = null;
 	    }
-	
+
 	    function shouldAdjustOldDeltas(orgEvent, absDelta) {
 	        // If this is an older event and the delta is divisable by 120,
 	        // then we are assuming that the browser is treating this as an
@@ -18623,20 +18580,17 @@
 	        // Turn this off by setting $.event.special.mousewheel.settings.adjustOldDeltas to false.
 	        return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
 	    }
-	
+
 	}));
 
 
 /***/ },
 /* 15 */
-/*!*****************************!*\
-  !*** ./assets/js/models.js ***!
-  \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Tween = __webpack_require__(/*! gsap */ 11),
-	    animsvg = __webpack_require__(/*! ./drawsvg */ 16);
-	
+	var Tween = __webpack_require__(11),
+	    animsvg = __webpack_require__(16);
+
 	module.exports = {
 	    "/": {
 	        "title": {
@@ -18646,7 +18600,7 @@
 	        "desc": "[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l'IMIE d'Angers.",
 	        "next": "/240"
 	    },
-	
+
 	    "/1560": {
 	        "title": {
 	            "number": '1560',
@@ -18657,10 +18611,10 @@
 	        anim: function() {
 	            var paths = document.querySelectorAll('path'),
 	                tweens = new Array(),
-	                tl = new TimelineMax; 
-	
+	                tl = new TimelineMax(); 
+
 	            animsvg.hideSVGPaths();
-	
+
 	            tweens.push(Tween.to(paths, 1, {drawSVG: "0%"}, {drawSVG: "100%"}));
 	            tl.add(tweens);
 	            return tl;
@@ -18669,7 +18623,7 @@
 	        "prev": "/",
 	        "next": "/240"
 	    },
-	
+
 	    "/240": {
 	        "title": {
 	            "number": "240",
@@ -18682,17 +18636,18 @@
 	            var ellipses = document.querySelectorAll('ellipse, path, rect, line, text');
 	            animsvg.hideSVG();
 	            var tweens = new Array,
-	                tl= new TimelineMax;
+	                tl= new TimelineMax();
 	            for (var i = 0; i < ellipses.length; i++) {
 	                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
 	            };
 	            tl.add(tweens, '+=0', 'start', .1);
+	            tl.add(function() {console.log('end of anim tl');})
 	            return tl;
 	        },
 	        "prev": "/1560",
 	        "next": "/120"
 	    },
-	
+
 	    "/120": {
 	        "title": {
 	            "number": "120",
@@ -18701,21 +18656,23 @@
 	        "desc": "Soit 60 € pour du Lipton Citron, quand même.",
 	        "illu": "cafe.svg",
 	        anim: function() {
+
 	            var ellipses = document.querySelectorAll('ellipse');
-	            animsvg.hideSVG();
 	            var tweens = new Array,
-	                tl= new TimelineMax;
+	                tl= new TimelineMax();
 	            for (var i = 0; i < ellipses.length; i++) {
+	                //tweens.push(animsvg.hideSVG);
 	                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
 	            };
 	            tl.add(tweens, '+=0', 'start', .1);
+	            tl.add(function() {console.log('end of anim tl');})
 	            return tl;
 	        },
 	        "pager": "03",
 	        "prev": "/240",
 	        "next": "/6"
 	    },
-	
+
 	    "/6": {
 	        "title": {
 	            "number": "6",
@@ -18732,13 +18689,14 @@
 	                tweens.push(Tween.fromTo(paths[i], 0.3, {opacity: 0}, {opacity:1}));
 	            };
 	            tl.add(tweens, '+=0');
+	            tl.add(function() {console.log('end of anim tl');})
 	            return tl;
 	        },
 	        "pager": "04",
 	        "prev": "/120",
 	        "next": "/2",
 	    },
-	
+
 	    "/2": {
 	        "title": {
 	            "number": "2",
@@ -18750,7 +18708,7 @@
 	        "prev": "/6",
 	        "next": "/1"
 	    },
-	
+
 	    "/1": {
 	        "title": {
 	            "number": "1",
@@ -18762,7 +18720,7 @@
 	        "prev": "/2",
 	        "next": "/merci"
 	    },
-	
+
 	    "/merci": {
 	       "title": {
 	            "label": "Merci"
@@ -18774,36 +18732,33 @@
 
 /***/ },
 /* 16 */
-/*!******************************!*\
-  !*** ./assets/js/drawsvg.js ***!
-  \******************************/
 /***/ function(module, exports) {
 
 	module.exports = {
-	
+
 		hideSVG: function() {
-	
+
 			var elements = document.querySelectorAll('ellipse, path, rect, line, text');
-	
+
 		    Array.prototype.forEach.call(elements, function(el, i) {	        
 		    	el.style.opacity = 0;
 		    	// //get the total length
 		     //    var totalLength = el.getTotalLength();
-	
+
 		     //    //set PATHs to invisible
 		     //    el.style.strokeDashoffset = totalLength;
 		     //    el.style.strokeDasharray = totalLength + ' ' + totalLength;
 		    });
 		},
-	
+
 		showSVG: function(el) {
 			Array.prototype.forEach.call(el, function(el, i) {	        
 		    	el.style.opacity = 1;
 		    });
 		},
-	
+
 		drawSVGPaths: function() {
-	
+
 			var paths = document.querySelectorAll('path'),
 				animID = null;
 			var _timeMin 	= 500,
@@ -18812,7 +18767,7 @@
 			
 			 Array.prototype.forEach.call(paths, function(el, i) {
 		        var length = el.getTotalLength;
-	
+
 		        el.style.transition = el.style.WebkitTransition =
 				  'none';
 				// Set up the starting positions
@@ -18826,7 +18781,7 @@
 				  'stroke-dashoffset 2s ease-in-out';
 				// Go!
 				el.style.strokeDashoffset = '0';
-	
+
 		        // function animStroke() {
 		        // 	var offset = parseInt(el.style.strokeDashoffset, 10);
 		        // 	console.log(offset);
@@ -18842,10 +18797,10 @@
 		        // animStroke();
 			 	
 			 });
-	
+
 		    //for each PATH..
 		    // $(paths).each(function(i) {
-	
+
 		    //     // setInterval(function() {
 		        	
 		    //     // }, _timeDelay*i);
@@ -18857,25 +18812,20 @@
 		    //     });
 		    // });
 		}
-	
+
 	}
 
 
 /***/ },
-/* 17 */
-/*!************************************!*\
-  !*** ./assets/templates/home.html ***!
-  \************************************/
+/* 17 */,
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var H = __webpack_require__(/*! hogan.js */ 18);
+	var H = __webpack_require__(19);
 	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"home section\">\r");t.b("\n" + i);t.b("	\r");t.b("\n" + i);t.b("	<div class=\"bar bottom\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar left\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar top\"></div>\r");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	<div class=\"content text\">\r");t.b("\n" + i);t.b("		\r");t.b("\n" + i);t.b("		<header>\r");t.b("\n" + i);t.b("			<h1 class=\"title text box\"><abbr title=\"");t.b(t.v(t.d("title.abbr",c,p,0)));t.b("\">");t.b(t.v(t.d("title.label",c,p,0)));t.b("</abbr></h1>\r");t.b("\n" + i);t.b("		</header>\r");t.b("\n" + i);t.b("		<div class=\"desc\">\r");t.b("\n" + i);t.b("			<p>");t.b(t.v(t.f("desc",c,p,0)));t.b("</p>\r");t.b("\n" + i);t.b("		</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("	\r");t.b("\n" + i);t.b("	<div class=\"scroll\">\r");t.b("\n" + i);t.b("		<p>Scroll</p>\r");t.b("\n" + i);t.b("	</div>\r");t.b("\n" + i);t.b("\r");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"home section\">\r\n\t\r\n\t<div class=\"bar bottom\"></div>\r\n\t<div class=\"bar left\"></div>\r\n\t<div class=\"bar top\"></div>\r\n\t<div class=\"bar right\"></div>\r\n\r\n\t<div class=\"content text\">\r\n\t\t\r\n\t\t<header>\r\n\t\t\t<h1 class=\"title text box\"><abbr title=\"{{title.abbr}}\">{{title.label}}</abbr></h1>\r\n\t\t</header>\r\n\t\t<div class=\"desc\">\r\n\t\t\t<p>{{desc}}</p>\r\n\t\t</div>\r\n\r\n\t</div>\r\n\t\r\n\t<div class=\"scroll\">\r\n\t\t<p>Scroll</p>\r\n\t</div>\r\n\r\n</section>", H);return T.render.apply(T, arguments); };
 
 /***/ },
-/* 18 */
-/*!*********************************!*\
-  !*** ./~/hogan.js/lib/hogan.js ***!
-  \*********************************/
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -18892,20 +18842,17 @@
 	 *  See the License for the specific language governing permissions and
 	 *  limitations under the License.
 	 */
-	
+
 	// This file is for use with Node.js. See dist/ for browser files.
-	
-	var Hogan = __webpack_require__(/*! ./compiler */ 19);
-	Hogan.Template = __webpack_require__(/*! ./template */ 20).Template;
+
+	var Hogan = __webpack_require__(20);
+	Hogan.Template = __webpack_require__(21).Template;
 	Hogan.template = Hogan.Template;
 	module.exports = Hogan;
 
 
 /***/ },
-/* 19 */
-/*!************************************!*\
-  !*** ./~/hogan.js/lib/compiler.js ***!
-  \************************************/
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -18922,7 +18869,7 @@
 	 *  See the License for the specific language governing permissions and
 	 *  limitations under the License.
 	 */
-	
+
 	(function (Hogan) {
 	  // Setup regex  assignments
 	  // remove whitespace according to Mustache spec
@@ -18933,13 +18880,13 @@
 	      rSlash = /\\/g,
 	      rLineSep = /\u2028/,
 	      rParagraphSep = /\u2029/;
-	
+
 	  Hogan.tags = {
 	    '#': 1, '^': 2, '<': 3, '$': 4,
 	    '/': 5, '!': 6, '>': 7, '=': 8, '_v': 9,
 	    '{': 10, '&': 11, '_t': 12
 	  };
-	
+
 	  Hogan.scan = function scan(text, delimiters) {
 	    var len = text.length,
 	        IN_TEXT = 0,
@@ -18955,14 +18902,14 @@
 	        lineStart = 0,
 	        otag = '{{',
 	        ctag = '}}';
-	
+
 	    function addBuf() {
 	      if (buf.length > 0) {
 	        tokens.push({tag: '_t', text: new String(buf)});
 	        buf = '';
 	      }
 	    }
-	
+
 	    function lineIsWhitespace() {
 	      var isAllWhitespace = true;
 	      for (var j = lineStart; j < tokens.length; j++) {
@@ -18973,13 +18920,13 @@
 	          return false;
 	        }
 	      }
-	
+
 	      return isAllWhitespace;
 	    }
-	
+
 	    function filterLine(haveSeenTag, noNewLine) {
 	      addBuf();
-	
+
 	      if (haveSeenTag && lineIsWhitespace()) {
 	        for (var j = lineStart, next; j < tokens.length; j++) {
 	          if (tokens[j].text) {
@@ -18993,30 +18940,30 @@
 	      } else if (!noNewLine) {
 	        tokens.push({tag:'\n'});
 	      }
-	
+
 	      seenTag = false;
 	      lineStart = tokens.length;
 	    }
-	
+
 	    function changeDelimiters(text, index) {
 	      var close = '=' + ctag,
 	          closeIndex = text.indexOf(close, index),
 	          delimiters = trim(
 	            text.substring(text.indexOf('=', index) + 1, closeIndex)
 	          ).split(' ');
-	
+
 	      otag = delimiters[0];
 	      ctag = delimiters[delimiters.length - 1];
-	
+
 	      return closeIndex + close.length - 1;
 	    }
-	
+
 	    if (delimiters) {
 	      delimiters = delimiters.split(' ');
 	      otag = delimiters[0];
 	      ctag = delimiters[1];
 	    }
-	
+
 	    for (i = 0; i < len; i++) {
 	      if (state == IN_TEXT) {
 	        if (tagChange(otag, text, i)) {
@@ -19063,58 +19010,58 @@
 	        }
 	      }
 	    }
-	
+
 	    filterLine(seenTag, true);
-	
+
 	    return tokens;
 	  }
-	
+
 	  function cleanTripleStache(token) {
 	    if (token.n.substr(token.n.length - 1) === '}') {
 	      token.n = token.n.substring(0, token.n.length - 1);
 	    }
 	  }
-	
+
 	  function trim(s) {
 	    if (s.trim) {
 	      return s.trim();
 	    }
-	
+
 	    return s.replace(/^\s*|\s*$/g, '');
 	  }
-	
+
 	  function tagChange(tag, text, index) {
 	    if (text.charAt(index) != tag.charAt(0)) {
 	      return false;
 	    }
-	
+
 	    for (var i = 1, l = tag.length; i < l; i++) {
 	      if (text.charAt(index + i) != tag.charAt(i)) {
 	        return false;
 	      }
 	    }
-	
+
 	    return true;
 	  }
-	
+
 	  // the tags allowed inside super templates
 	  var allowedInSuper = {'_t': true, '\n': true, '$': true, '/': true};
-	
+
 	  function buildTree(tokens, kind, stack, customTags) {
 	    var instructions = [],
 	        opener = null,
 	        tail = null,
 	        token = null;
-	
+
 	    tail = stack[stack.length - 1];
-	
+
 	    while (tokens.length > 0) {
 	      token = tokens.shift();
-	
+
 	      if (tail && tail.tag == '<' && !(token.tag in allowedInSuper)) {
 	        throw new Error('Illegal content in < super tag.');
 	      }
-	
+
 	      if (Hogan.tags[token.tag] <= Hogan.tags['$'] || isOpener(token, customTags)) {
 	        stack.push(token);
 	        token.nodes = buildTree(tokens, token.tag, stack, customTags);
@@ -19131,17 +19078,17 @@
 	      } else if (token.tag == '\n') {
 	        token.last = (tokens.length == 0) || (tokens[0].tag == '\n');
 	      }
-	
+
 	      instructions.push(token);
 	    }
-	
+
 	    if (stack.length > 0) {
 	      throw new Error('missing closing tag: ' + stack.pop().n);
 	    }
-	
+
 	    return instructions;
 	  }
-	
+
 	  function isOpener(token, tags) {
 	    for (var i = 0, l = tags.length; i < l; i++) {
 	      if (tags[i].o == token.n) {
@@ -19150,7 +19097,7 @@
 	      }
 	    }
 	  }
-	
+
 	  function isCloser(close, open, tags) {
 	    for (var i = 0, l = tags.length; i < l; i++) {
 	      if (tags[i].c == close && tags[i].o == open) {
@@ -19158,7 +19105,7 @@
 	      }
 	    }
 	  }
-	
+
 	  function stringifySubstitutions(obj) {
 	    var items = [];
 	    for (var key in obj) {
@@ -19166,7 +19113,7 @@
 	    }
 	    return "{ " + items.join(",") + " }";
 	  }
-	
+
 	  function stringifyPartials(codeObj) {
 	    var partials = [];
 	    for (var key in codeObj.partials) {
@@ -19174,36 +19121,36 @@
 	    }
 	    return "partials: {" + partials.join(",") + "}, subs: " + stringifySubstitutions(codeObj.subs);
 	  }
-	
+
 	  Hogan.stringify = function(codeObj, text, options) {
 	    return "{code: function (c,p,i) { " + Hogan.wrapMain(codeObj.code) + " }," + stringifyPartials(codeObj) +  "}";
 	  }
-	
+
 	  var serialNo = 0;
 	  Hogan.generate = function(tree, text, options) {
 	    serialNo = 0;
 	    var context = { code: '', subs: {}, partials: {} };
 	    Hogan.walk(tree, context);
-	
+
 	    if (options.asString) {
 	      return this.stringify(context, text, options);
 	    }
-	
+
 	    return this.makeTemplate(context, text, options);
 	  }
-	
+
 	  Hogan.wrapMain = function(code) {
 	    return 'var t=this;t.b(i=i||"");' + code + 'return t.fl();';
 	  }
-	
+
 	  Hogan.template = Hogan.Template;
-	
+
 	  Hogan.makeTemplate = function(codeObj, text, options) {
 	    var template = this.makePartials(codeObj);
 	    template.code = new Function('c', 'p', 'i', this.wrapMain(codeObj.code));
 	    return new this.template(template, text, this, options);
 	  }
-	
+
 	  Hogan.makePartials = function(codeObj) {
 	    var key, template = {subs: {}, partials: codeObj.partials, name: codeObj.name};
 	    for (key in template.partials) {
@@ -19214,7 +19161,7 @@
 	    }
 	    return template;
 	  }
-	
+
 	  function esc(s) {
 	    return s.replace(rSlash, '\\\\')
 	            .replace(rQuot, '\\\"')
@@ -19223,11 +19170,11 @@
 	            .replace(rLineSep, '\\u2028')
 	            .replace(rParagraphSep, '\\u2029');
 	  }
-	
+
 	  function chooseMethod(s) {
 	    return (~s.indexOf('.')) ? 'd' : 'f';
 	  }
-	
+
 	  function createPartial(node, context) {
 	    var prefix = "<" + (context.prefix || "");
 	    var sym = prefix + node.n + serialNo++;
@@ -19235,7 +19182,7 @@
 	    context.code += 't.b(t.rp("' +  esc(sym) + '",c,p,"' + (node.indent || '') + '"));';
 	    return sym;
 	  }
-	
+
 	  Hogan.codegen = {
 	    '#': function(node, context) {
 	      context.code += 'if(t.s(t.' + chooseMethod(node.n) + '("' + esc(node.n) + '",c,p,1),' +
@@ -19244,13 +19191,13 @@
 	      Hogan.walk(node.nodes, context);
 	      context.code += '});c.pop();}';
 	    },
-	
+
 	    '^': function(node, context) {
 	      context.code += 'if(!t.s(t.' + chooseMethod(node.n) + '("' + esc(node.n) + '",c,p,1),c,p,1,0,0,"")){';
 	      Hogan.walk(node.nodes, context);
 	      context.code += '};';
 	    },
-	
+
 	    '>': createPartial,
 	    '<': function(node, context) {
 	      var ctx = {partials: {}, code: '', subs: {}, inPartial: true};
@@ -19259,7 +19206,7 @@
 	      template.subs = ctx.subs;
 	      template.partials = ctx.partials;
 	    },
-	
+
 	    '$': function(node, context) {
 	      var ctx = {subs: {}, code: '', partials: context.partials, prefix: node.n};
 	      Hogan.walk(node.nodes, ctx);
@@ -19268,32 +19215,32 @@
 	        context.code += 't.sub("' + esc(node.n) + '",c,p,i);';
 	      }
 	    },
-	
+
 	    '\n': function(node, context) {
 	      context.code += write('"\\n"' + (node.last ? '' : ' + i'));
 	    },
-	
+
 	    '_v': function(node, context) {
 	      context.code += 't.b(t.v(t.' + chooseMethod(node.n) + '("' + esc(node.n) + '",c,p,0)));';
 	    },
-	
+
 	    '_t': function(node, context) {
 	      context.code += write('"' + esc(node.text) + '"');
 	    },
-	
+
 	    '{': tripleStache,
-	
+
 	    '&': tripleStache
 	  }
-	
+
 	  function tripleStache(node, context) {
 	    context.code += 't.b(t.t(t.' + chooseMethod(node.n) + '("' + esc(node.n) + '",c,p,0)));';
 	  }
-	
+
 	  function write(s) {
 	    return 't.b(' + s + ');';
 	  }
-	
+
 	  Hogan.walk = function(nodelist, context) {
 	    var func;
 	    for (var i = 0, l = nodelist.length; i < l; i++) {
@@ -19302,23 +19249,23 @@
 	    }
 	    return context;
 	  }
-	
+
 	  Hogan.parse = function(tokens, text, options) {
 	    options = options || {};
 	    return buildTree(tokens, '', [], options.sectionTags || []);
 	  }
-	
+
 	  Hogan.cache = {};
-	
+
 	  Hogan.cacheKey = function(text, options) {
 	    return [text, !!options.asString, !!options.disableLambda, options.delimiters, !!options.modelGet].join('||');
 	  }
-	
+
 	  Hogan.compile = function(text, options) {
 	    options = options || {};
 	    var key = Hogan.cacheKey(text, options);
 	    var template = this.cache[key];
-	
+
 	    if (template) {
 	      var partials = template.partials;
 	      for (var name in partials) {
@@ -19326,7 +19273,7 @@
 	      }
 	      return template;
 	    }
-	
+
 	    template = this.generate(this.parse(this.scan(text, options.delimiters), text, options), text, options);
 	    return this.cache[key] = template;
 	  }
@@ -19334,10 +19281,7 @@
 
 
 /***/ },
-/* 20 */
-/*!************************************!*\
-  !*** ./~/hogan.js/lib/template.js ***!
-  \************************************/
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -19354,9 +19298,9 @@
 	 *  See the License for the specific language governing permissions and
 	 *  limitations under the License.
 	 */
-	
+
 	var Hogan = {};
-	
+
 	(function (Hogan) {
 	  Hogan.Template = function (codeObj, text, compiler, options) {
 	    codeObj = codeObj || {};
@@ -19368,50 +19312,50 @@
 	    this.subs = codeObj.subs || {};
 	    this.buf = '';
 	  }
-	
+
 	  Hogan.Template.prototype = {
 	    // render: replaced by generated code.
 	    r: function (context, partials, indent) { return ''; },
-	
+
 	    // variable escaping
 	    v: hoganEscape,
-	
+
 	    // triple stache
 	    t: coerceToString,
-	
+
 	    render: function render(context, partials, indent) {
 	      return this.ri([context], partials || {}, indent);
 	    },
-	
+
 	    // render internal -- a hook for overrides that catches partials too
 	    ri: function (context, partials, indent) {
 	      return this.r(context, partials, indent);
 	    },
-	
+
 	    // ensurePartial
 	    ep: function(symbol, partials) {
 	      var partial = this.partials[symbol];
-	
+
 	      // check to see that if we've instantiated this partial before
 	      var template = partials[partial.name];
 	      if (partial.instance && partial.base == template) {
 	        return partial.instance;
 	      }
-	
+
 	      if (typeof template == 'string') {
 	        if (!this.c) {
 	          throw new Error("No compiler available.");
 	        }
 	        template = this.c.compile(template, this.options);
 	      }
-	
+
 	      if (!template) {
 	        return null;
 	      }
-	
+
 	      // We use this to check whether the partials dictionary has changed
 	      this.partials[symbol].base = template;
-	
+
 	      if (partial.subs) {
 	        // Make sure we consider parent template now
 	        if (!partials.stackText) partials.stackText = {};
@@ -19424,57 +19368,57 @@
 	          this.stackSubs, this.stackPartials, partials.stackText);
 	      }
 	      this.partials[symbol].instance = template;
-	
+
 	      return template;
 	    },
-	
+
 	    // tries to find a partial in the current scope and render it
 	    rp: function(symbol, context, partials, indent) {
 	      var partial = this.ep(symbol, partials);
 	      if (!partial) {
 	        return '';
 	      }
-	
+
 	      return partial.ri(context, partials, indent);
 	    },
-	
+
 	    // render a section
 	    rs: function(context, partials, section) {
 	      var tail = context[context.length - 1];
-	
+
 	      if (!isArray(tail)) {
 	        section(context, partials, this);
 	        return;
 	      }
-	
+
 	      for (var i = 0; i < tail.length; i++) {
 	        context.push(tail[i]);
 	        section(context, partials, this);
 	        context.pop();
 	      }
 	    },
-	
+
 	    // maybe start a section
 	    s: function(val, ctx, partials, inverted, start, end, tags) {
 	      var pass;
-	
+
 	      if (isArray(val) && val.length === 0) {
 	        return false;
 	      }
-	
+
 	      if (typeof val == 'function') {
 	        val = this.ms(val, ctx, partials, inverted, start, end, tags);
 	      }
-	
+
 	      pass = !!val;
-	
+
 	      if (!inverted && pass && ctx) {
 	        ctx.push((typeof val == 'object') ? val : ctx[ctx.length - 1]);
 	      }
-	
+
 	      return pass;
 	    },
-	
+
 	    // find values with dotted names
 	    d: function(key, ctx, partials, returnFound) {
 	      var found,
@@ -19482,7 +19426,7 @@
 	          val = this.f(names[0], ctx, partials, returnFound),
 	          doModelGet = this.options.modelGet,
 	          cx = null;
-	
+
 	      if (key === '.' && isArray(ctx[ctx.length - 2])) {
 	        val = ctx[ctx.length - 1];
 	      } else {
@@ -19496,27 +19440,27 @@
 	          }
 	        }
 	      }
-	
+
 	      if (returnFound && !val) {
 	        return false;
 	      }
-	
+
 	      if (!returnFound && typeof val == 'function') {
 	        ctx.push(cx);
 	        val = this.mv(val, ctx, partials);
 	        ctx.pop();
 	      }
-	
+
 	      return val;
 	    },
-	
+
 	    // find values with normal names
 	    f: function(key, ctx, partials, returnFound) {
 	      var val = false,
 	          v = null,
 	          found = false,
 	          doModelGet = this.options.modelGet;
-	
+
 	      for (var i = ctx.length - 1; i >= 0; i--) {
 	        v = ctx[i];
 	        val = findInScope(key, v, doModelGet);
@@ -19525,29 +19469,29 @@
 	          break;
 	        }
 	      }
-	
+
 	      if (!found) {
 	        return (returnFound) ? false : "";
 	      }
-	
+
 	      if (!returnFound && typeof val == 'function') {
 	        val = this.mv(val, ctx, partials);
 	      }
-	
+
 	      return val;
 	    },
-	
+
 	    // higher order templates
 	    ls: function(func, cx, partials, text, tags) {
 	      var oldTags = this.options.delimiters;
-	
+
 	      this.options.delimiters = tags;
 	      this.b(this.ct(coerceToString(func.call(cx, text)), cx, partials));
 	      this.options.delimiters = oldTags;
-	
+
 	      return false;
 	    },
-	
+
 	    // compile text
 	    ct: function(text, cx, partials) {
 	      if (this.options.disableLambda) {
@@ -19555,18 +19499,18 @@
 	      }
 	      return this.c.compile(text, this.options).render(cx, partials);
 	    },
-	
+
 	    // template result buffering
 	    b: function(s) { this.buf += s; },
-	
+
 	    fl: function() { var r = this.buf; this.buf = ''; return r; },
-	
+
 	    // method replace section
 	    ms: function(func, ctx, partials, inverted, start, end, tags) {
 	      var textSource,
 	          cx = ctx[ctx.length - 1],
 	          result = func.call(cx);
-	
+
 	      if (typeof result == 'function') {
 	        if (inverted) {
 	          return true;
@@ -19575,22 +19519,22 @@
 	          return this.ls(result, cx, partials, textSource.substring(start, end), tags);
 	        }
 	      }
-	
+
 	      return result;
 	    },
-	
+
 	    // method replace variable
 	    mv: function(func, ctx, partials) {
 	      var cx = ctx[ctx.length - 1];
 	      var result = func.call(cx);
-	
+
 	      if (typeof result == 'function') {
 	        return this.ct(coerceToString(result.call(cx)), cx, partials);
 	      }
-	
+
 	      return result;
 	    },
-	
+
 	    sub: function(name, context, partials, indent) {
 	      var f = this.subs[name];
 	      if (f) {
@@ -19599,27 +19543,27 @@
 	        this.activeSub = false;
 	      }
 	    }
-	
+
 	  };
-	
+
 	  //Find a key in an object
 	  function findInScope(key, scope, doModelGet) {
 	    var val;
-	
+
 	    if (scope && typeof scope == 'object') {
-	
+
 	      if (scope[key] !== undefined) {
 	        val = scope[key];
-	
+
 	      // try lookup with get for backbone or similar model data
 	      } else if (doModelGet && scope.get && typeof scope.get == 'function') {
 	        val = scope.get(key);
 	      }
 	    }
-	
+
 	    return val;
 	  }
-	
+
 	  function createSpecializedPartial(instance, subs, partials, stackSubs, stackPartials, stackText) {
 	    function PartialTemplate() {};
 	    PartialTemplate.prototype = instance;
@@ -19630,7 +19574,7 @@
 	    partial.subs = new Substitutions();
 	    partial.subsText = {};  //hehe. substext.
 	    partial.buf = '';
-	
+
 	    stackSubs = stackSubs || {};
 	    partial.stackSubs = stackSubs;
 	    partial.subsText = stackText;
@@ -19640,7 +19584,7 @@
 	    for (key in stackSubs) {
 	      partial.subs[key] = stackSubs[key];
 	    }
-	
+
 	    stackPartials = stackPartials || {};
 	    partial.stackPartials = stackPartials;
 	    for (key in partials) {
@@ -19649,21 +19593,21 @@
 	    for (key in stackPartials) {
 	      partial.partials[key] = stackPartials[key];
 	    }
-	
+
 	    return partial;
 	  }
-	
+
 	  var rAmp = /&/g,
 	      rLt = /</g,
 	      rGt = />/g,
 	      rApos = /\'/g,
 	      rQuot = /\"/g,
 	      hChars = /[&<>\"\']/;
-	
+
 	  function coerceToString(val) {
 	    return String((val === null || val === undefined) ? '' : val);
 	  }
-	
+
 	  function hoganEscape(str) {
 	    str = coerceToString(str);
 	    return hChars.test(str) ?
@@ -19675,28 +19619,32 @@
 	        .replace(rQuot, '&quot;') :
 	      str;
 	  }
-	
+
 	  var isArray = Array.isArray || function(a) {
 	    return Object.prototype.toString.call(a) === '[object Array]';
 	  };
-	
+
 	})( true ? exports : Hogan);
 
 
 /***/ },
-/* 21 */
-/*!*******************************!*\
-  !*** ./assets/sass/main.scss ***!
-  \*******************************/
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var H = __webpack_require__(19);
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"home section\">");t.b("\n" + i);t.b("	");t.b("\n" + i);t.b("	<div class=\"bar bottom\"></div>");t.b("\n" + i);t.b("	<div class=\"bar left\"></div>");t.b("\n" + i);t.b("	<div class=\"bar top\"></div>");t.b("\n" + i);t.b("	<div class=\"bar right\"></div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"content text\">");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("		<header>");t.b("\n" + i);t.b("			<h1 class=\"title text box\"><abbr title=\"");t.b(t.v(t.d("title.abbr",c,p,0)));t.b("\">");t.b(t.v(t.d("title.label",c,p,0)));t.b("</abbr></h1>");t.b("\n" + i);t.b("		</header>");t.b("\n" + i);t.b("		<div class=\"desc\">");t.b("\n" + i);t.b("			<p>");t.b(t.v(t.f("desc",c,p,0)));t.b("</p>");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"home section\">\n\t\n\t<div class=\"bar bottom\"></div>\n\t<div class=\"bar left\"></div>\n\t<div class=\"bar top\"></div>\n\t<div class=\"bar right\"></div>\n\n\t<div class=\"content text\">\n\t\t\n\t\t<header>\n\t\t\t<h1 class=\"title text box\"><abbr title=\"{{title.abbr}}\">{{title.label}}</abbr></h1>\n\t\t</header>\n\t\t<div class=\"desc\">\n\t\t\t<p>{{desc}}</p>\n\t\t</div>\n\n\t</div>\n\n</section>", H);return T.render.apply(T, arguments); };
+
+/***/ },
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
+
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./../../~/sass-loader!./main.scss */ 22);
+	var content = __webpack_require__(24);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 24)(content, {});
+	var update = __webpack_require__(26)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19713,27 +19661,21 @@
 	}
 
 /***/ },
-/* 22 */
-/*!**************************************************************!*\
-  !*** ./~/css-loader!./~/sass-loader!./assets/sass/main.scss ***!
-  \**************************************************************/
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 23)();
+	exports = module.exports = __webpack_require__(25)();
 	// imports
-	
-	
+
+
 	// module
 	exports.push([module.id, "/* ==========================================================================\n  \tKickstart, a base to start html project\n \tAuthor: JR\n  \tVersion: 2\n  \tCredits: \n  \t\t- Kaelig & his book CSS maintenables avec Sass et Compass\n  \t\t- Cathy Dutton for her organization\n  \t\t\thttps://github.com/cathydutton/maze/blob/master/src/sass/style.scss\n\n\n\n\n/* BASE - Reset, mixins & variables\n==================================================== */\n/****************\n    RESET  \n****************/\n/*Based on Eric Meyer's reste.css. \n  Originally @import compass/reset but copied to change it (ex line height on html)\n*/\nhtml, body, div, span, applet, object, iframe,\nh1, h2, h3, h4, h5, h6, p, blockquote, pre,\na, abbr, acronym, address, big, cite, code,\ndel, dfn, em, img, ins, kbd, q, s, samp,\nsmall, strike, strong, sub, sup, tt, var,\nb, u, i, center,\ndl, dt, dd, ol, ul, li,\nfieldset, form, label, legend,\ntable, caption, tbody, tfoot, thead, tr, th, td,\narticle, aside, canvas, details, embed,\nfigure, figcaption, footer, header, hgroup,\nmenu, nav, output, ruby, section, summary,\ntime, mark, audio, video {\n  margin: 0;\n  padding: 0;\n  border: 0;\n  font: inherit;\n  font-size: 100%;\n  vertical-align: baseline; }\n\nhtml {\n  line-height: 1.5; }\n\nol, ul {\n  list-style: none; }\n\ntable {\n  border-collapse: collapse;\n  border-spacing: 0; }\n\ncaption, th, td {\n  text-align: left;\n  font-weight: normal;\n  vertical-align: middle; }\n\nq, blockquote {\n  quotes: none; }\n\nq:before, q:after, blockquote:before, blockquote:after {\n  content: \"\";\n  content: none; }\n\na img {\n  border: none; }\n\narticle, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {\n  display: block; }\n\n*,\n*::before,\n*::after {\n  box-sizing: border-box; }\n\na {\n  text-decoration: none;\n  color: inherit; }\n\n/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #333333; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #333333; }\n\n/****************\n\tMIXINS\n****************/\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n/* VENDOR - Some things taken from Bootstrap, grid system and utilities\n============================================================================= */\n/********************************\n    GRID SYSTEM Bootstrap based\n********************************/\n/****************\n    GRID\n****************/\n.container {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left: 15px;\n  padding-right: 15px; }\n  .container:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n  @media (min-width: 768px) {\n    .container {\n      width: 750px; } }\n  @media (min-width: 992px) {\n    .container {\n      width: 970px; } }\n  @media (min-width: 1200px) {\n    .container {\n      width: 1170px; } }\n\n.container-fluid {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left: 15px;\n  padding-right: 15px; }\n  .container-fluid:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.row {\n  margin-left: -15px;\n  margin-right: -15px; }\n  .row:after {\n    content: \"\";\n    display: table;\n    clear: both; }\n\n.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {\n  position: relative;\n  min-height: 1px;\n  padding-left: 15px;\n  padding-right: 15px; }\n\n.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {\n  float: left; }\n\n.col-xs-1 {\n  width: 8.33333%; }\n\n.col-xs-2 {\n  width: 16.66667%; }\n\n.col-xs-3 {\n  width: 25%; }\n\n.col-xs-4 {\n  width: 33.33333%; }\n\n.col-xs-5 {\n  width: 41.66667%; }\n\n.col-xs-6 {\n  width: 50%; }\n\n.col-xs-7 {\n  width: 58.33333%; }\n\n.col-xs-8 {\n  width: 66.66667%; }\n\n.col-xs-9 {\n  width: 75%; }\n\n.col-xs-10 {\n  width: 83.33333%; }\n\n.col-xs-11 {\n  width: 91.66667%; }\n\n.col-xs-12 {\n  width: 100%; }\n\n.col-xs-pull-0 {\n  right: auto; }\n\n.col-xs-pull-1 {\n  right: 8.33333%; }\n\n.col-xs-pull-2 {\n  right: 16.66667%; }\n\n.col-xs-pull-3 {\n  right: 25%; }\n\n.col-xs-pull-4 {\n  right: 33.33333%; }\n\n.col-xs-pull-5 {\n  right: 41.66667%; }\n\n.col-xs-pull-6 {\n  right: 50%; }\n\n.col-xs-pull-7 {\n  right: 58.33333%; }\n\n.col-xs-pull-8 {\n  right: 66.66667%; }\n\n.col-xs-pull-9 {\n  right: 75%; }\n\n.col-xs-pull-10 {\n  right: 83.33333%; }\n\n.col-xs-pull-11 {\n  right: 91.66667%; }\n\n.col-xs-pull-12 {\n  right: 100%; }\n\n.col-xs-push-0 {\n  left: auto; }\n\n.col-xs-push-1 {\n  left: 8.33333%; }\n\n.col-xs-push-2 {\n  left: 16.66667%; }\n\n.col-xs-push-3 {\n  left: 25%; }\n\n.col-xs-push-4 {\n  left: 33.33333%; }\n\n.col-xs-push-5 {\n  left: 41.66667%; }\n\n.col-xs-push-6 {\n  left: 50%; }\n\n.col-xs-push-7 {\n  left: 58.33333%; }\n\n.col-xs-push-8 {\n  left: 66.66667%; }\n\n.col-xs-push-9 {\n  left: 75%; }\n\n.col-xs-push-10 {\n  left: 83.33333%; }\n\n.col-xs-push-11 {\n  left: 91.66667%; }\n\n.col-xs-push-12 {\n  left: 100%; }\n\n.col-xs-offset-0 {\n  margin-left: 0%; }\n\n.col-xs-offset-1 {\n  margin-left: 8.33333%; }\n\n.col-xs-offset-2 {\n  margin-left: 16.66667%; }\n\n.col-xs-offset-3 {\n  margin-left: 25%; }\n\n.col-xs-offset-4 {\n  margin-left: 33.33333%; }\n\n.col-xs-offset-5 {\n  margin-left: 41.66667%; }\n\n.col-xs-offset-6 {\n  margin-left: 50%; }\n\n.col-xs-offset-7 {\n  margin-left: 58.33333%; }\n\n.col-xs-offset-8 {\n  margin-left: 66.66667%; }\n\n.col-xs-offset-9 {\n  margin-left: 75%; }\n\n.col-xs-offset-10 {\n  margin-left: 83.33333%; }\n\n.col-xs-offset-11 {\n  margin-left: 91.66667%; }\n\n.col-xs-offset-12 {\n  margin-left: 100%; }\n\n@media (min-width: 768px) {\n  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {\n    float: left; }\n  .col-sm-1 {\n    width: 8.33333%; }\n  .col-sm-2 {\n    width: 16.66667%; }\n  .col-sm-3 {\n    width: 25%; }\n  .col-sm-4 {\n    width: 33.33333%; }\n  .col-sm-5 {\n    width: 41.66667%; }\n  .col-sm-6 {\n    width: 50%; }\n  .col-sm-7 {\n    width: 58.33333%; }\n  .col-sm-8 {\n    width: 66.66667%; }\n  .col-sm-9 {\n    width: 75%; }\n  .col-sm-10 {\n    width: 83.33333%; }\n  .col-sm-11 {\n    width: 91.66667%; }\n  .col-sm-12 {\n    width: 100%; }\n  .col-sm-pull-0 {\n    right: auto; }\n  .col-sm-pull-1 {\n    right: 8.33333%; }\n  .col-sm-pull-2 {\n    right: 16.66667%; }\n  .col-sm-pull-3 {\n    right: 25%; }\n  .col-sm-pull-4 {\n    right: 33.33333%; }\n  .col-sm-pull-5 {\n    right: 41.66667%; }\n  .col-sm-pull-6 {\n    right: 50%; }\n  .col-sm-pull-7 {\n    right: 58.33333%; }\n  .col-sm-pull-8 {\n    right: 66.66667%; }\n  .col-sm-pull-9 {\n    right: 75%; }\n  .col-sm-pull-10 {\n    right: 83.33333%; }\n  .col-sm-pull-11 {\n    right: 91.66667%; }\n  .col-sm-pull-12 {\n    right: 100%; }\n  .col-sm-push-0 {\n    left: auto; }\n  .col-sm-push-1 {\n    left: 8.33333%; }\n  .col-sm-push-2 {\n    left: 16.66667%; }\n  .col-sm-push-3 {\n    left: 25%; }\n  .col-sm-push-4 {\n    left: 33.33333%; }\n  .col-sm-push-5 {\n    left: 41.66667%; }\n  .col-sm-push-6 {\n    left: 50%; }\n  .col-sm-push-7 {\n    left: 58.33333%; }\n  .col-sm-push-8 {\n    left: 66.66667%; }\n  .col-sm-push-9 {\n    left: 75%; }\n  .col-sm-push-10 {\n    left: 83.33333%; }\n  .col-sm-push-11 {\n    left: 91.66667%; }\n  .col-sm-push-12 {\n    left: 100%; }\n  .col-sm-offset-0 {\n    margin-left: 0%; }\n  .col-sm-offset-1 {\n    margin-left: 8.33333%; }\n  .col-sm-offset-2 {\n    margin-left: 16.66667%; }\n  .col-sm-offset-3 {\n    margin-left: 25%; }\n  .col-sm-offset-4 {\n    margin-left: 33.33333%; }\n  .col-sm-offset-5 {\n    margin-left: 41.66667%; }\n  .col-sm-offset-6 {\n    margin-left: 50%; }\n  .col-sm-offset-7 {\n    margin-left: 58.33333%; }\n  .col-sm-offset-8 {\n    margin-left: 66.66667%; }\n  .col-sm-offset-9 {\n    margin-left: 75%; }\n  .col-sm-offset-10 {\n    margin-left: 83.33333%; }\n  .col-sm-offset-11 {\n    margin-left: 91.66667%; }\n  .col-sm-offset-12 {\n    margin-left: 100%; } }\n\n@media (min-width: 992px) {\n  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {\n    float: left; }\n  .col-md-1 {\n    width: 8.33333%; }\n  .col-md-2 {\n    width: 16.66667%; }\n  .col-md-3 {\n    width: 25%; }\n  .col-md-4 {\n    width: 33.33333%; }\n  .col-md-5 {\n    width: 41.66667%; }\n  .col-md-6 {\n    width: 50%; }\n  .col-md-7 {\n    width: 58.33333%; }\n  .col-md-8 {\n    width: 66.66667%; }\n  .col-md-9 {\n    width: 75%; }\n  .col-md-10 {\n    width: 83.33333%; }\n  .col-md-11 {\n    width: 91.66667%; }\n  .col-md-12 {\n    width: 100%; }\n  .col-md-pull-0 {\n    right: auto; }\n  .col-md-pull-1 {\n    right: 8.33333%; }\n  .col-md-pull-2 {\n    right: 16.66667%; }\n  .col-md-pull-3 {\n    right: 25%; }\n  .col-md-pull-4 {\n    right: 33.33333%; }\n  .col-md-pull-5 {\n    right: 41.66667%; }\n  .col-md-pull-6 {\n    right: 50%; }\n  .col-md-pull-7 {\n    right: 58.33333%; }\n  .col-md-pull-8 {\n    right: 66.66667%; }\n  .col-md-pull-9 {\n    right: 75%; }\n  .col-md-pull-10 {\n    right: 83.33333%; }\n  .col-md-pull-11 {\n    right: 91.66667%; }\n  .col-md-pull-12 {\n    right: 100%; }\n  .col-md-push-0 {\n    left: auto; }\n  .col-md-push-1 {\n    left: 8.33333%; }\n  .col-md-push-2 {\n    left: 16.66667%; }\n  .col-md-push-3 {\n    left: 25%; }\n  .col-md-push-4 {\n    left: 33.33333%; }\n  .col-md-push-5 {\n    left: 41.66667%; }\n  .col-md-push-6 {\n    left: 50%; }\n  .col-md-push-7 {\n    left: 58.33333%; }\n  .col-md-push-8 {\n    left: 66.66667%; }\n  .col-md-push-9 {\n    left: 75%; }\n  .col-md-push-10 {\n    left: 83.33333%; }\n  .col-md-push-11 {\n    left: 91.66667%; }\n  .col-md-push-12 {\n    left: 100%; }\n  .col-md-offset-0 {\n    margin-left: 0%; }\n  .col-md-offset-1 {\n    margin-left: 8.33333%; }\n  .col-md-offset-2 {\n    margin-left: 16.66667%; }\n  .col-md-offset-3 {\n    margin-left: 25%; }\n  .col-md-offset-4 {\n    margin-left: 33.33333%; }\n  .col-md-offset-5 {\n    margin-left: 41.66667%; }\n  .col-md-offset-6 {\n    margin-left: 50%; }\n  .col-md-offset-7 {\n    margin-left: 58.33333%; }\n  .col-md-offset-8 {\n    margin-left: 66.66667%; }\n  .col-md-offset-9 {\n    margin-left: 75%; }\n  .col-md-offset-10 {\n    margin-left: 83.33333%; }\n  .col-md-offset-11 {\n    margin-left: 91.66667%; }\n  .col-md-offset-12 {\n    margin-left: 100%; } }\n\n@media (min-width: 1200px) {\n  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {\n    float: left; }\n  .col-lg-1 {\n    width: 8.33333%; }\n  .col-lg-2 {\n    width: 16.66667%; }\n  .col-lg-3 {\n    width: 25%; }\n  .col-lg-4 {\n    width: 33.33333%; }\n  .col-lg-5 {\n    width: 41.66667%; }\n  .col-lg-6 {\n    width: 50%; }\n  .col-lg-7 {\n    width: 58.33333%; }\n  .col-lg-8 {\n    width: 66.66667%; }\n  .col-lg-9 {\n    width: 75%; }\n  .col-lg-10 {\n    width: 83.33333%; }\n  .col-lg-11 {\n    width: 91.66667%; }\n  .col-lg-12 {\n    width: 100%; }\n  .col-lg-pull-0 {\n    right: auto; }\n  .col-lg-pull-1 {\n    right: 8.33333%; }\n  .col-lg-pull-2 {\n    right: 16.66667%; }\n  .col-lg-pull-3 {\n    right: 25%; }\n  .col-lg-pull-4 {\n    right: 33.33333%; }\n  .col-lg-pull-5 {\n    right: 41.66667%; }\n  .col-lg-pull-6 {\n    right: 50%; }\n  .col-lg-pull-7 {\n    right: 58.33333%; }\n  .col-lg-pull-8 {\n    right: 66.66667%; }\n  .col-lg-pull-9 {\n    right: 75%; }\n  .col-lg-pull-10 {\n    right: 83.33333%; }\n  .col-lg-pull-11 {\n    right: 91.66667%; }\n  .col-lg-pull-12 {\n    right: 100%; }\n  .col-lg-push-0 {\n    left: auto; }\n  .col-lg-push-1 {\n    left: 8.33333%; }\n  .col-lg-push-2 {\n    left: 16.66667%; }\n  .col-lg-push-3 {\n    left: 25%; }\n  .col-lg-push-4 {\n    left: 33.33333%; }\n  .col-lg-push-5 {\n    left: 41.66667%; }\n  .col-lg-push-6 {\n    left: 50%; }\n  .col-lg-push-7 {\n    left: 58.33333%; }\n  .col-lg-push-8 {\n    left: 66.66667%; }\n  .col-lg-push-9 {\n    left: 75%; }\n  .col-lg-push-10 {\n    left: 83.33333%; }\n  .col-lg-push-11 {\n    left: 91.66667%; }\n  .col-lg-push-12 {\n    left: 100%; }\n  .col-lg-offset-0 {\n    margin-left: 0%; }\n  .col-lg-offset-1 {\n    margin-left: 8.33333%; }\n  .col-lg-offset-2 {\n    margin-left: 16.66667%; }\n  .col-lg-offset-3 {\n    margin-left: 25%; }\n  .col-lg-offset-4 {\n    margin-left: 33.33333%; }\n  .col-lg-offset-5 {\n    margin-left: 41.66667%; }\n  .col-lg-offset-6 {\n    margin-left: 50%; }\n  .col-lg-offset-7 {\n    margin-left: 58.33333%; }\n  .col-lg-offset-8 {\n    margin-left: 66.66667%; }\n  .col-lg-offset-9 {\n    margin-left: 75%; }\n  .col-lg-offset-10 {\n    margin-left: 83.33333%; }\n  .col-lg-offset-11 {\n    margin-left: 91.66667%; }\n  .col-lg-offset-12 {\n    margin-left: 100%; } }\n\n/****************\n\tHELPERS \n****************/\n.clearfix:after {\n  content: \"\";\n  display: table;\n  clear: both; }\n\n/* Sprite */\n/* .sprite {\n\tbackground: url(../img/sprite.svg);IE 9+ & Android 3+\n\t.no-svg & {\n\t\tbackground: url(../img/sprite.png);\n\t}\n}\n */\n/* OBJECTS - Repeating components\n==================================================== */\n/****************\n\tFORMS\n****************/\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  margin: -1px;\n  padding: 0;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0; }\n\ninput[type=\"text\"],\ninput[type=\"email\"],\ninput[type=\"submit\"],\ninput[type=\"radio\"],\nselect,\ntextarea,\ninput[type=\"checkbox\"] {\n  -webkit-appearance: none; }\n\n/****************\n\tBUTTONS  \n****************/\n.btn, .btn--black, .btn--big {\n  font-weight: 700;\n  font-family: \"Source Sans Pro\", sans-serif;\n  text-transform: uppercase;\n  background-color: #333333;\n  color: #fff;\n  font-size: 15px; }\n\n.btn--black {\n  background-color: #fff;\n  color: #333333; }\n\n.btn--big {\n  display: block;\n  font-size: 30px;\n  text-align: center; }\n\n/* THEME - Main files for website\n==================================================== */\n/****************\n\tFONTS\n****************/\nbody {\n  font-family: \"Source Sans Pro\", sans-serif;\n  color: #333333; }\n\nh1,\nh2,\nh3 {\n  font-family: \"Montserrat\", sans-serif;\n  color: #333333; }\n\n/****************\n\tHEADER\n****************/\n/****************\n\tTYPO\n****************/\nhtml {\n  font-size: 100%; }\n\n/****************\n\tFOOTER\n****************/\n/****************\n\tMAIN\n****************/\nhtml,\nbody,\n#app,\nsection {\n  width: 100%;\n  height: 100%;\n  position: relative; }\n\n.box {\n  overflow: hidden; }\n\n.section {\n  display: -webkit-flex;\n  display: -moz-flex;\n  display: -ms-flex;\n  display: -o-flex;\n  display: flex;\n  align-items: center; }\n  .section .bar {\n    position: absolute;\n    background: #333333; }\n  .section .bar.top {\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 14px;\n    transform-origin: 0 0; }\n  .section .bar.bottom {\n    bottom: 0;\n    left: 0;\n    right: 0;\n    height: 14px;\n    transform-origin: 100% 0; }\n  .section .bar.left {\n    bottom: 0;\n    top: 0;\n    left: 0;\n    width: 14px;\n    transform-origin: 0 100%; }\n  .section .bar.right {\n    bottom: 0;\n    top: 0;\n    right: 0;\n    width: 14px;\n    transform-origin: 0 0; }\n\n#bar--transition {\n  position: absolute;\n  background: #333333;\n  bottom: 0;\n  right: 0;\n  left: 50%;\n  height: 0;\n  -webkit-transform-origin: 100% 100%;\n  transform-origin: 100% 100%; }\n\n/****************\n\tSHAME\n****************/\n", ""]);
-	
+
 	// exports
 
 
 /***/ },
-/* 23 */
-/*!**************************************!*\
-  !*** ./~/css-loader/lib/css-base.js ***!
-  \**************************************/
+/* 25 */
 /***/ function(module, exports) {
 
 	/*
@@ -19743,7 +19685,7 @@
 	// css base code, injected by the css-loader
 	module.exports = function() {
 		var list = [];
-	
+
 		// return the list of modules as css string
 		list.toString = function toString() {
 			var result = [];
@@ -19757,7 +19699,7 @@
 			}
 			return result.join("");
 		};
-	
+
 		// import a list of modules into the list
 		list.i = function(modules, mediaQuery) {
 			if(typeof modules === "string")
@@ -19789,10 +19731,7 @@
 
 
 /***/ },
-/* 24 */
-/*!*************************************!*\
-  !*** ./~/style-loader/addStyles.js ***!
-  \*************************************/
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -19816,23 +19755,23 @@
 		singletonElement = null,
 		singletonCounter = 0,
 		styleElementsInsertedAtTop = [];
-	
+
 	module.exports = function(list, options) {
-		if(true) {
+		if(false) {
 			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
 		}
-	
+
 		options = options || {};
 		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
 		// tags it will allow on a page
 		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-	
+
 		// By default, add <style> tags to the bottom of <head>.
 		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-	
+
 		var styles = listToStyles(list);
 		addStylesToDom(styles, options);
-	
+
 		return function update(newList) {
 			var mayRemove = [];
 			for(var i = 0; i < styles.length; i++) {
@@ -19855,7 +19794,7 @@
 			}
 		};
 	}
-	
+
 	function addStylesToDom(styles, options) {
 		for(var i = 0; i < styles.length; i++) {
 			var item = styles[i];
@@ -19877,7 +19816,7 @@
 			}
 		}
 	}
-	
+
 	function listToStyles(list) {
 		var styles = [];
 		var newStyles = {};
@@ -19895,7 +19834,7 @@
 		}
 		return styles;
 	}
-	
+
 	function insertStyleElement(options, styleElement) {
 		var head = getHeadElement();
 		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
@@ -19914,7 +19853,7 @@
 			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
 		}
 	}
-	
+
 	function removeStyleElement(styleElement) {
 		styleElement.parentNode.removeChild(styleElement);
 		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
@@ -19922,24 +19861,24 @@
 			styleElementsInsertedAtTop.splice(idx, 1);
 		}
 	}
-	
+
 	function createStyleElement(options) {
 		var styleElement = document.createElement("style");
 		styleElement.type = "text/css";
 		insertStyleElement(options, styleElement);
 		return styleElement;
 	}
-	
+
 	function createLinkElement(options) {
 		var linkElement = document.createElement("link");
 		linkElement.rel = "stylesheet";
 		insertStyleElement(options, linkElement);
 		return linkElement;
 	}
-	
+
 	function addStyle(obj, options) {
 		var styleElement, update, remove;
-	
+
 		if (options.singleton) {
 			var styleIndex = singletonCounter++;
 			styleElement = singletonElement || (singletonElement = createStyleElement(options));
@@ -19965,9 +19904,9 @@
 				removeStyleElement(styleElement);
 			};
 		}
-	
+
 		update(obj);
-	
+
 		return function updateStyle(newObj) {
 			if(newObj) {
 				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
@@ -19978,19 +19917,19 @@
 			}
 		};
 	}
-	
+
 	var replaceText = (function () {
 		var textStore = [];
-	
+
 		return function (index, replacement) {
 			textStore[index] = replacement;
 			return textStore.filter(Boolean).join('\n');
 		};
 	})();
-	
+
 	function applyToSingletonTag(styleElement, index, remove, obj) {
 		var css = remove ? "" : obj.css;
-	
+
 		if (styleElement.styleSheet) {
 			styleElement.styleSheet.cssText = replaceText(index, css);
 		} else {
@@ -20004,16 +19943,16 @@
 			}
 		}
 	}
-	
+
 	function applyToTag(styleElement, obj) {
 		var css = obj.css;
 		var media = obj.media;
 		var sourceMap = obj.sourceMap;
-	
+
 		if(media) {
 			styleElement.setAttribute("media", media)
 		}
-	
+
 		if(styleElement.styleSheet) {
 			styleElement.styleSheet.cssText = css;
 		} else {
@@ -20023,42 +19962,39 @@
 			styleElement.appendChild(document.createTextNode(css));
 		}
 	}
-	
+
 	function updateLink(linkElement, obj) {
 		var css = obj.css;
 		var media = obj.media;
 		var sourceMap = obj.sourceMap;
-	
+
 		if(sourceMap) {
 			// http://stackoverflow.com/a/26603875
 			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
 		}
-	
+
 		var blob = new Blob([css], { type: "text/css" });
-	
+
 		var oldSrc = linkElement.href;
-	
+
 		linkElement.href = URL.createObjectURL(blob);
-	
+
 		if(oldSrc)
 			URL.revokeObjectURL(oldSrc);
 	}
 
 
 /***/ },
-/* 25 */
-/*!****************************************!*\
-  !*** ./assets/sass/partials/home.scss ***!
-  \****************************************/
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
+
 	// load the styles
-	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./home.scss */ 26);
+	var content = __webpack_require__(28);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 24)(content, {});
+	var update = __webpack_require__(26)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -20075,42 +20011,36 @@
 	}
 
 /***/ },
-/* 26 */
-/*!***********************************************************************!*\
-  !*** ./~/css-loader!./~/sass-loader!./assets/sass/partials/home.scss ***!
-  \***********************************************************************/
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 23)();
+	exports = module.exports = __webpack_require__(25)();
 	// imports
-	
-	
+
+
 	// module
 	exports.push([module.id, "/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #333333; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #333333; }\n\n.home {\n  padding: 30px; }\n  .home .content {\n    margin: 0 auto;\n    background: #eeeeee;\n    padding: 50px;\n    position: relative;\n    max-width: 400px; }\n    .home .content .title {\n      position: absolute;\n      left: -45px;\n      top: -90px;\n      font-size: 110px;\n      font-family: \"Montserrat\", sans-serif;\n      font-weight: 700; }\n    .home .content .desc {\n      padding-left: 100px;\n      position: relative; }\n      .home .content .desc:before {\n        content: \"\";\n        position: absolute;\n        left: 0;\n        top: 8px;\n        width: 80px;\n        height: 1px;\n        background-color: #333333; }\n  .home .scroll {\n    position: absolute;\n    bottom: 14px;\n    left: 50%;\n    transform: translateX(-50%);\n    text-align: center;\n    color: #333333;\n    text-transform: uppercase; }\n    .home .scroll:after {\n      content: \"\";\n      display: inline-block;\n      width: 1px;\n      height: 35px;\n      background-color: #333333; }\n", ""]);
-	
+
 	// exports
 
 
 /***/ },
-/* 27 */
-/*!**************************************!*\
-  !*** ./assets/js/sections/Number.js ***!
-  \**************************************/
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Tween = __webpack_require__(/*! gsap */ 11),
-	    $ = __webpack_require__(/*! jquery */ 13),
-	    mousewheel = __webpack_require__(/*! jquery-mousewheel */ 14),
-	    animsvg = __webpack_require__(/*! ../drawsvg */ 16);
-	    model = __webpack_require__(/*! ../models.js */ 15);
-	
+	var Tween = __webpack_require__(11),
+	    $ = __webpack_require__(13),
+	    mousewheel = __webpack_require__(14),
+	    animsvg = __webpack_require__(16);
+	    model = __webpack_require__(15);
+
 	module.exports = Number;
-	
+
 	function Number() {
-	
+
 	    var _this = this;
 	   
-	
+
 	    this.MouseWheelListener = function(e) {
 	        var e = window.event || e; // old IE support
 	        this.delta = e.wheelDelta || -e.detail;
@@ -20124,10 +20054,10 @@
 	        }
 	        window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
 	        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
-	
+
 	        return false;
 	    };
-	
+
 	    this.KeyPressListener = function(e) {
 	        // scroll down
 	        if(e.keyCode == '40') {
@@ -20140,79 +20070,79 @@
 	        else {return false;}
 	        window.removeEventListener("mkeydown", _this.KeyPressListener, false);
 	    };
-	
+
 	    this.addListeners = function() {
 	        window.addEventListener("keydown", _this.KeyPressListener, false);
 	        window.addEventListener("mousewheel", _this.MouseWheelListener, false);
 	        window.addEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
 	    };
-	
+
 	    this.removeListeners = function() {
 	        window.addEventListener("keydown", _this.KeyPressListener, false);
 	        window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
 	        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
 	    };
-	
+
 	}
-	
+
 	Number.prototype = {
-	
+
 	    el: {},
-	
-	
+
+
 	    init: function(req, done) {
-	
+
 	        // On importe le template et les styles
-	        var raw = __webpack_require__(/*! ./../../templates/number.html */ 28);
+	        var raw = __webpack_require__(37);
 	        this.el = raw(model[ req.route ]);
-	
+
 	        this.req = req;
-	
-	        __webpack_require__(/*! ./../../sass/main.scss */ 21);
-	        __webpack_require__(/*! ./../../sass/partials/number.scss */ 29);
+
+	        __webpack_require__(23);
+	        __webpack_require__(30);
 	        
 	        done();
 	    },
-	
+
 	    resize: function(width, height) {
 	    },
-	
+
 	    animateIn: function(req, done) {
-	
+
 	        // TODO:
 	        // -gérer les transitions en fonction de req
 	        // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
 	        // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
 	        // -Voir pour mutualiser les listeners sur les différenst objets
 	        // -mettre un curseur différents sur partie haut/basse et click
-	
+
 	        // on insère le contenu après la fin du animateOut 
 	        // de la section précédente (overlap false dans framework)
 	        this.app = document.getElementById('app');
 	        this.app.innerHTML = this.el; 
-	
+
 	        this.pager = document.querySelector('.pager');
 	        this.title = document.querySelector('.title');
 	        this.text = document.querySelector('.desc');
-	        this.illu = __webpack_require__(/*! ../../svg */ 31)("./"+model[ req.route ].illu);
+	        this.illu = __webpack_require__(32)("./"+model[ req.route ].illu);
 	        this.svg = this.illu();
 	        this.halfRight = document.querySelector('.right');
 	        this.halfRight.innerHTML = this.svg;
 	        this.barTransition = document.getElementById('bar--transition');
-	
-	        this.anims = model[ req.route ].anim;
-	
+
+	        this.anims = model[ req.route ].anim();
+
 	        animsvg.hideSVG();
-	
+
 	        var tweens = new Array();  
-	        tweens.push(Tween.fromTo(this.pager, 0.5, {opacity: 0}, {opacity: 1}));
-	        tweens.push(Tween.fromTo(this.title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
-	        tweens.push(Tween.fromTo(this.text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+	        tweens.push(Tween.fromTo(this.pager, 0.2, {opacity: 0}, {opacity: 1}));
+	        tweens.push(Tween.fromTo(this.title, 0.2, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+	        tweens.push(Tween.fromTo(this.text, 0.2, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
 	        if(this.anims) {
-	            tweens.push(this.anims);
+	            tweens.push(this.anims.play);
 	        }
 	        
-	
+
 	         // for(var x = 0; x<paths.length;x++){
 	         //    var path = paths[x];
 	         //    var pathDimensions = path.getTotalLength();
@@ -20232,61 +20162,46 @@
 	        // On lance la timeline avec son callback
 	        tlIn = new TimelineMax({paused: true});
 	        tlIn.add(Tween.to(this.barTransition, 0.6, {height: window.outerHeight, ease: Power3.easeIn}));
-	        tlIn.add(tweens);
+	        tlIn.add(tweens, '+=0', 'sequence');
 	        var inTl = this.tl;
 	        tlIn.add(done);
 	        tlIn.add(this.addListeners);
-	
+
 	        tlIn.play();
 	    },
 	    animateOut: function(req, done) {
 	        var tweens = new Array();  
-	        tweens.push(Tween.to(this.pager, 0.5, {opacity: 0}));
-	        tweens.push(Tween.to(this.title, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
-	        tweens.push(Tween.to(this.text, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
-	        
+	        //this.anims.reverse();
+	        tweens.push(this.anims.reverse); // a voir MARCHE PAS !!!!!!!!!!!!!!!
+	        tweens.push(Tween.to(this.pager, 0.2, {opacity: 0}));
+	        tweens.push(Tween.to(this.title, 0.2, {opacity:0, transform: 'translateY(-20px)'}));
+	        tweens.push(Tween.to(this.text, 0.2, {opacity:0, transform: 'translateY(-20px)'}));
+
+
 	        tlOut = new TimelineMax({paused: true});
-	
-	        tlOut.add(tweens);
-	        tlOut.add(this.addListeners);
-	        if(this.anims) {
-	            tlOut.add(this.anims);
-	        }
+	        tlOut.add(tweens, '+=0', 'start');
 	        tlOut.add(done);
 	        tlOut.play();
 	    },
-	
+
 	    destroy: function(req, done) {
 	        //  el.parentNode.removeChild(el);
 	        done();
 	    }
-	
+
 	}
 
 /***/ },
-/* 28 */
-/*!**************************************!*\
-  !*** ./assets/templates/number.html ***!
-  \**************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var H = __webpack_require__(/*! hogan.js */ 18);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"number section\">");t.b("\n" + i);t.b("	");t.b("\n" + i);t.b("	<div class=\"half left\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			<header class=\"header box\">");t.b("\n" + i);t.b("				<h1 class=\"title text\">");t.b(t.v(t.d("title.number",c,p,0)));t.b(" <span>");t.b(t.v(t.d("title.desc",c,p,0)));t.b("</span></h1>");t.b("\n" + i);t.b("			</header>");t.b("\n" + i);t.b("			<div class=\"desc\">");t.b("\n" + i);t.b("				");t.b(t.v(t.f("desc",c,p,0)));t.b("\n" + i);t.b("			</div>");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n" + i);t.b("		<p class=\"pager\">");t.b("\n" + i);t.b("			");t.b(t.v(t.f("pager",c,p,0)));t.b("\n" + i);t.b("		</p>");t.b("\n" + i);t.b("		");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half right\">	");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"number section\">\n\t\n\t<div class=\"half left\">\n\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t<header class=\"header box\">\n\t\t\t\t<h1 class=\"title text\">{{title.number}} <span>{{title.desc}}</span></h1>\n\t\t\t</header>\n\t\t\t<div class=\"desc\">\n\t\t\t\t{{desc}}\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\n\t\t<p class=\"pager\">\n\t\t\t{{pager}}\n\t\t</p>\n\t\t\n\n\t</div>\n\n\t<div class=\"half right\">\t\n\t\t\n\t\t<div class=\"half__content\">\n\t\t\t\n\n\t\t\t\n\t\t</div>\n\n\n\t</div>\n\n</section>", H);return T.render.apply(T, arguments); };
-
-/***/ },
-/* 29 */
-/*!******************************************!*\
-  !*** ./assets/sass/partials/number.scss ***!
-  \******************************************/
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
+
 	// load the styles
-	var content = __webpack_require__(/*! !./../../../~/css-loader!./../../../~/sass-loader!./number.scss */ 30);
+	var content = __webpack_require__(31);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../../~/style-loader/addStyles.js */ 24)(content, {});
+	var update = __webpack_require__(26)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -20303,34 +20218,28 @@
 	}
 
 /***/ },
-/* 30 */
-/*!*************************************************************************!*\
-  !*** ./~/css-loader!./~/sass-loader!./assets/sass/partials/number.scss ***!
-  \*************************************************************************/
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(/*! ./../../../~/css-loader/lib/css-base.js */ 23)();
+	exports = module.exports = __webpack_require__(25)();
 	// imports
-	
-	
+
+
 	// module
 	exports.push([module.id, "/****************\n\tVARIABLES  \n****************/\n:selection {\n  color: #fff;\n  background-color: #333333; }\n\n::-moz-selection {\n  color: #fff;\n  background-color: #333333; }\n\n.number {\n  /*------------------------------\n\t\tanimations\n\t------------------------------*/ }\n  .number .half {\n    width: 50%;\n    float: left;\n    height: 100%;\n    line-height: 100%;\n    padding: 45px;\n    text-align: center;\n    display: -webkit-flex;\n    display: -moz-flex;\n    display: -ms-flex;\n    display: -o-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-align-items: center;\n    -ms-flex-align: center;\n    align-items: center;\n    -webkit-justify-content: center;\n    -ms-flex-pack: center;\n    justify-content: center;\n    position: relative;\n    overflow: hidden; }\n  .number .header,\n  .number .desc {\n    display: block;\n    line-height: 1.5em;\n    text-align: left;\n    max-width: 320px;\n    padding: 0 15px;\n    margin: 0 auto; }\n  .number .title {\n    font-size: 110px;\n    line-height: 1.1em;\n    font-weight: 700;\n    margin-bottom: 50px; }\n    .number .title span {\n      display: block;\n      color: #FFA900;\n      font-size: 35px;\n      line-height: 1.1em;\n      font-family: \"Source Serif Pro\", serif;\n      font-style: italic; }\n  .number .desc {\n    padding-left: 100px;\n    position: relative; }\n    .number .desc:before {\n      content: \"\";\n      position: absolute;\n      left: 15px;\n      top: 8px;\n      width: 65px;\n      height: 1px;\n      background-color: #999999; }\n  .number .pager {\n    font-size: 463px;\n    line-height: .5em;\n    position: absolute;\n    bottom: -27px;\n    right: -66px;\n    z-index: -1;\n    color: #f2f2f2;\n    font-family: \"Montserrat\", sans-serif; }\n  .number .key1 {\n    -webkit-animation: push 5s;\n    animation: push 5s;\n    -webkit-animation-iteration-count: infinite;\n    animation-iteration-count: infinite; }\n\n@-webkit-keyframes push {\n  0% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); }\n  5% {\n    -webkit-transform: translate3d(10px, 14px, 0);\n    transform: translate3d(10px, 14px, 0); }\n  10% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); }\n  15% {\n    -webkit-transform: translate3d(10px, 14px, 0);\n    transform: translate3d(10px, 14px, 0); }\n  20% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); }\n  100% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); } }\n\n@keyframes push {\n  0% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); }\n  5% {\n    -webkit-transform: translate3d(10px, 14px, 0);\n    transform: translate3d(10px, 14px, 0); }\n  10% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); }\n  15% {\n    -webkit-transform: translate3d(10px, 14px, 0);\n    transform: translate3d(10px, 14px, 0); }\n  20% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); }\n  100% {\n    -webkit-transform: translate3d(0, 0, 0);\n    transform: translate3d(0, 0, 0); } }\n", ""]);
-	
+
 	// exports
 
 
 /***/ },
-/* 31 */
-/*!*****************************!*\
-  !*** ./assets/svg ^\.\/.*$ ***!
-  \*****************************/
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./bike.svg": 32,
-		"./cafe.svg": 33,
-		"./key.svg": 34,
-		"./train.svg": 35
+		"./bike.svg": 33,
+		"./cafe.svg": 34,
+		"./key.svg": 35,
+		"./train.svg": 36
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -20343,49 +20252,66 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 31;
+	webpackContext.id = 32;
 
-
-/***/ },
-/* 32 */
-/*!*****************************!*\
-  !*** ./assets/svg/bike.svg ***!
-  \*****************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var H = __webpack_require__(/*! hogan.js */ 18);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div>");t.b("\n" + i);t.b("<svg version=\"1.1\" id=\"illu\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"422.377px\" height=\"331.207px\" viewBox=\"0 0 422.377 331.207\" enable-background=\"new 0 0 422.377 331.207\"");t.b("\n" + i);t.b("	 xml:space=\"preserve\">");t.b("\n" + i);t.b("<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M352.6,189.285c-7.75,0-15.205,1.289-22.178,3.642");t.b("\n" + i);t.b("	c-0.442-1.493-0.901-3.021-1.369-4.561c7.396-2.487,15.317-3.833,23.547-3.833c2.557,0,5.088,0.128,7.576,0.38");t.b("\n" + i);t.b("	c0,0,0.081-2.238,4.628-3.483c4.547-1.238-9.384-1.477-9.384-1.477c-2.492-0.251-5.015-0.383-7.566-0.383");t.b("\n" + i);t.b("	c-7.172,0-14.109,1.021-20.664,2.927c-3.998-12.387-8.244-23.991-8.244-23.994l-1.892-13.28c0,0-0.06,0.014-0.146,0.029");t.b("\n" + i);t.b("	l-13.543-77.068c3.795-0.813,6.444-2.136,6.3-3.293c-0.141-1.145-2.981-1.773-6.798-1.654l-3.049-21.014l-2.782-26.788");t.b("\n" + i);t.b("	c2.136-2.144,3.101-5.347,2.233-8.474c-1.271-4.652-6.074-7.388-10.724-6.111c-1.417,0.378-2.642,1.098-3.642,2.037l-2.467-0.421");t.b("\n" + i);t.b("	c-1.586-1.638-3.981-2.382-6.338-1.731c-3.437,0.944-5.457,4.492-4.513,7.924c0.944,3.441,4.491,5.467,7.921,4.518");t.b("\n" + i);t.b("	c0.659-0.179,1.255-0.451,1.803-0.804l1.502,0.26c1.088,2.611,3.335,4.462,5.963,5.112l0.293,1.527l0,0l6.742,44.939");t.b("\n" + i);t.b("	c-3.245,0.815-5.414,2.006-5.295,3.053c0.132,1.055,2.556,1.676,5.934,1.672l6.58,79.436c-1.569,0.403-2.863,0.773-3.619,1.071");t.b("\n" + i);t.b("	c-6.164,2.441-17.883,8.805-24.127,11.081c-24.398,8.902-90.673,25.798-114.297,31.731l-3.619-11.272");t.b("\n" + i);t.b("	c1.952-1.127,3.07-2.258,2.82-3.041c-0.32-0.991-2.736-1.17-5.964-0.583l-29.767-91.085l9.319-6.879");t.b("\n" + i);t.b("	c0.153-0.119,1.688-1.037,2.961-1.857c4.7,0.225,9.188,0.676,13.021,1.19c0.336,0.067,0.734,0.067,0.889-0.218");t.b("\n" + i);t.b("	c0.851-1.514,0.82-3.189,0.225-4.66c-1.174-2.617-3.819-8.853-6.652-8.875c-22.377-6.801-46.3,0.588-65.679-3.109h-0.005");t.b("\n" + i);t.b("	c-2.007,0-3.683,1.532-3.776,3.549c-0.251,2.488,0,5.13,0.229,7.545c5.428,4.629,10.872,8.002,16.93,11.098l7.252,6.428");t.b("\n" + i);t.b("	c0.455,0.396,0.97,0.74,1.557,0.668l17.095-2.441l28.745,91.055c-3.104,1.417-5.087,3.012-4.76,4.037");t.b("\n" + i);t.b("	c0.273,0.855,2.11,1.102,4.688,0.777l3.055,9.444c-1.408,0.757-3.407,1.85-5.874,3.232c-14.79-11.655-29.247-17.499-36.296-19.89");t.b("\n" + i);t.b("	c4.343-1.578,8.107-4.101,9.175-5.684c0.596-0.884,0.511-1.585,0.336-2.023c-0.183-0.447-0.701-1.205-2.156-1.205");t.b("\n" + i);t.b("	c-1.706,0-4.802,0.987-8.384,2.17c-1.152,0.384-2.445,0.809-2.857,0.894c-0.073,0.005-0.307,0.017-0.975,0.017");t.b("\n" + i);t.b("	c-5.355,0-28.091-0.582-46.355-1.042c-13.62-0.34-25.377-0.638-27.448-0.638c-2.199,0-5.007-1.455-7.47-2.727");t.b("\n" + i);t.b("	c-2.275-1.179-4.07-2.105-5.575-2.105c-1.119,0-1.774,0.515-2.132,0.957c-0.506,0.612-1.212,1.931-0.306,3.836");t.b("\n" + i);t.b("	c1.634,3.455,8.256,7.347,10.8,7.347c0.093,0,0.297,0,0.587,0.004c2.415,1.578,9.234,6.456,17.49,16.023");t.b("\n" + i);t.b("	C17.553,204.713,0.5,229.678,0.5,258.546c0,39.788,32.37,72.161,72.153,72.161c39.788,0,72.157-32.373,72.157-72.161");t.b("\n" + i);t.b("	c0-1.089-0.025-2.161-0.077-3.233c3.386-0.434,6.011-0.757,7.474-0.948c3.463,13.931,16.049,24.25,31.047,24.25");t.b("\n" + i);t.b("	c17.428,0,31.596-13.931,31.99-31.264l7.941-0.974l-0.561,3.964c-0.162,1.161,0.646,2.259,1.833,2.424l3.046,0.426");t.b("\n" + i);t.b("	c1.174,0.166,2.263-0.655,2.424-1.82l2.008-14.206c0.166-1.179-0.65-2.26-1.824-2.426l-3.051-0.434");t.b("\n" + i);t.b("	c-1.182-0.166-2.263,0.646-2.428,1.838l-0.826,5.84l-8.749,1.071c-1.353-12.228-9.587-22.372-20.749-26.486l0,0");t.b("\n" + i);t.b("	c0,0,7.452-18.758,21.472-22.948l95.633-28.584c1.71,4.781,4.462,12.654,6.997,20.626c-26.215,11.392-44.561,37.508-44.561,67.925");t.b("\n" + i);t.b("	c0,3.672,0.426,7.261,0.787,10.809c0.251,2.415-0.991,7.584-2.441,10.685c-1.445,3.104,6.533-2.344,7.197-5.717");t.b("\n" + i);t.b("	c0.689-3.496-0.787-7.146-0.787-10.824c0-29.303,17.031-54.629,41.74-66.615c0.473,1.591,0.923,3.151,1.335,4.657");t.b("\n" + i);t.b("	c-22.705,11.383-38.329,34.875-38.329,61.958c0,38.196,31.073,69.269,69.257,69.269c38.197,0,69.269-31.072,69.269-69.269");t.b("\n" + i);t.b("	C421.869,220.354,390.801,189.285,352.6,189.285z M101.16,86.953l-1.974-1.815c4.041-1.093,8.435-3.884,10.854-5.071");t.b("\n" + i);t.b("	c5.832-1.85,12.604-2.552,19.286-2.645c-0.229,0.361-0.399,0.634-0.425,0.65l-8.436,6.215L101.16,86.953z M178.52,220.928");t.b("\n" + i);t.b("	c1.234-0.233,2.416,0.592,2.642,1.829c0.229,1.229-0.591,2.416-1.825,2.649c-3.012,0.549-5.814,1.701-8.336,3.45");t.b("\n" + i);t.b("	c-0.396,0.271-0.848,0.399-1.289,0.399c-0.723,0-1.434-0.34-1.872-0.978c-0.715-1.03-0.455-2.451,0.579-3.157");t.b("\n" + i);t.b("	C171.471,223,174.87,221.6,178.52,220.928z M142.105,198.137c-0.749,0.421-1.536,0.868-2.354,1.337");t.b("\n" + i);t.b("	c-13.988-11.656-28.051-18.002-36.209-21.026c0.356-0.072,0.714-0.149,1.066-0.233C110.14,179.906,125.848,185.47,142.105,198.137z");t.b("\n" + i);t.b("	 M127.384,258.546c0,30.192-24.556,54.747-54.747,54.747c-30.184,0-54.744-24.555-54.744-54.747");t.b("\n" + i);t.b("	c0-23.194,14.518-43.075,34.943-51.034c6.201,9.485,12.501,21.502,17.92,36.504c-7.555,0.583-13.5,6.896-13.5,14.607");t.b("\n" + i);t.b("	c0,8.081,6.559,14.645,14.641,14.645c6.346,0,11.752-4.045,13.785-9.687c6.738-1.353,25.572-3.93,41.685-6.038");t.b("\n" + i);t.b("	C127.375,257.883,127.384,258.215,127.384,258.546z M72.637,195.904c0.65,0,1.301,0.017,1.943,0.033");t.b("\n" + i);t.b("	c-0.191,1.188-0.379,2.438-0.565,3.757c-0.455-0.014-0.915-0.026-1.378-0.026c-3.356,0-6.648,0.285-9.859,0.834");t.b("\n" + i);t.b("	c-0.813-1.174-1.63-2.306-2.43-3.387C64.32,196.33,68.434,195.904,72.637,195.904z M53.746,188.911");t.b("\n" + i);t.b("	c-4.385-5.036-8.337-8.758-11.383-11.344c1.43,0.034,2.914,0.067,4.433,0.105c10.005,0.234,21.808,0.511,31.813,0.728");t.b("\n" + i);t.b("	c-0.485,1.392-1.302,4.007-2.225,8.091c-1.242-0.067-2.488-0.099-3.743-0.099C66.104,186.393,59.77,187.27,53.746,188.911z");t.b("\n" + i);t.b("	 M77.434,245.063c-1.084-0.447-2.236-0.774-3.436-0.94c0.148-16.997,1.16-30.217,2.402-40.188");t.b("\n" + i);t.b("	c12.82,0.876,24.433,6.185,33.331,14.395C98.123,226.372,86.299,235.615,77.434,245.063z M72.254,215.959");t.b("\n" + i);t.b("	c-2.28-4.235-4.607-8.124-6.917-11.663c2.391-0.323,4.828-0.489,7.3-0.489c0.28,0,0.553,0.01,0.833,0.01");t.b("\n" + i);t.b("	C73.023,207.435,72.611,211.477,72.254,215.959z M59.667,201.114c-2.187,0.497-4.33,1.114-6.418,1.847");t.b("\n" + i);t.b("	c-0.762-1.103-1.515-2.17-2.263-3.19c2.037-0.757,4.135-1.407,6.27-1.952C58.051,198.877,58.859,199.975,59.667,201.114z");t.b("\n" + i);t.b("	 M62.211,204.802c3.229,4.871,6.5,10.409,9.655,16.691c-0.289,4.743-0.522,9.919-0.65,15.56");t.b("\n" + i);t.b("	c-4.837-12.186-10.234-22.28-15.585-30.541C57.766,205.819,59.965,205.244,62.211,204.802z M86.532,258.295");t.b("\n" + i);t.b("	c-0.076-3.704-1.535-7.078-3.879-9.622c8.92-9.289,20.341-18.209,31.408-25.87c6.699,7.751,11.259,17.39,12.769,28.014");t.b("\n" + i);t.b("	L86.532,258.295z M117.498,220.455c1.06-0.706,2.11-1.411,3.152-2.101c7.27,8.673,12.237,19.315,13.965,31.013l-3.706,0.697");t.b("\n" + i);t.b("	C129.281,238.865,124.504,228.686,117.498,220.455z M113.232,215.942c-9.592-9.146-22.259-15.087-36.274-16.116");t.b("\n" + i);t.b("	c0.187-1.311,0.378-2.553,0.57-3.731c15.083,1.166,28.689,7.712,38.902,17.703C115.371,214.505,114.309,215.22,113.232,215.942z");t.b("\n" + i);t.b("	 M79.34,186.708c1.152-5.049,2.102-7.644,2.322-8.239c8.508,0.187,15.317,0.323,17.916,0.341c6.869,2.249,22.74,8.435,38.639,21.534");t.b("\n" + i);t.b("	c-3.989,2.314-8.625,5.075-13.611,8.193C112.93,196.415,97.051,188.346,79.34,186.708z M15.83,168.579");t.b("\n" + i);t.b("	c-0.17-0.361-0.17-0.549-0.132-0.659c0.817,0.026,2.612,0.952,4.198,1.773c2.765,1.438,5.899,3.055,8.805,3.055");t.b("\n" + i);t.b("	c2.038,0,13.777,0.302,27.372,0.642c19.234,0.489,41.042,1.042,46.431,1.042c1.056,0,1.256-0.021,1.417-0.051");t.b("\n" + i);t.b("	c0.57-0.094,1.591-0.429,3.335-1.008c1.365-0.455,3.117-1.038,4.637-1.459c-2.758,1.782-7.525,4.007-11.791,4.007");t.b("\n" + i);t.b("	c-4.496,0-32.663-0.663-53.229-1.14c-12.251-0.29-21.924-0.515-22.859-0.515C22.746,174.267,17.029,171.105,15.83,168.579z");t.b("\n" + i);t.b("	 M29.714,177.273c2.165,0.056,4.866,0.114,7.915,0.187c2.91,2.238,7.598,6.219,13.063,12.357c-1.991,0.629-3.943,1.344-5.853,2.147");t.b("\n" + i);t.b("	C38.715,184.772,33.295,180.043,29.714,177.273z M135.287,258.546c0,34.543-28.099,62.65-62.65,62.65");t.b("\n" + i);t.b("	c-34.543,0-62.643-28.103-62.643-62.65c0-25.879,15.776-48.142,38.223-57.683c0.744,1.008,1.497,2.06,2.25,3.147");t.b("\n" + i);t.b("	c-21.506,8.775-36.703,29.907-36.703,54.53c0,32.469,26.409,58.887,58.873,58.887c32.471,0,58.882-26.418,58.882-58.887");t.b("\n" + i);t.b("	c0-0.515-0.005-1.029-0.021-1.535c1.28-0.166,2.53-0.332,3.747-0.488C135.273,257.202,135.287,257.865,135.287,258.546z");t.b("\n" + i);t.b("	 M128.711,213.187c10.285-6.415,18.864-11.123,22.752-13.198l8.12,25.082h0.004c-5.112,5.606-8.247,13.042-8.337,21.2l-7.277,1.353");t.b("\n" + i);t.b("	C141.999,234.709,136.588,222.914,128.711,213.187z M164.9,262.025c-0.396,0.268-0.848,0.4-1.289,0.4");t.b("\n" + i);t.b("	c-0.724,0-1.438-0.341-1.876-0.975c-2.109-3.059-3.522-6.465-4.189-10.111c-0.226-1.237,0.6-2.415,1.833-2.641");t.b("\n" + i);t.b("	c1.242-0.234,2.424,0.591,2.649,1.829c0.55,3.007,1.71,5.814,3.45,8.332C166.193,259.891,165.93,261.311,164.9,262.025z");t.b("\n" + i);t.b("	 M165.479,234.377c-1.744,2.519-2.905,5.317-3.454,8.333c-0.204,1.098-1.157,1.867-2.237,1.867c-0.137,0-0.271-0.017-0.413-0.034");t.b("\n" + i);t.b("	c-1.233-0.233-2.054-1.42-1.832-2.65c0.667-3.645,2.079-7.052,4.189-10.102c0.71-1.029,2.126-1.297,3.165-0.583");t.b("\n" + i);t.b("	C165.93,231.927,166.193,233.339,165.479,234.377z M181.161,270.485c-0.195,1.098-1.157,1.867-2.229,1.867");t.b("\n" + i);t.b("	c-0.135,0-0.271-0.017-0.412-0.034c-3.649-0.672-7.049-2.083-10.102-4.194c-1.034-0.705-1.294-2.126-0.579-3.155");t.b("\n" + i);t.b("	c0.71-1.038,2.127-1.289,3.165-0.582c2.522,1.742,5.325,2.9,8.337,3.449C180.57,268.065,181.395,269.247,181.161,270.485z");t.b("\n" + i);t.b("	 M198.069,268.124c-3.054,2.111-6.453,3.522-10.103,4.194c-0.137,0.018-0.271,0.034-0.413,0.034c-1.079,0-2.037-0.773-2.237-1.867");t.b("\n" + i);t.b("	c-0.225-1.238,0.592-2.416,1.83-2.649c3.011-0.549,5.818-1.701,8.336-3.449c1.029-0.707,2.451-0.456,3.165,0.582");t.b("\n" + i);t.b("	C199.361,265.998,199.107,267.419,198.069,268.124z M208.937,251.345c-0.667,3.646-2.071,7.053-4.181,10.11");t.b("\n" + i);t.b("	c-0.442,0.63-1.152,0.974-1.876,0.974c-0.442,0-0.894-0.131-1.288-0.399c-1.039-0.714-1.294-2.136-0.584-3.165");t.b("\n" + i);t.b("	c1.744-2.517,2.906-5.325,3.454-8.333c0.226-1.237,1.407-2.058,2.649-1.828C208.342,248.925,209.158,250.106,208.937,251.345z");t.b("\n" + i);t.b("	 M201.592,231.213c1.028-0.715,2.449-0.456,3.164,0.583c2.109,3.049,3.514,6.456,4.181,10.103c0.226,1.229-0.595,2.415-1.825,2.649");t.b("\n" + i);t.b("	c-0.135,0.017-0.28,0.033-0.412,0.033c-1.08,0-2.037-0.773-2.237-1.867c-0.548-3.016-1.71-5.814-3.454-8.333");t.b("\n" + i);t.b("	C200.293,233.339,200.553,231.927,201.592,231.213z M198.651,228.273c-0.442,0.638-1.152,0.979-1.876,0.979");t.b("\n" + i);t.b("	c-0.442,0-0.893-0.124-1.289-0.4c-2.521-1.744-5.329-2.9-8.336-3.449c-1.238-0.234-2.055-1.42-1.83-2.65");t.b("\n" + i);t.b("	c0.23-1.237,1.417-2.059,2.65-1.828c3.65,0.671,7.049,2.066,10.103,4.185C199.107,225.823,199.361,227.244,198.651,228.273z");t.b("\n" + i);t.b("	 M186.04,214.747c-0.919-0.076-1.854-0.123-2.804-0.123c-5.035,0-9.809,1.161-14.049,3.249l-3.016-9.421l31.042-9.272");t.b("\n" + i);t.b("	C191.374,204.398,187.601,211.459,186.04,214.747z M352.6,319.125c-33.398,0-60.574-27.176-60.574-60.579");t.b("\n" + i);t.b("	c0-22.978,12.871-43.024,31.787-53.284c0.271,1.131,0.646,2.387,1.097,3.73c-17.346,9.736-29.085,28.294-29.085,49.554");t.b("\n" + i);t.b("	c0,31.31,25.479,56.793,56.78,56.793c31.31,0,56.794-25.478,56.794-56.793c0-31.314-25.479-56.785-56.794-56.785");t.b("\n" + i);t.b("	c-6.665,0-13.08,1.162-19.034,3.288c-0.043-0.183-0.09-0.357-0.119-0.535c-0.209-0.982-0.447-2.063-0.724-3.19");t.b("\n" + i);t.b("	c6.228-2.174,12.913-3.356,19.877-3.356c33.407,0,60.587,27.181,60.587,60.574C413.188,291.953,386.012,319.125,352.6,319.125z");t.b("\n" + i);t.b("	 M349.338,257.891c1.004,2.169,3.198,3.68,5.746,3.68c3.496,0,6.334-2.842,6.334-6.338c0-3.506-2.838-6.347-6.334-6.347");t.b("\n" + i);t.b("	c-0.842,0-1.658,0.175-2.398,0.473c-5.539-10.924-14.398-29.086-17.992-40.319c5.593-2.037,11.633-3.14,17.915-3.14");t.b("\n" + i);t.b("	c29.044,0,52.659,23.612,52.659,52.646c0,29.035-23.615,52.663-52.659,52.663c-29.03,0-52.646-23.628-52.646-52.663");t.b("\n" + i);t.b("	c0-19.474,10.633-36.521,26.396-45.627C332.681,228.886,346.836,253.578,349.338,257.891z\"/>");t.b("\n" + i);t.b("</svg>");t.b("\n" + i);t.b("</div>");return t.fl(); },partials: {}, subs: {  }}, "<div>\n<svg version=\"1.1\" id=\"illu\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"422.377px\" height=\"331.207px\" viewBox=\"0 0 422.377 331.207\" enable-background=\"new 0 0 422.377 331.207\"\n\t xml:space=\"preserve\">\n<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M352.6,189.285c-7.75,0-15.205,1.289-22.178,3.642\n\tc-0.442-1.493-0.901-3.021-1.369-4.561c7.396-2.487,15.317-3.833,23.547-3.833c2.557,0,5.088,0.128,7.576,0.38\n\tc0,0,0.081-2.238,4.628-3.483c4.547-1.238-9.384-1.477-9.384-1.477c-2.492-0.251-5.015-0.383-7.566-0.383\n\tc-7.172,0-14.109,1.021-20.664,2.927c-3.998-12.387-8.244-23.991-8.244-23.994l-1.892-13.28c0,0-0.06,0.014-0.146,0.029\n\tl-13.543-77.068c3.795-0.813,6.444-2.136,6.3-3.293c-0.141-1.145-2.981-1.773-6.798-1.654l-3.049-21.014l-2.782-26.788\n\tc2.136-2.144,3.101-5.347,2.233-8.474c-1.271-4.652-6.074-7.388-10.724-6.111c-1.417,0.378-2.642,1.098-3.642,2.037l-2.467-0.421\n\tc-1.586-1.638-3.981-2.382-6.338-1.731c-3.437,0.944-5.457,4.492-4.513,7.924c0.944,3.441,4.491,5.467,7.921,4.518\n\tc0.659-0.179,1.255-0.451,1.803-0.804l1.502,0.26c1.088,2.611,3.335,4.462,5.963,5.112l0.293,1.527l0,0l6.742,44.939\n\tc-3.245,0.815-5.414,2.006-5.295,3.053c0.132,1.055,2.556,1.676,5.934,1.672l6.58,79.436c-1.569,0.403-2.863,0.773-3.619,1.071\n\tc-6.164,2.441-17.883,8.805-24.127,11.081c-24.398,8.902-90.673,25.798-114.297,31.731l-3.619-11.272\n\tc1.952-1.127,3.07-2.258,2.82-3.041c-0.32-0.991-2.736-1.17-5.964-0.583l-29.767-91.085l9.319-6.879\n\tc0.153-0.119,1.688-1.037,2.961-1.857c4.7,0.225,9.188,0.676,13.021,1.19c0.336,0.067,0.734,0.067,0.889-0.218\n\tc0.851-1.514,0.82-3.189,0.225-4.66c-1.174-2.617-3.819-8.853-6.652-8.875c-22.377-6.801-46.3,0.588-65.679-3.109h-0.005\n\tc-2.007,0-3.683,1.532-3.776,3.549c-0.251,2.488,0,5.13,0.229,7.545c5.428,4.629,10.872,8.002,16.93,11.098l7.252,6.428\n\tc0.455,0.396,0.97,0.74,1.557,0.668l17.095-2.441l28.745,91.055c-3.104,1.417-5.087,3.012-4.76,4.037\n\tc0.273,0.855,2.11,1.102,4.688,0.777l3.055,9.444c-1.408,0.757-3.407,1.85-5.874,3.232c-14.79-11.655-29.247-17.499-36.296-19.89\n\tc4.343-1.578,8.107-4.101,9.175-5.684c0.596-0.884,0.511-1.585,0.336-2.023c-0.183-0.447-0.701-1.205-2.156-1.205\n\tc-1.706,0-4.802,0.987-8.384,2.17c-1.152,0.384-2.445,0.809-2.857,0.894c-0.073,0.005-0.307,0.017-0.975,0.017\n\tc-5.355,0-28.091-0.582-46.355-1.042c-13.62-0.34-25.377-0.638-27.448-0.638c-2.199,0-5.007-1.455-7.47-2.727\n\tc-2.275-1.179-4.07-2.105-5.575-2.105c-1.119,0-1.774,0.515-2.132,0.957c-0.506,0.612-1.212,1.931-0.306,3.836\n\tc1.634,3.455,8.256,7.347,10.8,7.347c0.093,0,0.297,0,0.587,0.004c2.415,1.578,9.234,6.456,17.49,16.023\n\tC17.553,204.713,0.5,229.678,0.5,258.546c0,39.788,32.37,72.161,72.153,72.161c39.788,0,72.157-32.373,72.157-72.161\n\tc0-1.089-0.025-2.161-0.077-3.233c3.386-0.434,6.011-0.757,7.474-0.948c3.463,13.931,16.049,24.25,31.047,24.25\n\tc17.428,0,31.596-13.931,31.99-31.264l7.941-0.974l-0.561,3.964c-0.162,1.161,0.646,2.259,1.833,2.424l3.046,0.426\n\tc1.174,0.166,2.263-0.655,2.424-1.82l2.008-14.206c0.166-1.179-0.65-2.26-1.824-2.426l-3.051-0.434\n\tc-1.182-0.166-2.263,0.646-2.428,1.838l-0.826,5.84l-8.749,1.071c-1.353-12.228-9.587-22.372-20.749-26.486l0,0\n\tc0,0,7.452-18.758,21.472-22.948l95.633-28.584c1.71,4.781,4.462,12.654,6.997,20.626c-26.215,11.392-44.561,37.508-44.561,67.925\n\tc0,3.672,0.426,7.261,0.787,10.809c0.251,2.415-0.991,7.584-2.441,10.685c-1.445,3.104,6.533-2.344,7.197-5.717\n\tc0.689-3.496-0.787-7.146-0.787-10.824c0-29.303,17.031-54.629,41.74-66.615c0.473,1.591,0.923,3.151,1.335,4.657\n\tc-22.705,11.383-38.329,34.875-38.329,61.958c0,38.196,31.073,69.269,69.257,69.269c38.197,0,69.269-31.072,69.269-69.269\n\tC421.869,220.354,390.801,189.285,352.6,189.285z M101.16,86.953l-1.974-1.815c4.041-1.093,8.435-3.884,10.854-5.071\n\tc5.832-1.85,12.604-2.552,19.286-2.645c-0.229,0.361-0.399,0.634-0.425,0.65l-8.436,6.215L101.16,86.953z M178.52,220.928\n\tc1.234-0.233,2.416,0.592,2.642,1.829c0.229,1.229-0.591,2.416-1.825,2.649c-3.012,0.549-5.814,1.701-8.336,3.45\n\tc-0.396,0.271-0.848,0.399-1.289,0.399c-0.723,0-1.434-0.34-1.872-0.978c-0.715-1.03-0.455-2.451,0.579-3.157\n\tC171.471,223,174.87,221.6,178.52,220.928z M142.105,198.137c-0.749,0.421-1.536,0.868-2.354,1.337\n\tc-13.988-11.656-28.051-18.002-36.209-21.026c0.356-0.072,0.714-0.149,1.066-0.233C110.14,179.906,125.848,185.47,142.105,198.137z\n\t M127.384,258.546c0,30.192-24.556,54.747-54.747,54.747c-30.184,0-54.744-24.555-54.744-54.747\n\tc0-23.194,14.518-43.075,34.943-51.034c6.201,9.485,12.501,21.502,17.92,36.504c-7.555,0.583-13.5,6.896-13.5,14.607\n\tc0,8.081,6.559,14.645,14.641,14.645c6.346,0,11.752-4.045,13.785-9.687c6.738-1.353,25.572-3.93,41.685-6.038\n\tC127.375,257.883,127.384,258.215,127.384,258.546z M72.637,195.904c0.65,0,1.301,0.017,1.943,0.033\n\tc-0.191,1.188-0.379,2.438-0.565,3.757c-0.455-0.014-0.915-0.026-1.378-0.026c-3.356,0-6.648,0.285-9.859,0.834\n\tc-0.813-1.174-1.63-2.306-2.43-3.387C64.32,196.33,68.434,195.904,72.637,195.904z M53.746,188.911\n\tc-4.385-5.036-8.337-8.758-11.383-11.344c1.43,0.034,2.914,0.067,4.433,0.105c10.005,0.234,21.808,0.511,31.813,0.728\n\tc-0.485,1.392-1.302,4.007-2.225,8.091c-1.242-0.067-2.488-0.099-3.743-0.099C66.104,186.393,59.77,187.27,53.746,188.911z\n\t M77.434,245.063c-1.084-0.447-2.236-0.774-3.436-0.94c0.148-16.997,1.16-30.217,2.402-40.188\n\tc12.82,0.876,24.433,6.185,33.331,14.395C98.123,226.372,86.299,235.615,77.434,245.063z M72.254,215.959\n\tc-2.28-4.235-4.607-8.124-6.917-11.663c2.391-0.323,4.828-0.489,7.3-0.489c0.28,0,0.553,0.01,0.833,0.01\n\tC73.023,207.435,72.611,211.477,72.254,215.959z M59.667,201.114c-2.187,0.497-4.33,1.114-6.418,1.847\n\tc-0.762-1.103-1.515-2.17-2.263-3.19c2.037-0.757,4.135-1.407,6.27-1.952C58.051,198.877,58.859,199.975,59.667,201.114z\n\t M62.211,204.802c3.229,4.871,6.5,10.409,9.655,16.691c-0.289,4.743-0.522,9.919-0.65,15.56\n\tc-4.837-12.186-10.234-22.28-15.585-30.541C57.766,205.819,59.965,205.244,62.211,204.802z M86.532,258.295\n\tc-0.076-3.704-1.535-7.078-3.879-9.622c8.92-9.289,20.341-18.209,31.408-25.87c6.699,7.751,11.259,17.39,12.769,28.014\n\tL86.532,258.295z M117.498,220.455c1.06-0.706,2.11-1.411,3.152-2.101c7.27,8.673,12.237,19.315,13.965,31.013l-3.706,0.697\n\tC129.281,238.865,124.504,228.686,117.498,220.455z M113.232,215.942c-9.592-9.146-22.259-15.087-36.274-16.116\n\tc0.187-1.311,0.378-2.553,0.57-3.731c15.083,1.166,28.689,7.712,38.902,17.703C115.371,214.505,114.309,215.22,113.232,215.942z\n\t M79.34,186.708c1.152-5.049,2.102-7.644,2.322-8.239c8.508,0.187,15.317,0.323,17.916,0.341c6.869,2.249,22.74,8.435,38.639,21.534\n\tc-3.989,2.314-8.625,5.075-13.611,8.193C112.93,196.415,97.051,188.346,79.34,186.708z M15.83,168.579\n\tc-0.17-0.361-0.17-0.549-0.132-0.659c0.817,0.026,2.612,0.952,4.198,1.773c2.765,1.438,5.899,3.055,8.805,3.055\n\tc2.038,0,13.777,0.302,27.372,0.642c19.234,0.489,41.042,1.042,46.431,1.042c1.056,0,1.256-0.021,1.417-0.051\n\tc0.57-0.094,1.591-0.429,3.335-1.008c1.365-0.455,3.117-1.038,4.637-1.459c-2.758,1.782-7.525,4.007-11.791,4.007\n\tc-4.496,0-32.663-0.663-53.229-1.14c-12.251-0.29-21.924-0.515-22.859-0.515C22.746,174.267,17.029,171.105,15.83,168.579z\n\t M29.714,177.273c2.165,0.056,4.866,0.114,7.915,0.187c2.91,2.238,7.598,6.219,13.063,12.357c-1.991,0.629-3.943,1.344-5.853,2.147\n\tC38.715,184.772,33.295,180.043,29.714,177.273z M135.287,258.546c0,34.543-28.099,62.65-62.65,62.65\n\tc-34.543,0-62.643-28.103-62.643-62.65c0-25.879,15.776-48.142,38.223-57.683c0.744,1.008,1.497,2.06,2.25,3.147\n\tc-21.506,8.775-36.703,29.907-36.703,54.53c0,32.469,26.409,58.887,58.873,58.887c32.471,0,58.882-26.418,58.882-58.887\n\tc0-0.515-0.005-1.029-0.021-1.535c1.28-0.166,2.53-0.332,3.747-0.488C135.273,257.202,135.287,257.865,135.287,258.546z\n\t M128.711,213.187c10.285-6.415,18.864-11.123,22.752-13.198l8.12,25.082h0.004c-5.112,5.606-8.247,13.042-8.337,21.2l-7.277,1.353\n\tC141.999,234.709,136.588,222.914,128.711,213.187z M164.9,262.025c-0.396,0.268-0.848,0.4-1.289,0.4\n\tc-0.724,0-1.438-0.341-1.876-0.975c-2.109-3.059-3.522-6.465-4.189-10.111c-0.226-1.237,0.6-2.415,1.833-2.641\n\tc1.242-0.234,2.424,0.591,2.649,1.829c0.55,3.007,1.71,5.814,3.45,8.332C166.193,259.891,165.93,261.311,164.9,262.025z\n\t M165.479,234.377c-1.744,2.519-2.905,5.317-3.454,8.333c-0.204,1.098-1.157,1.867-2.237,1.867c-0.137,0-0.271-0.017-0.413-0.034\n\tc-1.233-0.233-2.054-1.42-1.832-2.65c0.667-3.645,2.079-7.052,4.189-10.102c0.71-1.029,2.126-1.297,3.165-0.583\n\tC165.93,231.927,166.193,233.339,165.479,234.377z M181.161,270.485c-0.195,1.098-1.157,1.867-2.229,1.867\n\tc-0.135,0-0.271-0.017-0.412-0.034c-3.649-0.672-7.049-2.083-10.102-4.194c-1.034-0.705-1.294-2.126-0.579-3.155\n\tc0.71-1.038,2.127-1.289,3.165-0.582c2.522,1.742,5.325,2.9,8.337,3.449C180.57,268.065,181.395,269.247,181.161,270.485z\n\t M198.069,268.124c-3.054,2.111-6.453,3.522-10.103,4.194c-0.137,0.018-0.271,0.034-0.413,0.034c-1.079,0-2.037-0.773-2.237-1.867\n\tc-0.225-1.238,0.592-2.416,1.83-2.649c3.011-0.549,5.818-1.701,8.336-3.449c1.029-0.707,2.451-0.456,3.165,0.582\n\tC199.361,265.998,199.107,267.419,198.069,268.124z M208.937,251.345c-0.667,3.646-2.071,7.053-4.181,10.11\n\tc-0.442,0.63-1.152,0.974-1.876,0.974c-0.442,0-0.894-0.131-1.288-0.399c-1.039-0.714-1.294-2.136-0.584-3.165\n\tc1.744-2.517,2.906-5.325,3.454-8.333c0.226-1.237,1.407-2.058,2.649-1.828C208.342,248.925,209.158,250.106,208.937,251.345z\n\t M201.592,231.213c1.028-0.715,2.449-0.456,3.164,0.583c2.109,3.049,3.514,6.456,4.181,10.103c0.226,1.229-0.595,2.415-1.825,2.649\n\tc-0.135,0.017-0.28,0.033-0.412,0.033c-1.08,0-2.037-0.773-2.237-1.867c-0.548-3.016-1.71-5.814-3.454-8.333\n\tC200.293,233.339,200.553,231.927,201.592,231.213z M198.651,228.273c-0.442,0.638-1.152,0.979-1.876,0.979\n\tc-0.442,0-0.893-0.124-1.289-0.4c-2.521-1.744-5.329-2.9-8.336-3.449c-1.238-0.234-2.055-1.42-1.83-2.65\n\tc0.23-1.237,1.417-2.059,2.65-1.828c3.65,0.671,7.049,2.066,10.103,4.185C199.107,225.823,199.361,227.244,198.651,228.273z\n\t M186.04,214.747c-0.919-0.076-1.854-0.123-2.804-0.123c-5.035,0-9.809,1.161-14.049,3.249l-3.016-9.421l31.042-9.272\n\tC191.374,204.398,187.601,211.459,186.04,214.747z M352.6,319.125c-33.398,0-60.574-27.176-60.574-60.579\n\tc0-22.978,12.871-43.024,31.787-53.284c0.271,1.131,0.646,2.387,1.097,3.73c-17.346,9.736-29.085,28.294-29.085,49.554\n\tc0,31.31,25.479,56.793,56.78,56.793c31.31,0,56.794-25.478,56.794-56.793c0-31.314-25.479-56.785-56.794-56.785\n\tc-6.665,0-13.08,1.162-19.034,3.288c-0.043-0.183-0.09-0.357-0.119-0.535c-0.209-0.982-0.447-2.063-0.724-3.19\n\tc6.228-2.174,12.913-3.356,19.877-3.356c33.407,0,60.587,27.181,60.587,60.574C413.188,291.953,386.012,319.125,352.6,319.125z\n\t M349.338,257.891c1.004,2.169,3.198,3.68,5.746,3.68c3.496,0,6.334-2.842,6.334-6.338c0-3.506-2.838-6.347-6.334-6.347\n\tc-0.842,0-1.658,0.175-2.398,0.473c-5.539-10.924-14.398-29.086-17.992-40.319c5.593-2.037,11.633-3.14,17.915-3.14\n\tc29.044,0,52.659,23.612,52.659,52.646c0,29.035-23.615,52.663-52.659,52.663c-29.03,0-52.646-23.628-52.646-52.663\n\tc0-19.474,10.633-36.521,26.396-45.627C332.681,228.886,346.836,253.578,349.338,257.891z\"/>\n</svg>\n</div>", H);return T.render.apply(T, arguments); };
 
 /***/ },
 /* 33 */
-/*!*****************************!*\
-  !*** ./assets/svg/cafe.svg ***!
-  \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var H = __webpack_require__(/*! hogan.js */ 18);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<svg version=\"1.1\" id=\"cafe\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"219.96px\" height=\"281px\" viewBox=\"0 0 219.96 281\" enable-background=\"new 0 0 219.96 281\" xml:space=\"preserve\">");t.b("\n" + i);t.b("<g>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"262.265\" rx=\"73.575\" ry=\"18.235\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"147.909\" rx=\"87.5\" ry=\"21.686\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"138.28\" rx=\"89\" ry=\"22.059\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.48\" cy=\"128.528\" rx=\"90\" ry=\"22.306\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"118.652\" rx=\"90.5\" ry=\"22.43\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"32.366\" rx=\"109.48\" ry=\"27.134\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"27.634\" rx=\"109.48\" ry=\"27.134\"/>");t.b("\n" + i);t.b("</g>");t.b("\n" + i);t.b("</svg>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}, "<svg version=\"1.1\" id=\"cafe\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"219.96px\" height=\"281px\" viewBox=\"0 0 219.96 281\" enable-background=\"new 0 0 219.96 281\" xml:space=\"preserve\">\n<g>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"262.265\" rx=\"73.575\" ry=\"18.235\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"147.909\" rx=\"87.5\" ry=\"21.686\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"138.28\" rx=\"89\" ry=\"22.059\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.48\" cy=\"128.528\" rx=\"90\" ry=\"22.306\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"118.652\" rx=\"90.5\" ry=\"22.43\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"32.366\" rx=\"109.48\" ry=\"27.134\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"27.634\" rx=\"109.48\" ry=\"27.134\"/>\n</g>\n</svg>\n", H);return T.render.apply(T, arguments); };
+	var H = __webpack_require__(19);
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div>");t.b("\n" + i);t.b("<svg version=\"1.1\" id=\"illu\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"422.377px\" height=\"331.207px\" viewBox=\"0 0 422.377 331.207\" enable-background=\"new 0 0 422.377 331.207\"");t.b("\n" + i);t.b("	 xml:space=\"preserve\">");t.b("\n" + i);t.b("<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M352.6,189.285c-7.75,0-15.205,1.289-22.178,3.642");t.b("\n" + i);t.b("	c-0.442-1.493-0.901-3.021-1.369-4.561c7.396-2.487,15.317-3.833,23.547-3.833c2.557,0,5.088,0.128,7.576,0.38");t.b("\n" + i);t.b("	c0,0,0.081-2.238,4.628-3.483c4.547-1.238-9.384-1.477-9.384-1.477c-2.492-0.251-5.015-0.383-7.566-0.383");t.b("\n" + i);t.b("	c-7.172,0-14.109,1.021-20.664,2.927c-3.998-12.387-8.244-23.991-8.244-23.994l-1.892-13.28c0,0-0.06,0.014-0.146,0.029");t.b("\n" + i);t.b("	l-13.543-77.068c3.795-0.813,6.444-2.136,6.3-3.293c-0.141-1.145-2.981-1.773-6.798-1.654l-3.049-21.014l-2.782-26.788");t.b("\n" + i);t.b("	c2.136-2.144,3.101-5.347,2.233-8.474c-1.271-4.652-6.074-7.388-10.724-6.111c-1.417,0.378-2.642,1.098-3.642,2.037l-2.467-0.421");t.b("\n" + i);t.b("	c-1.586-1.638-3.981-2.382-6.338-1.731c-3.437,0.944-5.457,4.492-4.513,7.924c0.944,3.441,4.491,5.467,7.921,4.518");t.b("\n" + i);t.b("	c0.659-0.179,1.255-0.451,1.803-0.804l1.502,0.26c1.088,2.611,3.335,4.462,5.963,5.112l0.293,1.527l0,0l6.742,44.939");t.b("\n" + i);t.b("	c-3.245,0.815-5.414,2.006-5.295,3.053c0.132,1.055,2.556,1.676,5.934,1.672l6.58,79.436c-1.569,0.403-2.863,0.773-3.619,1.071");t.b("\n" + i);t.b("	c-6.164,2.441-17.883,8.805-24.127,11.081c-24.398,8.902-90.673,25.798-114.297,31.731l-3.619-11.272");t.b("\n" + i);t.b("	c1.952-1.127,3.07-2.258,2.82-3.041c-0.32-0.991-2.736-1.17-5.964-0.583l-29.767-91.085l9.319-6.879");t.b("\n" + i);t.b("	c0.153-0.119,1.688-1.037,2.961-1.857c4.7,0.225,9.188,0.676,13.021,1.19c0.336,0.067,0.734,0.067,0.889-0.218");t.b("\n" + i);t.b("	c0.851-1.514,0.82-3.189,0.225-4.66c-1.174-2.617-3.819-8.853-6.652-8.875c-22.377-6.801-46.3,0.588-65.679-3.109h-0.005");t.b("\n" + i);t.b("	c-2.007,0-3.683,1.532-3.776,3.549c-0.251,2.488,0,5.13,0.229,7.545c5.428,4.629,10.872,8.002,16.93,11.098l7.252,6.428");t.b("\n" + i);t.b("	c0.455,0.396,0.97,0.74,1.557,0.668l17.095-2.441l28.745,91.055c-3.104,1.417-5.087,3.012-4.76,4.037");t.b("\n" + i);t.b("	c0.273,0.855,2.11,1.102,4.688,0.777l3.055,9.444c-1.408,0.757-3.407,1.85-5.874,3.232c-14.79-11.655-29.247-17.499-36.296-19.89");t.b("\n" + i);t.b("	c4.343-1.578,8.107-4.101,9.175-5.684c0.596-0.884,0.511-1.585,0.336-2.023c-0.183-0.447-0.701-1.205-2.156-1.205");t.b("\n" + i);t.b("	c-1.706,0-4.802,0.987-8.384,2.17c-1.152,0.384-2.445,0.809-2.857,0.894c-0.073,0.005-0.307,0.017-0.975,0.017");t.b("\n" + i);t.b("	c-5.355,0-28.091-0.582-46.355-1.042c-13.62-0.34-25.377-0.638-27.448-0.638c-2.199,0-5.007-1.455-7.47-2.727");t.b("\n" + i);t.b("	c-2.275-1.179-4.07-2.105-5.575-2.105c-1.119,0-1.774,0.515-2.132,0.957c-0.506,0.612-1.212,1.931-0.306,3.836");t.b("\n" + i);t.b("	c1.634,3.455,8.256,7.347,10.8,7.347c0.093,0,0.297,0,0.587,0.004c2.415,1.578,9.234,6.456,17.49,16.023");t.b("\n" + i);t.b("	C17.553,204.713,0.5,229.678,0.5,258.546c0,39.788,32.37,72.161,72.153,72.161c39.788,0,72.157-32.373,72.157-72.161");t.b("\n" + i);t.b("	c0-1.089-0.025-2.161-0.077-3.233c3.386-0.434,6.011-0.757,7.474-0.948c3.463,13.931,16.049,24.25,31.047,24.25");t.b("\n" + i);t.b("	c17.428,0,31.596-13.931,31.99-31.264l7.941-0.974l-0.561,3.964c-0.162,1.161,0.646,2.259,1.833,2.424l3.046,0.426");t.b("\n" + i);t.b("	c1.174,0.166,2.263-0.655,2.424-1.82l2.008-14.206c0.166-1.179-0.65-2.26-1.824-2.426l-3.051-0.434");t.b("\n" + i);t.b("	c-1.182-0.166-2.263,0.646-2.428,1.838l-0.826,5.84l-8.749,1.071c-1.353-12.228-9.587-22.372-20.749-26.486l0,0");t.b("\n" + i);t.b("	c0,0,7.452-18.758,21.472-22.948l95.633-28.584c1.71,4.781,4.462,12.654,6.997,20.626c-26.215,11.392-44.561,37.508-44.561,67.925");t.b("\n" + i);t.b("	c0,3.672,0.426,7.261,0.787,10.809c0.251,2.415-0.991,7.584-2.441,10.685c-1.445,3.104,6.533-2.344,7.197-5.717");t.b("\n" + i);t.b("	c0.689-3.496-0.787-7.146-0.787-10.824c0-29.303,17.031-54.629,41.74-66.615c0.473,1.591,0.923,3.151,1.335,4.657");t.b("\n" + i);t.b("	c-22.705,11.383-38.329,34.875-38.329,61.958c0,38.196,31.073,69.269,69.257,69.269c38.197,0,69.269-31.072,69.269-69.269");t.b("\n" + i);t.b("	C421.869,220.354,390.801,189.285,352.6,189.285z M101.16,86.953l-1.974-1.815c4.041-1.093,8.435-3.884,10.854-5.071");t.b("\n" + i);t.b("	c5.832-1.85,12.604-2.552,19.286-2.645c-0.229,0.361-0.399,0.634-0.425,0.65l-8.436,6.215L101.16,86.953z M178.52,220.928");t.b("\n" + i);t.b("	c1.234-0.233,2.416,0.592,2.642,1.829c0.229,1.229-0.591,2.416-1.825,2.649c-3.012,0.549-5.814,1.701-8.336,3.45");t.b("\n" + i);t.b("	c-0.396,0.271-0.848,0.399-1.289,0.399c-0.723,0-1.434-0.34-1.872-0.978c-0.715-1.03-0.455-2.451,0.579-3.157");t.b("\n" + i);t.b("	C171.471,223,174.87,221.6,178.52,220.928z M142.105,198.137c-0.749,0.421-1.536,0.868-2.354,1.337");t.b("\n" + i);t.b("	c-13.988-11.656-28.051-18.002-36.209-21.026c0.356-0.072,0.714-0.149,1.066-0.233C110.14,179.906,125.848,185.47,142.105,198.137z");t.b("\n" + i);t.b("	 M127.384,258.546c0,30.192-24.556,54.747-54.747,54.747c-30.184,0-54.744-24.555-54.744-54.747");t.b("\n" + i);t.b("	c0-23.194,14.518-43.075,34.943-51.034c6.201,9.485,12.501,21.502,17.92,36.504c-7.555,0.583-13.5,6.896-13.5,14.607");t.b("\n" + i);t.b("	c0,8.081,6.559,14.645,14.641,14.645c6.346,0,11.752-4.045,13.785-9.687c6.738-1.353,25.572-3.93,41.685-6.038");t.b("\n" + i);t.b("	C127.375,257.883,127.384,258.215,127.384,258.546z M72.637,195.904c0.65,0,1.301,0.017,1.943,0.033");t.b("\n" + i);t.b("	c-0.191,1.188-0.379,2.438-0.565,3.757c-0.455-0.014-0.915-0.026-1.378-0.026c-3.356,0-6.648,0.285-9.859,0.834");t.b("\n" + i);t.b("	c-0.813-1.174-1.63-2.306-2.43-3.387C64.32,196.33,68.434,195.904,72.637,195.904z M53.746,188.911");t.b("\n" + i);t.b("	c-4.385-5.036-8.337-8.758-11.383-11.344c1.43,0.034,2.914,0.067,4.433,0.105c10.005,0.234,21.808,0.511,31.813,0.728");t.b("\n" + i);t.b("	c-0.485,1.392-1.302,4.007-2.225,8.091c-1.242-0.067-2.488-0.099-3.743-0.099C66.104,186.393,59.77,187.27,53.746,188.911z");t.b("\n" + i);t.b("	 M77.434,245.063c-1.084-0.447-2.236-0.774-3.436-0.94c0.148-16.997,1.16-30.217,2.402-40.188");t.b("\n" + i);t.b("	c12.82,0.876,24.433,6.185,33.331,14.395C98.123,226.372,86.299,235.615,77.434,245.063z M72.254,215.959");t.b("\n" + i);t.b("	c-2.28-4.235-4.607-8.124-6.917-11.663c2.391-0.323,4.828-0.489,7.3-0.489c0.28,0,0.553,0.01,0.833,0.01");t.b("\n" + i);t.b("	C73.023,207.435,72.611,211.477,72.254,215.959z M59.667,201.114c-2.187,0.497-4.33,1.114-6.418,1.847");t.b("\n" + i);t.b("	c-0.762-1.103-1.515-2.17-2.263-3.19c2.037-0.757,4.135-1.407,6.27-1.952C58.051,198.877,58.859,199.975,59.667,201.114z");t.b("\n" + i);t.b("	 M62.211,204.802c3.229,4.871,6.5,10.409,9.655,16.691c-0.289,4.743-0.522,9.919-0.65,15.56");t.b("\n" + i);t.b("	c-4.837-12.186-10.234-22.28-15.585-30.541C57.766,205.819,59.965,205.244,62.211,204.802z M86.532,258.295");t.b("\n" + i);t.b("	c-0.076-3.704-1.535-7.078-3.879-9.622c8.92-9.289,20.341-18.209,31.408-25.87c6.699,7.751,11.259,17.39,12.769,28.014");t.b("\n" + i);t.b("	L86.532,258.295z M117.498,220.455c1.06-0.706,2.11-1.411,3.152-2.101c7.27,8.673,12.237,19.315,13.965,31.013l-3.706,0.697");t.b("\n" + i);t.b("	C129.281,238.865,124.504,228.686,117.498,220.455z M113.232,215.942c-9.592-9.146-22.259-15.087-36.274-16.116");t.b("\n" + i);t.b("	c0.187-1.311,0.378-2.553,0.57-3.731c15.083,1.166,28.689,7.712,38.902,17.703C115.371,214.505,114.309,215.22,113.232,215.942z");t.b("\n" + i);t.b("	 M79.34,186.708c1.152-5.049,2.102-7.644,2.322-8.239c8.508,0.187,15.317,0.323,17.916,0.341c6.869,2.249,22.74,8.435,38.639,21.534");t.b("\n" + i);t.b("	c-3.989,2.314-8.625,5.075-13.611,8.193C112.93,196.415,97.051,188.346,79.34,186.708z M15.83,168.579");t.b("\n" + i);t.b("	c-0.17-0.361-0.17-0.549-0.132-0.659c0.817,0.026,2.612,0.952,4.198,1.773c2.765,1.438,5.899,3.055,8.805,3.055");t.b("\n" + i);t.b("	c2.038,0,13.777,0.302,27.372,0.642c19.234,0.489,41.042,1.042,46.431,1.042c1.056,0,1.256-0.021,1.417-0.051");t.b("\n" + i);t.b("	c0.57-0.094,1.591-0.429,3.335-1.008c1.365-0.455,3.117-1.038,4.637-1.459c-2.758,1.782-7.525,4.007-11.791,4.007");t.b("\n" + i);t.b("	c-4.496,0-32.663-0.663-53.229-1.14c-12.251-0.29-21.924-0.515-22.859-0.515C22.746,174.267,17.029,171.105,15.83,168.579z");t.b("\n" + i);t.b("	 M29.714,177.273c2.165,0.056,4.866,0.114,7.915,0.187c2.91,2.238,7.598,6.219,13.063,12.357c-1.991,0.629-3.943,1.344-5.853,2.147");t.b("\n" + i);t.b("	C38.715,184.772,33.295,180.043,29.714,177.273z M135.287,258.546c0,34.543-28.099,62.65-62.65,62.65");t.b("\n" + i);t.b("	c-34.543,0-62.643-28.103-62.643-62.65c0-25.879,15.776-48.142,38.223-57.683c0.744,1.008,1.497,2.06,2.25,3.147");t.b("\n" + i);t.b("	c-21.506,8.775-36.703,29.907-36.703,54.53c0,32.469,26.409,58.887,58.873,58.887c32.471,0,58.882-26.418,58.882-58.887");t.b("\n" + i);t.b("	c0-0.515-0.005-1.029-0.021-1.535c1.28-0.166,2.53-0.332,3.747-0.488C135.273,257.202,135.287,257.865,135.287,258.546z");t.b("\n" + i);t.b("	 M128.711,213.187c10.285-6.415,18.864-11.123,22.752-13.198l8.12,25.082h0.004c-5.112,5.606-8.247,13.042-8.337,21.2l-7.277,1.353");t.b("\n" + i);t.b("	C141.999,234.709,136.588,222.914,128.711,213.187z M164.9,262.025c-0.396,0.268-0.848,0.4-1.289,0.4");t.b("\n" + i);t.b("	c-0.724,0-1.438-0.341-1.876-0.975c-2.109-3.059-3.522-6.465-4.189-10.111c-0.226-1.237,0.6-2.415,1.833-2.641");t.b("\n" + i);t.b("	c1.242-0.234,2.424,0.591,2.649,1.829c0.55,3.007,1.71,5.814,3.45,8.332C166.193,259.891,165.93,261.311,164.9,262.025z");t.b("\n" + i);t.b("	 M165.479,234.377c-1.744,2.519-2.905,5.317-3.454,8.333c-0.204,1.098-1.157,1.867-2.237,1.867c-0.137,0-0.271-0.017-0.413-0.034");t.b("\n" + i);t.b("	c-1.233-0.233-2.054-1.42-1.832-2.65c0.667-3.645,2.079-7.052,4.189-10.102c0.71-1.029,2.126-1.297,3.165-0.583");t.b("\n" + i);t.b("	C165.93,231.927,166.193,233.339,165.479,234.377z M181.161,270.485c-0.195,1.098-1.157,1.867-2.229,1.867");t.b("\n" + i);t.b("	c-0.135,0-0.271-0.017-0.412-0.034c-3.649-0.672-7.049-2.083-10.102-4.194c-1.034-0.705-1.294-2.126-0.579-3.155");t.b("\n" + i);t.b("	c0.71-1.038,2.127-1.289,3.165-0.582c2.522,1.742,5.325,2.9,8.337,3.449C180.57,268.065,181.395,269.247,181.161,270.485z");t.b("\n" + i);t.b("	 M198.069,268.124c-3.054,2.111-6.453,3.522-10.103,4.194c-0.137,0.018-0.271,0.034-0.413,0.034c-1.079,0-2.037-0.773-2.237-1.867");t.b("\n" + i);t.b("	c-0.225-1.238,0.592-2.416,1.83-2.649c3.011-0.549,5.818-1.701,8.336-3.449c1.029-0.707,2.451-0.456,3.165,0.582");t.b("\n" + i);t.b("	C199.361,265.998,199.107,267.419,198.069,268.124z M208.937,251.345c-0.667,3.646-2.071,7.053-4.181,10.11");t.b("\n" + i);t.b("	c-0.442,0.63-1.152,0.974-1.876,0.974c-0.442,0-0.894-0.131-1.288-0.399c-1.039-0.714-1.294-2.136-0.584-3.165");t.b("\n" + i);t.b("	c1.744-2.517,2.906-5.325,3.454-8.333c0.226-1.237,1.407-2.058,2.649-1.828C208.342,248.925,209.158,250.106,208.937,251.345z");t.b("\n" + i);t.b("	 M201.592,231.213c1.028-0.715,2.449-0.456,3.164,0.583c2.109,3.049,3.514,6.456,4.181,10.103c0.226,1.229-0.595,2.415-1.825,2.649");t.b("\n" + i);t.b("	c-0.135,0.017-0.28,0.033-0.412,0.033c-1.08,0-2.037-0.773-2.237-1.867c-0.548-3.016-1.71-5.814-3.454-8.333");t.b("\n" + i);t.b("	C200.293,233.339,200.553,231.927,201.592,231.213z M198.651,228.273c-0.442,0.638-1.152,0.979-1.876,0.979");t.b("\n" + i);t.b("	c-0.442,0-0.893-0.124-1.289-0.4c-2.521-1.744-5.329-2.9-8.336-3.449c-1.238-0.234-2.055-1.42-1.83-2.65");t.b("\n" + i);t.b("	c0.23-1.237,1.417-2.059,2.65-1.828c3.65,0.671,7.049,2.066,10.103,4.185C199.107,225.823,199.361,227.244,198.651,228.273z");t.b("\n" + i);t.b("	 M186.04,214.747c-0.919-0.076-1.854-0.123-2.804-0.123c-5.035,0-9.809,1.161-14.049,3.249l-3.016-9.421l31.042-9.272");t.b("\n" + i);t.b("	C191.374,204.398,187.601,211.459,186.04,214.747z M352.6,319.125c-33.398,0-60.574-27.176-60.574-60.579");t.b("\n" + i);t.b("	c0-22.978,12.871-43.024,31.787-53.284c0.271,1.131,0.646,2.387,1.097,3.73c-17.346,9.736-29.085,28.294-29.085,49.554");t.b("\n" + i);t.b("	c0,31.31,25.479,56.793,56.78,56.793c31.31,0,56.794-25.478,56.794-56.793c0-31.314-25.479-56.785-56.794-56.785");t.b("\n" + i);t.b("	c-6.665,0-13.08,1.162-19.034,3.288c-0.043-0.183-0.09-0.357-0.119-0.535c-0.209-0.982-0.447-2.063-0.724-3.19");t.b("\n" + i);t.b("	c6.228-2.174,12.913-3.356,19.877-3.356c33.407,0,60.587,27.181,60.587,60.574C413.188,291.953,386.012,319.125,352.6,319.125z");t.b("\n" + i);t.b("	 M349.338,257.891c1.004,2.169,3.198,3.68,5.746,3.68c3.496,0,6.334-2.842,6.334-6.338c0-3.506-2.838-6.347-6.334-6.347");t.b("\n" + i);t.b("	c-0.842,0-1.658,0.175-2.398,0.473c-5.539-10.924-14.398-29.086-17.992-40.319c5.593-2.037,11.633-3.14,17.915-3.14");t.b("\n" + i);t.b("	c29.044,0,52.659,23.612,52.659,52.646c0,29.035-23.615,52.663-52.659,52.663c-29.03,0-52.646-23.628-52.646-52.663");t.b("\n" + i);t.b("	c0-19.474,10.633-36.521,26.396-45.627C332.681,228.886,346.836,253.578,349.338,257.891z\"/>");t.b("\n" + i);t.b("</svg>");t.b("\n" + i);t.b("</div>");return t.fl(); },partials: {}, subs: {  }}, "<div>\n<svg version=\"1.1\" id=\"illu\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"422.377px\" height=\"331.207px\" viewBox=\"0 0 422.377 331.207\" enable-background=\"new 0 0 422.377 331.207\"\n\t xml:space=\"preserve\">\n<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M352.6,189.285c-7.75,0-15.205,1.289-22.178,3.642\n\tc-0.442-1.493-0.901-3.021-1.369-4.561c7.396-2.487,15.317-3.833,23.547-3.833c2.557,0,5.088,0.128,7.576,0.38\n\tc0,0,0.081-2.238,4.628-3.483c4.547-1.238-9.384-1.477-9.384-1.477c-2.492-0.251-5.015-0.383-7.566-0.383\n\tc-7.172,0-14.109,1.021-20.664,2.927c-3.998-12.387-8.244-23.991-8.244-23.994l-1.892-13.28c0,0-0.06,0.014-0.146,0.029\n\tl-13.543-77.068c3.795-0.813,6.444-2.136,6.3-3.293c-0.141-1.145-2.981-1.773-6.798-1.654l-3.049-21.014l-2.782-26.788\n\tc2.136-2.144,3.101-5.347,2.233-8.474c-1.271-4.652-6.074-7.388-10.724-6.111c-1.417,0.378-2.642,1.098-3.642,2.037l-2.467-0.421\n\tc-1.586-1.638-3.981-2.382-6.338-1.731c-3.437,0.944-5.457,4.492-4.513,7.924c0.944,3.441,4.491,5.467,7.921,4.518\n\tc0.659-0.179,1.255-0.451,1.803-0.804l1.502,0.26c1.088,2.611,3.335,4.462,5.963,5.112l0.293,1.527l0,0l6.742,44.939\n\tc-3.245,0.815-5.414,2.006-5.295,3.053c0.132,1.055,2.556,1.676,5.934,1.672l6.58,79.436c-1.569,0.403-2.863,0.773-3.619,1.071\n\tc-6.164,2.441-17.883,8.805-24.127,11.081c-24.398,8.902-90.673,25.798-114.297,31.731l-3.619-11.272\n\tc1.952-1.127,3.07-2.258,2.82-3.041c-0.32-0.991-2.736-1.17-5.964-0.583l-29.767-91.085l9.319-6.879\n\tc0.153-0.119,1.688-1.037,2.961-1.857c4.7,0.225,9.188,0.676,13.021,1.19c0.336,0.067,0.734,0.067,0.889-0.218\n\tc0.851-1.514,0.82-3.189,0.225-4.66c-1.174-2.617-3.819-8.853-6.652-8.875c-22.377-6.801-46.3,0.588-65.679-3.109h-0.005\n\tc-2.007,0-3.683,1.532-3.776,3.549c-0.251,2.488,0,5.13,0.229,7.545c5.428,4.629,10.872,8.002,16.93,11.098l7.252,6.428\n\tc0.455,0.396,0.97,0.74,1.557,0.668l17.095-2.441l28.745,91.055c-3.104,1.417-5.087,3.012-4.76,4.037\n\tc0.273,0.855,2.11,1.102,4.688,0.777l3.055,9.444c-1.408,0.757-3.407,1.85-5.874,3.232c-14.79-11.655-29.247-17.499-36.296-19.89\n\tc4.343-1.578,8.107-4.101,9.175-5.684c0.596-0.884,0.511-1.585,0.336-2.023c-0.183-0.447-0.701-1.205-2.156-1.205\n\tc-1.706,0-4.802,0.987-8.384,2.17c-1.152,0.384-2.445,0.809-2.857,0.894c-0.073,0.005-0.307,0.017-0.975,0.017\n\tc-5.355,0-28.091-0.582-46.355-1.042c-13.62-0.34-25.377-0.638-27.448-0.638c-2.199,0-5.007-1.455-7.47-2.727\n\tc-2.275-1.179-4.07-2.105-5.575-2.105c-1.119,0-1.774,0.515-2.132,0.957c-0.506,0.612-1.212,1.931-0.306,3.836\n\tc1.634,3.455,8.256,7.347,10.8,7.347c0.093,0,0.297,0,0.587,0.004c2.415,1.578,9.234,6.456,17.49,16.023\n\tC17.553,204.713,0.5,229.678,0.5,258.546c0,39.788,32.37,72.161,72.153,72.161c39.788,0,72.157-32.373,72.157-72.161\n\tc0-1.089-0.025-2.161-0.077-3.233c3.386-0.434,6.011-0.757,7.474-0.948c3.463,13.931,16.049,24.25,31.047,24.25\n\tc17.428,0,31.596-13.931,31.99-31.264l7.941-0.974l-0.561,3.964c-0.162,1.161,0.646,2.259,1.833,2.424l3.046,0.426\n\tc1.174,0.166,2.263-0.655,2.424-1.82l2.008-14.206c0.166-1.179-0.65-2.26-1.824-2.426l-3.051-0.434\n\tc-1.182-0.166-2.263,0.646-2.428,1.838l-0.826,5.84l-8.749,1.071c-1.353-12.228-9.587-22.372-20.749-26.486l0,0\n\tc0,0,7.452-18.758,21.472-22.948l95.633-28.584c1.71,4.781,4.462,12.654,6.997,20.626c-26.215,11.392-44.561,37.508-44.561,67.925\n\tc0,3.672,0.426,7.261,0.787,10.809c0.251,2.415-0.991,7.584-2.441,10.685c-1.445,3.104,6.533-2.344,7.197-5.717\n\tc0.689-3.496-0.787-7.146-0.787-10.824c0-29.303,17.031-54.629,41.74-66.615c0.473,1.591,0.923,3.151,1.335,4.657\n\tc-22.705,11.383-38.329,34.875-38.329,61.958c0,38.196,31.073,69.269,69.257,69.269c38.197,0,69.269-31.072,69.269-69.269\n\tC421.869,220.354,390.801,189.285,352.6,189.285z M101.16,86.953l-1.974-1.815c4.041-1.093,8.435-3.884,10.854-5.071\n\tc5.832-1.85,12.604-2.552,19.286-2.645c-0.229,0.361-0.399,0.634-0.425,0.65l-8.436,6.215L101.16,86.953z M178.52,220.928\n\tc1.234-0.233,2.416,0.592,2.642,1.829c0.229,1.229-0.591,2.416-1.825,2.649c-3.012,0.549-5.814,1.701-8.336,3.45\n\tc-0.396,0.271-0.848,0.399-1.289,0.399c-0.723,0-1.434-0.34-1.872-0.978c-0.715-1.03-0.455-2.451,0.579-3.157\n\tC171.471,223,174.87,221.6,178.52,220.928z M142.105,198.137c-0.749,0.421-1.536,0.868-2.354,1.337\n\tc-13.988-11.656-28.051-18.002-36.209-21.026c0.356-0.072,0.714-0.149,1.066-0.233C110.14,179.906,125.848,185.47,142.105,198.137z\n\t M127.384,258.546c0,30.192-24.556,54.747-54.747,54.747c-30.184,0-54.744-24.555-54.744-54.747\n\tc0-23.194,14.518-43.075,34.943-51.034c6.201,9.485,12.501,21.502,17.92,36.504c-7.555,0.583-13.5,6.896-13.5,14.607\n\tc0,8.081,6.559,14.645,14.641,14.645c6.346,0,11.752-4.045,13.785-9.687c6.738-1.353,25.572-3.93,41.685-6.038\n\tC127.375,257.883,127.384,258.215,127.384,258.546z M72.637,195.904c0.65,0,1.301,0.017,1.943,0.033\n\tc-0.191,1.188-0.379,2.438-0.565,3.757c-0.455-0.014-0.915-0.026-1.378-0.026c-3.356,0-6.648,0.285-9.859,0.834\n\tc-0.813-1.174-1.63-2.306-2.43-3.387C64.32,196.33,68.434,195.904,72.637,195.904z M53.746,188.911\n\tc-4.385-5.036-8.337-8.758-11.383-11.344c1.43,0.034,2.914,0.067,4.433,0.105c10.005,0.234,21.808,0.511,31.813,0.728\n\tc-0.485,1.392-1.302,4.007-2.225,8.091c-1.242-0.067-2.488-0.099-3.743-0.099C66.104,186.393,59.77,187.27,53.746,188.911z\n\t M77.434,245.063c-1.084-0.447-2.236-0.774-3.436-0.94c0.148-16.997,1.16-30.217,2.402-40.188\n\tc12.82,0.876,24.433,6.185,33.331,14.395C98.123,226.372,86.299,235.615,77.434,245.063z M72.254,215.959\n\tc-2.28-4.235-4.607-8.124-6.917-11.663c2.391-0.323,4.828-0.489,7.3-0.489c0.28,0,0.553,0.01,0.833,0.01\n\tC73.023,207.435,72.611,211.477,72.254,215.959z M59.667,201.114c-2.187,0.497-4.33,1.114-6.418,1.847\n\tc-0.762-1.103-1.515-2.17-2.263-3.19c2.037-0.757,4.135-1.407,6.27-1.952C58.051,198.877,58.859,199.975,59.667,201.114z\n\t M62.211,204.802c3.229,4.871,6.5,10.409,9.655,16.691c-0.289,4.743-0.522,9.919-0.65,15.56\n\tc-4.837-12.186-10.234-22.28-15.585-30.541C57.766,205.819,59.965,205.244,62.211,204.802z M86.532,258.295\n\tc-0.076-3.704-1.535-7.078-3.879-9.622c8.92-9.289,20.341-18.209,31.408-25.87c6.699,7.751,11.259,17.39,12.769,28.014\n\tL86.532,258.295z M117.498,220.455c1.06-0.706,2.11-1.411,3.152-2.101c7.27,8.673,12.237,19.315,13.965,31.013l-3.706,0.697\n\tC129.281,238.865,124.504,228.686,117.498,220.455z M113.232,215.942c-9.592-9.146-22.259-15.087-36.274-16.116\n\tc0.187-1.311,0.378-2.553,0.57-3.731c15.083,1.166,28.689,7.712,38.902,17.703C115.371,214.505,114.309,215.22,113.232,215.942z\n\t M79.34,186.708c1.152-5.049,2.102-7.644,2.322-8.239c8.508,0.187,15.317,0.323,17.916,0.341c6.869,2.249,22.74,8.435,38.639,21.534\n\tc-3.989,2.314-8.625,5.075-13.611,8.193C112.93,196.415,97.051,188.346,79.34,186.708z M15.83,168.579\n\tc-0.17-0.361-0.17-0.549-0.132-0.659c0.817,0.026,2.612,0.952,4.198,1.773c2.765,1.438,5.899,3.055,8.805,3.055\n\tc2.038,0,13.777,0.302,27.372,0.642c19.234,0.489,41.042,1.042,46.431,1.042c1.056,0,1.256-0.021,1.417-0.051\n\tc0.57-0.094,1.591-0.429,3.335-1.008c1.365-0.455,3.117-1.038,4.637-1.459c-2.758,1.782-7.525,4.007-11.791,4.007\n\tc-4.496,0-32.663-0.663-53.229-1.14c-12.251-0.29-21.924-0.515-22.859-0.515C22.746,174.267,17.029,171.105,15.83,168.579z\n\t M29.714,177.273c2.165,0.056,4.866,0.114,7.915,0.187c2.91,2.238,7.598,6.219,13.063,12.357c-1.991,0.629-3.943,1.344-5.853,2.147\n\tC38.715,184.772,33.295,180.043,29.714,177.273z M135.287,258.546c0,34.543-28.099,62.65-62.65,62.65\n\tc-34.543,0-62.643-28.103-62.643-62.65c0-25.879,15.776-48.142,38.223-57.683c0.744,1.008,1.497,2.06,2.25,3.147\n\tc-21.506,8.775-36.703,29.907-36.703,54.53c0,32.469,26.409,58.887,58.873,58.887c32.471,0,58.882-26.418,58.882-58.887\n\tc0-0.515-0.005-1.029-0.021-1.535c1.28-0.166,2.53-0.332,3.747-0.488C135.273,257.202,135.287,257.865,135.287,258.546z\n\t M128.711,213.187c10.285-6.415,18.864-11.123,22.752-13.198l8.12,25.082h0.004c-5.112,5.606-8.247,13.042-8.337,21.2l-7.277,1.353\n\tC141.999,234.709,136.588,222.914,128.711,213.187z M164.9,262.025c-0.396,0.268-0.848,0.4-1.289,0.4\n\tc-0.724,0-1.438-0.341-1.876-0.975c-2.109-3.059-3.522-6.465-4.189-10.111c-0.226-1.237,0.6-2.415,1.833-2.641\n\tc1.242-0.234,2.424,0.591,2.649,1.829c0.55,3.007,1.71,5.814,3.45,8.332C166.193,259.891,165.93,261.311,164.9,262.025z\n\t M165.479,234.377c-1.744,2.519-2.905,5.317-3.454,8.333c-0.204,1.098-1.157,1.867-2.237,1.867c-0.137,0-0.271-0.017-0.413-0.034\n\tc-1.233-0.233-2.054-1.42-1.832-2.65c0.667-3.645,2.079-7.052,4.189-10.102c0.71-1.029,2.126-1.297,3.165-0.583\n\tC165.93,231.927,166.193,233.339,165.479,234.377z M181.161,270.485c-0.195,1.098-1.157,1.867-2.229,1.867\n\tc-0.135,0-0.271-0.017-0.412-0.034c-3.649-0.672-7.049-2.083-10.102-4.194c-1.034-0.705-1.294-2.126-0.579-3.155\n\tc0.71-1.038,2.127-1.289,3.165-0.582c2.522,1.742,5.325,2.9,8.337,3.449C180.57,268.065,181.395,269.247,181.161,270.485z\n\t M198.069,268.124c-3.054,2.111-6.453,3.522-10.103,4.194c-0.137,0.018-0.271,0.034-0.413,0.034c-1.079,0-2.037-0.773-2.237-1.867\n\tc-0.225-1.238,0.592-2.416,1.83-2.649c3.011-0.549,5.818-1.701,8.336-3.449c1.029-0.707,2.451-0.456,3.165,0.582\n\tC199.361,265.998,199.107,267.419,198.069,268.124z M208.937,251.345c-0.667,3.646-2.071,7.053-4.181,10.11\n\tc-0.442,0.63-1.152,0.974-1.876,0.974c-0.442,0-0.894-0.131-1.288-0.399c-1.039-0.714-1.294-2.136-0.584-3.165\n\tc1.744-2.517,2.906-5.325,3.454-8.333c0.226-1.237,1.407-2.058,2.649-1.828C208.342,248.925,209.158,250.106,208.937,251.345z\n\t M201.592,231.213c1.028-0.715,2.449-0.456,3.164,0.583c2.109,3.049,3.514,6.456,4.181,10.103c0.226,1.229-0.595,2.415-1.825,2.649\n\tc-0.135,0.017-0.28,0.033-0.412,0.033c-1.08,0-2.037-0.773-2.237-1.867c-0.548-3.016-1.71-5.814-3.454-8.333\n\tC200.293,233.339,200.553,231.927,201.592,231.213z M198.651,228.273c-0.442,0.638-1.152,0.979-1.876,0.979\n\tc-0.442,0-0.893-0.124-1.289-0.4c-2.521-1.744-5.329-2.9-8.336-3.449c-1.238-0.234-2.055-1.42-1.83-2.65\n\tc0.23-1.237,1.417-2.059,2.65-1.828c3.65,0.671,7.049,2.066,10.103,4.185C199.107,225.823,199.361,227.244,198.651,228.273z\n\t M186.04,214.747c-0.919-0.076-1.854-0.123-2.804-0.123c-5.035,0-9.809,1.161-14.049,3.249l-3.016-9.421l31.042-9.272\n\tC191.374,204.398,187.601,211.459,186.04,214.747z M352.6,319.125c-33.398,0-60.574-27.176-60.574-60.579\n\tc0-22.978,12.871-43.024,31.787-53.284c0.271,1.131,0.646,2.387,1.097,3.73c-17.346,9.736-29.085,28.294-29.085,49.554\n\tc0,31.31,25.479,56.793,56.78,56.793c31.31,0,56.794-25.478,56.794-56.793c0-31.314-25.479-56.785-56.794-56.785\n\tc-6.665,0-13.08,1.162-19.034,3.288c-0.043-0.183-0.09-0.357-0.119-0.535c-0.209-0.982-0.447-2.063-0.724-3.19\n\tc6.228-2.174,12.913-3.356,19.877-3.356c33.407,0,60.587,27.181,60.587,60.574C413.188,291.953,386.012,319.125,352.6,319.125z\n\t M349.338,257.891c1.004,2.169,3.198,3.68,5.746,3.68c3.496,0,6.334-2.842,6.334-6.338c0-3.506-2.838-6.347-6.334-6.347\n\tc-0.842,0-1.658,0.175-2.398,0.473c-5.539-10.924-14.398-29.086-17.992-40.319c5.593-2.037,11.633-3.14,17.915-3.14\n\tc29.044,0,52.659,23.612,52.659,52.646c0,29.035-23.615,52.663-52.659,52.663c-29.03,0-52.646-23.628-52.646-52.663\n\tc0-19.474,10.633-36.521,26.396-45.627C332.681,228.886,346.836,253.578,349.338,257.891z\"/>\n</svg>\n</div>", H);return T.render.apply(T, arguments); };
 
 /***/ },
 /* 34 */
-/*!****************************!*\
-  !*** ./assets/svg/key.svg ***!
-  \****************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var H = __webpack_require__(/*! hogan.js */ 18);
-	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"160px\" height=\"214px\" viewBox=\"0 0 160 214\" enable-background=\"new 0 0 160 214\" xml:space=\"preserve\">");t.b("\n" + i);t.b("<g>");t.b("\n" + i);t.b("	<g class=\"key1\">");t.b("\n" + i);t.b("		<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M0.5,10.772C0.5,5.272,5,0.5,10.5,0.5h19.12c5.5,0,14.5,0,20,0");t.b("\n" + i);t.b("			h90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V189.5c0,5.5-4.324,10-9.824,10H49.62c-5.5,0-10.12-4.5-10.12-10");t.b("\n" + i);t.b("			v-83.275c0-5.5-4.38-9.725-9.88-9.725H10.5c-5.5,0-10-4.775-10-10.275V10.772z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M32.105,48.613h-6.686V37.004h6.686v2.018h-4.224v2.549h3.93v2.017h-3.93v2.993h4.224V48.613z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M42.531,48.613h-2.422v-5.186c0-0.64-0.114-1.12-0.342-1.44s-0.59-0.48-1.088-0.48");t.b("\n" + i);t.b("			c-0.677,0-1.167,0.226-1.469,0.679c-0.302,0.452-0.453,1.203-0.453,2.251v4.177h-2.422v-8.878h1.85l0.326,1.136h0.135");t.b("\n" + i);t.b("			c0.27-0.429,0.642-0.753,1.116-0.973s1.013-0.329,1.616-0.329c1.032,0,1.815,0.279,2.35,0.837");t.b("\n" + i);t.b("			c0.535,0.559,0.802,1.365,0.802,2.418V48.613z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M48.765,46.843c0.423,0,0.932-0.093,1.524-0.278v1.803c-0.604,0.27-1.345,0.405-2.224,0.405");t.b("\n" + i);t.b("			c-0.969,0-1.674-0.245-2.116-0.735c-0.442-0.489-0.663-1.224-0.663-2.203v-4.28h-1.16v-1.024l1.334-0.81l0.699-1.874h1.549v1.89");t.b("\n" + i);t.b("			h2.485v1.818h-2.485v4.28c0,0.345,0.096,0.599,0.29,0.763S48.447,46.843,48.765,46.843z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M57.039,39.569c0.328,0,0.601,0.023,0.818,0.071l-0.183,2.271c-0.196-0.053-0.434-0.079-0.715-0.079");t.b("\n" + i);t.b("			c-0.773,0-1.375,0.198-1.807,0.596c-0.431,0.396-0.647,0.953-0.647,1.667v4.519h-2.422v-8.878h1.834l0.357,1.493h0.119");t.b("\n" + i);t.b("			c0.275-0.497,0.647-0.898,1.116-1.203C55.979,39.721,56.488,39.569,57.039,39.569z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M63.486,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351");t.b("\n" + i);t.b("			c0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176h-5.725");t.b("\n" + i);t.b("			c0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167");t.b("\n" + i);t.b("			c0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C64.767,48.721,64.18,48.772,63.486,48.772z");t.b("\n" + i);t.b("			 M63.145,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386");t.b("\n" + i);t.b("			C64.066,41.455,63.658,41.292,63.145,41.292z M61.747,38.759v-0.214c0.911-1.059,1.533-1.855,1.866-2.391h2.716v0.167");t.b("\n" + i);t.b("			c-0.275,0.275-0.745,0.685-1.41,1.227c-0.665,0.543-1.185,0.946-1.56,1.211H61.747z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M73.094,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351");t.b("\n" + i);t.b("			c0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176H70.99");t.b("\n" + i);t.b("			c0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167");t.b("\n" + i);t.b("			c0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C74.375,48.721,73.788,48.772,73.094,48.772z");t.b("\n" + i);t.b("			 M72.752,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386");t.b("\n" + i);t.b("			C73.674,41.455,73.266,41.292,72.752,41.292z\"/>");t.b("\n" + i);t.b("	</g>");t.b("\n" + i);t.b("	<g>");t.b("\n" + i);t.b("		<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M10.5,24.772c0-5.5,4.5-10.272,10-10.272h19.12c5.5,0,14.5,0,20,0");t.b("\n" + i);t.b("			h90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V203.5c0,5.5-4.324,10-9.824,10H59.62c-5.5,0-10.12-4.5-10.12-10");t.b("\n" + i);t.b("			v-83.275c0-5.5-4.38-9.725-9.88-9.725H20.5c-5.5,0-10-4.775-10-10.275V24.772z\"/>");t.b("\n" + i);t.b("	</g>");t.b("\n" + i);t.b("</g>");t.b("\n" + i);t.b("</svg>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}, "<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"160px\" height=\"214px\" viewBox=\"0 0 160 214\" enable-background=\"new 0 0 160 214\" xml:space=\"preserve\">\n<g>\n\t<g class=\"key1\">\n\t\t<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M0.5,10.772C0.5,5.272,5,0.5,10.5,0.5h19.12c5.5,0,14.5,0,20,0\n\t\t\th90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V189.5c0,5.5-4.324,10-9.824,10H49.62c-5.5,0-10.12-4.5-10.12-10\n\t\t\tv-83.275c0-5.5-4.38-9.725-9.88-9.725H10.5c-5.5,0-10-4.775-10-10.275V10.772z\"/>\n\t\t<path fill=\"#999999\" d=\"M32.105,48.613h-6.686V37.004h6.686v2.018h-4.224v2.549h3.93v2.017h-3.93v2.993h4.224V48.613z\"/>\n\t\t<path fill=\"#999999\" d=\"M42.531,48.613h-2.422v-5.186c0-0.64-0.114-1.12-0.342-1.44s-0.59-0.48-1.088-0.48\n\t\t\tc-0.677,0-1.167,0.226-1.469,0.679c-0.302,0.452-0.453,1.203-0.453,2.251v4.177h-2.422v-8.878h1.85l0.326,1.136h0.135\n\t\t\tc0.27-0.429,0.642-0.753,1.116-0.973s1.013-0.329,1.616-0.329c1.032,0,1.815,0.279,2.35,0.837\n\t\t\tc0.535,0.559,0.802,1.365,0.802,2.418V48.613z\"/>\n\t\t<path fill=\"#999999\" d=\"M48.765,46.843c0.423,0,0.932-0.093,1.524-0.278v1.803c-0.604,0.27-1.345,0.405-2.224,0.405\n\t\t\tc-0.969,0-1.674-0.245-2.116-0.735c-0.442-0.489-0.663-1.224-0.663-2.203v-4.28h-1.16v-1.024l1.334-0.81l0.699-1.874h1.549v1.89\n\t\t\th2.485v1.818h-2.485v4.28c0,0.345,0.096,0.599,0.29,0.763S48.447,46.843,48.765,46.843z\"/>\n\t\t<path fill=\"#999999\" d=\"M57.039,39.569c0.328,0,0.601,0.023,0.818,0.071l-0.183,2.271c-0.196-0.053-0.434-0.079-0.715-0.079\n\t\t\tc-0.773,0-1.375,0.198-1.807,0.596c-0.431,0.396-0.647,0.953-0.647,1.667v4.519h-2.422v-8.878h1.834l0.357,1.493h0.119\n\t\t\tc0.275-0.497,0.647-0.898,1.116-1.203C55.979,39.721,56.488,39.569,57.039,39.569z\"/>\n\t\t<path fill=\"#999999\" d=\"M63.486,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351\n\t\t\tc0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176h-5.725\n\t\t\tc0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167\n\t\t\tc0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C64.767,48.721,64.18,48.772,63.486,48.772z\n\t\t\t M63.145,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386\n\t\t\tC64.066,41.455,63.658,41.292,63.145,41.292z M61.747,38.759v-0.214c0.911-1.059,1.533-1.855,1.866-2.391h2.716v0.167\n\t\t\tc-0.275,0.275-0.745,0.685-1.41,1.227c-0.665,0.543-1.185,0.946-1.56,1.211H61.747z\"/>\n\t\t<path fill=\"#999999\" d=\"M73.094,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351\n\t\t\tc0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176H70.99\n\t\t\tc0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167\n\t\t\tc0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C74.375,48.721,73.788,48.772,73.094,48.772z\n\t\t\t M72.752,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386\n\t\t\tC73.674,41.455,73.266,41.292,72.752,41.292z\"/>\n\t</g>\n\t<g>\n\t\t<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M10.5,24.772c0-5.5,4.5-10.272,10-10.272h19.12c5.5,0,14.5,0,20,0\n\t\t\th90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V203.5c0,5.5-4.324,10-9.824,10H59.62c-5.5,0-10.12-4.5-10.12-10\n\t\t\tv-83.275c0-5.5-4.38-9.725-9.88-9.725H20.5c-5.5,0-10-4.775-10-10.275V24.772z\"/>\n\t</g>\n</g>\n</svg>\n", H);return T.render.apply(T, arguments); };
+	var H = __webpack_require__(19);
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<svg version=\"1.1\" id=\"cafe\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"219.96px\" height=\"281px\" viewBox=\"0 0 219.96 281\" enable-background=\"new 0 0 219.96 281\" xml:space=\"preserve\">");t.b("\n" + i);t.b("<g>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"262.265\" rx=\"73.575\" ry=\"18.235\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"147.909\" rx=\"87.5\" ry=\"21.686\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"138.28\" rx=\"89\" ry=\"22.059\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.48\" cy=\"128.528\" rx=\"90\" ry=\"22.306\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"118.652\" rx=\"90.5\" ry=\"22.43\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"32.366\" rx=\"109.48\" ry=\"27.134\"/>");t.b("\n" + i);t.b("	<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"27.634\" rx=\"109.48\" ry=\"27.134\"/>");t.b("\n" + i);t.b("</g>");t.b("\n" + i);t.b("</svg>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}, "<svg version=\"1.1\" id=\"cafe\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"219.96px\" height=\"281px\" viewBox=\"0 0 219.96 281\" enable-background=\"new 0 0 219.96 281\" xml:space=\"preserve\">\n<g>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"262.265\" rx=\"73.575\" ry=\"18.235\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"147.909\" rx=\"87.5\" ry=\"21.686\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.564\" cy=\"138.28\" rx=\"89\" ry=\"22.059\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.48\" cy=\"128.528\" rx=\"90\" ry=\"22.306\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"118.652\" rx=\"90.5\" ry=\"22.43\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"32.366\" rx=\"109.48\" ry=\"27.134\"/>\n\t<ellipse fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" cx=\"109.98\" cy=\"27.634\" rx=\"109.48\" ry=\"27.134\"/>\n</g>\n</svg>\n", H);return T.render.apply(T, arguments); };
 
 /***/ },
 /* 35 */
-/*!******************************!*\
-  !*** ./assets/svg/train.svg ***!
-  \******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var H = __webpack_require__(/*! hogan.js */ 18);
+	var H = __webpack_require__(19);
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"160px\" height=\"214px\" viewBox=\"0 0 160 214\" enable-background=\"new 0 0 160 214\" xml:space=\"preserve\">");t.b("\n" + i);t.b("<g>");t.b("\n" + i);t.b("	<g class=\"key1\">");t.b("\n" + i);t.b("		<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M0.5,10.772C0.5,5.272,5,0.5,10.5,0.5h19.12c5.5,0,14.5,0,20,0");t.b("\n" + i);t.b("			h90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V189.5c0,5.5-4.324,10-9.824,10H49.62c-5.5,0-10.12-4.5-10.12-10");t.b("\n" + i);t.b("			v-83.275c0-5.5-4.38-9.725-9.88-9.725H10.5c-5.5,0-10-4.775-10-10.275V10.772z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M32.105,48.613h-6.686V37.004h6.686v2.018h-4.224v2.549h3.93v2.017h-3.93v2.993h4.224V48.613z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M42.531,48.613h-2.422v-5.186c0-0.64-0.114-1.12-0.342-1.44s-0.59-0.48-1.088-0.48");t.b("\n" + i);t.b("			c-0.677,0-1.167,0.226-1.469,0.679c-0.302,0.452-0.453,1.203-0.453,2.251v4.177h-2.422v-8.878h1.85l0.326,1.136h0.135");t.b("\n" + i);t.b("			c0.27-0.429,0.642-0.753,1.116-0.973s1.013-0.329,1.616-0.329c1.032,0,1.815,0.279,2.35,0.837");t.b("\n" + i);t.b("			c0.535,0.559,0.802,1.365,0.802,2.418V48.613z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M48.765,46.843c0.423,0,0.932-0.093,1.524-0.278v1.803c-0.604,0.27-1.345,0.405-2.224,0.405");t.b("\n" + i);t.b("			c-0.969,0-1.674-0.245-2.116-0.735c-0.442-0.489-0.663-1.224-0.663-2.203v-4.28h-1.16v-1.024l1.334-0.81l0.699-1.874h1.549v1.89");t.b("\n" + i);t.b("			h2.485v1.818h-2.485v4.28c0,0.345,0.096,0.599,0.29,0.763S48.447,46.843,48.765,46.843z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M57.039,39.569c0.328,0,0.601,0.023,0.818,0.071l-0.183,2.271c-0.196-0.053-0.434-0.079-0.715-0.079");t.b("\n" + i);t.b("			c-0.773,0-1.375,0.198-1.807,0.596c-0.431,0.396-0.647,0.953-0.647,1.667v4.519h-2.422v-8.878h1.834l0.357,1.493h0.119");t.b("\n" + i);t.b("			c0.275-0.497,0.647-0.898,1.116-1.203C55.979,39.721,56.488,39.569,57.039,39.569z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M63.486,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351");t.b("\n" + i);t.b("			c0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176h-5.725");t.b("\n" + i);t.b("			c0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167");t.b("\n" + i);t.b("			c0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C64.767,48.721,64.18,48.772,63.486,48.772z");t.b("\n" + i);t.b("			 M63.145,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386");t.b("\n" + i);t.b("			C64.066,41.455,63.658,41.292,63.145,41.292z M61.747,38.759v-0.214c0.911-1.059,1.533-1.855,1.866-2.391h2.716v0.167");t.b("\n" + i);t.b("			c-0.275,0.275-0.745,0.685-1.41,1.227c-0.665,0.543-1.185,0.946-1.56,1.211H61.747z\"/>");t.b("\n" + i);t.b("		<path fill=\"#999999\" d=\"M73.094,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351");t.b("\n" + i);t.b("			c0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176H70.99");t.b("\n" + i);t.b("			c0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167");t.b("\n" + i);t.b("			c0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C74.375,48.721,73.788,48.772,73.094,48.772z");t.b("\n" + i);t.b("			 M72.752,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386");t.b("\n" + i);t.b("			C73.674,41.455,73.266,41.292,72.752,41.292z\"/>");t.b("\n" + i);t.b("	</g>");t.b("\n" + i);t.b("	<g>");t.b("\n" + i);t.b("		<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M10.5,24.772c0-5.5,4.5-10.272,10-10.272h19.12c5.5,0,14.5,0,20,0");t.b("\n" + i);t.b("			h90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V203.5c0,5.5-4.324,10-9.824,10H59.62c-5.5,0-10.12-4.5-10.12-10");t.b("\n" + i);t.b("			v-83.275c0-5.5-4.38-9.725-9.88-9.725H20.5c-5.5,0-10-4.775-10-10.275V24.772z\"/>");t.b("\n" + i);t.b("	</g>");t.b("\n" + i);t.b("</g>");t.b("\n" + i);t.b("</svg>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}, "<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"160px\" height=\"214px\" viewBox=\"0 0 160 214\" enable-background=\"new 0 0 160 214\" xml:space=\"preserve\">\n<g>\n\t<g class=\"key1\">\n\t\t<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M0.5,10.772C0.5,5.272,5,0.5,10.5,0.5h19.12c5.5,0,14.5,0,20,0\n\t\t\th90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V189.5c0,5.5-4.324,10-9.824,10H49.62c-5.5,0-10.12-4.5-10.12-10\n\t\t\tv-83.275c0-5.5-4.38-9.725-9.88-9.725H10.5c-5.5,0-10-4.775-10-10.275V10.772z\"/>\n\t\t<path fill=\"#999999\" d=\"M32.105,48.613h-6.686V37.004h6.686v2.018h-4.224v2.549h3.93v2.017h-3.93v2.993h4.224V48.613z\"/>\n\t\t<path fill=\"#999999\" d=\"M42.531,48.613h-2.422v-5.186c0-0.64-0.114-1.12-0.342-1.44s-0.59-0.48-1.088-0.48\n\t\t\tc-0.677,0-1.167,0.226-1.469,0.679c-0.302,0.452-0.453,1.203-0.453,2.251v4.177h-2.422v-8.878h1.85l0.326,1.136h0.135\n\t\t\tc0.27-0.429,0.642-0.753,1.116-0.973s1.013-0.329,1.616-0.329c1.032,0,1.815,0.279,2.35,0.837\n\t\t\tc0.535,0.559,0.802,1.365,0.802,2.418V48.613z\"/>\n\t\t<path fill=\"#999999\" d=\"M48.765,46.843c0.423,0,0.932-0.093,1.524-0.278v1.803c-0.604,0.27-1.345,0.405-2.224,0.405\n\t\t\tc-0.969,0-1.674-0.245-2.116-0.735c-0.442-0.489-0.663-1.224-0.663-2.203v-4.28h-1.16v-1.024l1.334-0.81l0.699-1.874h1.549v1.89\n\t\t\th2.485v1.818h-2.485v4.28c0,0.345,0.096,0.599,0.29,0.763S48.447,46.843,48.765,46.843z\"/>\n\t\t<path fill=\"#999999\" d=\"M57.039,39.569c0.328,0,0.601,0.023,0.818,0.071l-0.183,2.271c-0.196-0.053-0.434-0.079-0.715-0.079\n\t\t\tc-0.773,0-1.375,0.198-1.807,0.596c-0.431,0.396-0.647,0.953-0.647,1.667v4.519h-2.422v-8.878h1.834l0.357,1.493h0.119\n\t\t\tc0.275-0.497,0.647-0.898,1.116-1.203C55.979,39.721,56.488,39.569,57.039,39.569z\"/>\n\t\t<path fill=\"#999999\" d=\"M63.486,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351\n\t\t\tc0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176h-5.725\n\t\t\tc0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167\n\t\t\tc0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C64.767,48.721,64.18,48.772,63.486,48.772z\n\t\t\t M63.145,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386\n\t\t\tC64.066,41.455,63.658,41.292,63.145,41.292z M61.747,38.759v-0.214c0.911-1.059,1.533-1.855,1.866-2.391h2.716v0.167\n\t\t\tc-0.275,0.275-0.745,0.685-1.41,1.227c-0.665,0.543-1.185,0.946-1.56,1.211H61.747z\"/>\n\t\t<path fill=\"#999999\" d=\"M73.094,48.772c-1.429,0-2.546-0.395-3.351-1.184s-1.207-1.905-1.207-3.351\n\t\t\tc0-1.487,0.372-2.638,1.116-3.45s1.772-1.219,3.085-1.219c1.254,0,2.231,0.356,2.93,1.071s1.048,1.702,1.048,2.962v1.176H70.99\n\t\t\tc0.026,0.688,0.23,1.226,0.611,1.611c0.381,0.387,0.916,0.58,1.604,0.58c0.535,0,1.041-0.056,1.517-0.167\n\t\t\tc0.476-0.111,0.974-0.288,1.493-0.532v1.874c-0.424,0.212-0.876,0.369-1.358,0.473C74.375,48.721,73.788,48.772,73.094,48.772z\n\t\t\t M72.752,41.292c-0.513,0-0.916,0.163-1.207,0.488c-0.292,0.326-0.458,0.788-0.5,1.386h3.398c-0.011-0.598-0.167-1.06-0.468-1.386\n\t\t\tC73.674,41.455,73.266,41.292,72.752,41.292z\"/>\n\t</g>\n\t<g>\n\t\t<path fill=\"none\" stroke=\"#BCBCBC\" stroke-miterlimit=\"10\" d=\"M10.5,24.772c0-5.5,4.5-10.272,10-10.272h19.12c5.5,0,14.5,0,20,0\n\t\t\th90.056c5.5,0,9.824,4.772,9.824,10.272v75.452c0,5.5,0,14.5,0,20V203.5c0,5.5-4.324,10-9.824,10H59.62c-5.5,0-10.12-4.5-10.12-10\n\t\t\tv-83.275c0-5.5-4.38-9.725-9.88-9.725H20.5c-5.5,0-10-4.775-10-10.275V24.772z\"/>\n\t</g>\n</g>\n</svg>\n", H);return T.render.apply(T, arguments); };
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var H = __webpack_require__(19);
 	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"");t.b("\n" + i);t.b("	 width=\"409.309px\" height=\"209.702px\" viewBox=\"0 0 409.309 209.702\" enable-background=\"new 0 0 409.309 209.702\"");t.b("\n" + i);t.b("	 xml:space=\"preserve\">");t.b("\n" + i);t.b("<g>");t.b("\n" + i);t.b("	<line fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" x1=\"193.534\" y1=\"164.259\" x2=\"380.593\" y2=\"145.478\"/>");t.b("\n" + i);t.b("	<g>");t.b("\n" + i);t.b("		<g>");t.b("\n" + i);t.b("			<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M408.759,160.741c0.55,5.473-3.479,10.399-8.951,10.949");t.b("\n" + i);t.b("				L26.684,209.152c-5.473,0.55-10.4-3.479-10.949-8.951L0.55,48.961c-0.549-5.473,3.479-10.399,8.951-10.949L382.625,0.55");t.b("\n" + i);t.b("				c5.473-0.55,10.4,3.479,10.949,8.951L408.759,160.741z\"/>");t.b("\n" + i);t.b("		</g>");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("			<rect x=\"317.163\" y=\"16.228\" transform=\"matrix(0.995 -0.0999 0.0999 0.995 -0.5102 35.0187)\" fill=\"none\" width=\"64.499\" height=\"12.75\"/>");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("			<text transform=\"matrix(0.995 -0.0999 0.0999 0.995 317.5679 28.0371)\" fill=\"#808080\" font-family=\"'CourierNewPSMT'\" font-size=\"14\">BILLET</text>");t.b("\n" + i);t.b("		<line fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" x1=\"32.313\" y1=\"100.043\" x2=\"372.602\" y2=\"65.878\"/>");t.b("\n" + i);t.b("		<line fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" x1=\"36.208\" y1=\"138.849\" x2=\"376.498\" y2=\"104.683\"/>");t.b("\n" + i);t.b("		<g>");t.b("\n" + i);t.b("			<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M82.009,55.962c-21.509-11.398-54.442-7.715-60.38-6.725");t.b("\n" + i);t.b("				l3.087,30.754l53.324-5.354L82.009,55.962\"/>");t.b("\n" + i);t.b("			<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M65.216,57.958l-1.516,11.979c-0.75,0.144-1.513,0.218-2.278,0.23");t.b("\n" + i);t.b("				c-2.787,0.051-6.907-1.506-6.131-5.075c0.581-2.666,3.492-4.54,7.198-5.206c0.651-0.105,1.005-1.857,1.005-1.857");t.b("\n" + i);t.b("				c-0.012,0.002-0.198,0.001-0.511,0.041c-5.32,0.713-8.94,2.538-10.512,5.765c-0.041,0.082-0.08,0.163-0.116,0.247l0.516-4.884");t.b("\n" + i);t.b("				l-2.569,0.258l-1.016,9.631c-2.044-4.12-4.611-7.988-10.312-8.368c-1.254-0.082-1.835-0.081-3.27,0.07");t.b("\n" + i);t.b("				c-4.088,0.443-7.655,1.969-8.042,4.406c-0.648,4.117,8.653,2.598,8.751,5.284c0.06,1.633-2.659,2.82-4.918,3.029");t.b("\n" + i);t.b("				c-1.681,0.149-3.584-0.068-4.652-0.241l-0.653,1.853c1.458,0.159,2.996,0.286,4.606,0.142c6.696-0.608,9.072-3.165,9.152-5.353");t.b("\n" + i);t.b("				c0.131-3.999-9.209-2.68-8.756-5.225c0.243-1.59,3.184-2.165,4.899-2.325c0.742-0.07,1.385-0.075,1.978-0.023");t.b("\n" + i);t.b("				c0.322,0.061,0.602-0.303,0.839-1.032c0.013-0.041,0.091-0.079,0.1,0.008c0,0-0.36,3.424-0.468,4.453");t.b("\n" + i);t.b("				c-0.076,0.719-0.019,1.028,0.905,1.813c0.623,0.533,1.201,1.049,1.259,0.488c0.179-1.741,0.366-3.508,0.549-5.239");t.b("\n" + i);t.b("				c4.841,4.56,7.587,10.493,7.587,10.493l2.569-0.259l0.558-5.283c0.016,0.065,0.034,0.126,0.053,0.186");t.b("\n" + i);t.b("				c0.819,2.791,4.884,4.553,9.791,4.187c1.668-0.124,2.876-0.335,3.492-0.682c0.616-0.343,0.97-0.705,1.085-1.63");t.b("\n" + i);t.b("				c0.091-0.72,0.519-4.095,0.519-4.095l6.439-0.646c0.395-0.04,0.709-0.321,1.16-2.244l-7.325,0.735l0.5-3.96");t.b("\n" + i);t.b("				c0,0,8.472-0.851,8.476-0.851c0.267-0.027,0.655-0.055,1.118-2.029L65.216,57.958\"/>");t.b("\n" + i);t.b("		</g>");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("			<rect x=\"193.315\" y=\"132.106\" transform=\"matrix(0.995 -0.0999 0.0999 0.995 -12.2688 29.5395)\" fill=\"none\" width=\"191.001\" height=\"10.334\"/>");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("			<text transform=\"matrix(0.995 -0.0999 0.0999 0.995 194.1577 150.2271)\" fill=\"#999999\" font-family=\"'CourierNewPSMT'\" font-size=\"14\">Total           5,00 €</text>");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("			<rect x=\"34.745\" y=\"101.807\" transform=\"matrix(0.995 -0.0999 0.0999 0.995 -10.4837 14.9212)\" fill=\"none\" width=\"218.001\" height=\"20.667\"/>");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("			<text transform=\"matrix(0.995 -0.0999 0.0999 0.995 35.1392 121.3022)\" fill=\"#999999\" font-family=\"'CourierNewPSMT'\" font-size=\"14\">Nantes - Angers - Nantes</text>");t.b("\n" + i);t.b("	</g>");t.b("\n" + i);t.b("</g>");t.b("\n" + i);t.b("</svg>");t.b("\n");return t.fl(); },partials: {}, subs: {  }}, "<svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t width=\"409.309px\" height=\"209.702px\" viewBox=\"0 0 409.309 209.702\" enable-background=\"new 0 0 409.309 209.702\"\n\t xml:space=\"preserve\">\n<g>\n\t<line fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" x1=\"193.534\" y1=\"164.259\" x2=\"380.593\" y2=\"145.478\"/>\n\t<g>\n\t\t<g>\n\t\t\t<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M408.759,160.741c0.55,5.473-3.479,10.399-8.951,10.949\n\t\t\t\tL26.684,209.152c-5.473,0.55-10.4-3.479-10.949-8.951L0.55,48.961c-0.549-5.473,3.479-10.399,8.951-10.949L382.625,0.55\n\t\t\t\tc5.473-0.55,10.4,3.479,10.949,8.951L408.759,160.741z\"/>\n\t\t</g>\n\t\t\n\t\t\t<rect x=\"317.163\" y=\"16.228\" transform=\"matrix(0.995 -0.0999 0.0999 0.995 -0.5102 35.0187)\" fill=\"none\" width=\"64.499\" height=\"12.75\"/>\n\t\t\n\t\t\t<text transform=\"matrix(0.995 -0.0999 0.0999 0.995 317.5679 28.0371)\" fill=\"#808080\" font-family=\"'CourierNewPSMT'\" font-size=\"14\">BILLET</text>\n\t\t<line fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" x1=\"32.313\" y1=\"100.043\" x2=\"372.602\" y2=\"65.878\"/>\n\t\t<line fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" x1=\"36.208\" y1=\"138.849\" x2=\"376.498\" y2=\"104.683\"/>\n\t\t<g>\n\t\t\t<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M82.009,55.962c-21.509-11.398-54.442-7.715-60.38-6.725\n\t\t\t\tl3.087,30.754l53.324-5.354L82.009,55.962\"/>\n\t\t\t<path fill=\"none\" stroke=\"#999999\" stroke-miterlimit=\"10\" d=\"M65.216,57.958l-1.516,11.979c-0.75,0.144-1.513,0.218-2.278,0.23\n\t\t\t\tc-2.787,0.051-6.907-1.506-6.131-5.075c0.581-2.666,3.492-4.54,7.198-5.206c0.651-0.105,1.005-1.857,1.005-1.857\n\t\t\t\tc-0.012,0.002-0.198,0.001-0.511,0.041c-5.32,0.713-8.94,2.538-10.512,5.765c-0.041,0.082-0.08,0.163-0.116,0.247l0.516-4.884\n\t\t\t\tl-2.569,0.258l-1.016,9.631c-2.044-4.12-4.611-7.988-10.312-8.368c-1.254-0.082-1.835-0.081-3.27,0.07\n\t\t\t\tc-4.088,0.443-7.655,1.969-8.042,4.406c-0.648,4.117,8.653,2.598,8.751,5.284c0.06,1.633-2.659,2.82-4.918,3.029\n\t\t\t\tc-1.681,0.149-3.584-0.068-4.652-0.241l-0.653,1.853c1.458,0.159,2.996,0.286,4.606,0.142c6.696-0.608,9.072-3.165,9.152-5.353\n\t\t\t\tc0.131-3.999-9.209-2.68-8.756-5.225c0.243-1.59,3.184-2.165,4.899-2.325c0.742-0.07,1.385-0.075,1.978-0.023\n\t\t\t\tc0.322,0.061,0.602-0.303,0.839-1.032c0.013-0.041,0.091-0.079,0.1,0.008c0,0-0.36,3.424-0.468,4.453\n\t\t\t\tc-0.076,0.719-0.019,1.028,0.905,1.813c0.623,0.533,1.201,1.049,1.259,0.488c0.179-1.741,0.366-3.508,0.549-5.239\n\t\t\t\tc4.841,4.56,7.587,10.493,7.587,10.493l2.569-0.259l0.558-5.283c0.016,0.065,0.034,0.126,0.053,0.186\n\t\t\t\tc0.819,2.791,4.884,4.553,9.791,4.187c1.668-0.124,2.876-0.335,3.492-0.682c0.616-0.343,0.97-0.705,1.085-1.63\n\t\t\t\tc0.091-0.72,0.519-4.095,0.519-4.095l6.439-0.646c0.395-0.04,0.709-0.321,1.16-2.244l-7.325,0.735l0.5-3.96\n\t\t\t\tc0,0,8.472-0.851,8.476-0.851c0.267-0.027,0.655-0.055,1.118-2.029L65.216,57.958\"/>\n\t\t</g>\n\t\t\n\t\t\t<rect x=\"193.315\" y=\"132.106\" transform=\"matrix(0.995 -0.0999 0.0999 0.995 -12.2688 29.5395)\" fill=\"none\" width=\"191.001\" height=\"10.334\"/>\n\t\t\n\t\t\t<text transform=\"matrix(0.995 -0.0999 0.0999 0.995 194.1577 150.2271)\" fill=\"#999999\" font-family=\"'CourierNewPSMT'\" font-size=\"14\">Total           5,00 €</text>\n\t\t\n\t\t\t<rect x=\"34.745\" y=\"101.807\" transform=\"matrix(0.995 -0.0999 0.0999 0.995 -10.4837 14.9212)\" fill=\"none\" width=\"218.001\" height=\"20.667\"/>\n\t\t\n\t\t\t<text transform=\"matrix(0.995 -0.0999 0.0999 0.995 35.1392 121.3022)\" fill=\"#999999\" font-family=\"'CourierNewPSMT'\" font-size=\"14\">Nantes - Angers - Nantes</text>\n\t</g>\n</g>\n</svg>\n", H);return T.render.apply(T, arguments); };
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var H = __webpack_require__(19);
+	module.exports = function() { var T = new H.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<section class=\"number section\">");t.b("\n" + i);t.b("	");t.b("\n" + i);t.b("	<div class=\"half left\">");t.b("\n");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("			<header class=\"header box\">");t.b("\n" + i);t.b("				<h1 class=\"title text\">");t.b(t.v(t.d("title.number",c,p,0)));t.b(" <span>");t.b(t.v(t.d("title.desc",c,p,0)));t.b("</span></h1>");t.b("\n" + i);t.b("			</header>");t.b("\n" + i);t.b("			<div class=\"desc\">");t.b("\n" + i);t.b("				");t.b(t.v(t.f("desc",c,p,0)));t.b("\n" + i);t.b("			</div>");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n" + i);t.b("		<p class=\"pager\">");t.b("\n" + i);t.b("			");t.b(t.v(t.f("pager",c,p,0)));t.b("\n" + i);t.b("		</p>");t.b("\n" + i);t.b("		");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("	<div class=\"half right\">	");t.b("\n" + i);t.b("		");t.b("\n" + i);t.b("		<div class=\"half__content\">");t.b("\n" + i);t.b("			");t.b("\n");t.b("\n" + i);t.b("			");t.b("\n" + i);t.b("		</div>");t.b("\n");t.b("\n");t.b("\n" + i);t.b("	</div>");t.b("\n");t.b("\n" + i);t.b("</section>");return t.fl(); },partials: {}, subs: {  }}, "<section class=\"number section\">\n\t\n\t<div class=\"half left\">\n\n\t\t<div class=\"half__content\">\n\t\t\t\n\t\t\t<header class=\"header box\">\n\t\t\t\t<h1 class=\"title text\">{{title.number}} <span>{{title.desc}}</span></h1>\n\t\t\t</header>\n\t\t\t<div class=\"desc\">\n\t\t\t\t{{desc}}\n\t\t\t</div>\n\t\t\t\n\t\t</div>\n\n\t\t<p class=\"pager\">\n\t\t\t{{pager}}\n\t\t</p>\n\t\t\n\n\t</div>\n\n\t<div class=\"half right\">\t\n\t\t\n\t\t<div class=\"half__content\">\n\t\t\t\n\n\t\t\t\n\t\t</div>\n\n\n\t</div>\n\n</section>", H);return T.render.apply(T, arguments); };
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./templates/home.html": 18,
+		"./templates/merci.html": 22,
+		"./templates/number.html": 37
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 38;
+
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=main.js.map

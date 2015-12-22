@@ -100,16 +100,16 @@ Number.prototype = {
         this.halfRight.innerHTML = this.svg;
         this.barTransition = document.getElementById('bar--transition');
 
-        this.anims = model[ req.route ].anim;
+        this.anims = model[ req.route ].anim();
 
         animsvg.hideSVG();
 
         var tweens = new Array();  
-        tweens.push(Tween.fromTo(this.pager, 0.5, {opacity: 0}, {opacity: 1}));
-        tweens.push(Tween.fromTo(this.title, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
-        tweens.push(Tween.fromTo(this.text, 0.5, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+        tweens.push(Tween.fromTo(this.pager, 0.2, {opacity: 0}, {opacity: 1}));
+        tweens.push(Tween.fromTo(this.title, 0.2, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
+        tweens.push(Tween.fromTo(this.text, 0.2, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
         if(this.anims) {
-            tweens.push(this.anims);
+            tweens.push(this.anims.play);
         }
         
 
@@ -132,7 +132,7 @@ Number.prototype = {
         // On lance la timeline avec son callback
         tlIn = new TimelineMax({paused: true});
         tlIn.add(Tween.to(this.barTransition, 0.6, {height: window.outerHeight, ease: Power3.easeIn}));
-        tlIn.add(tweens);
+        tlIn.add(tweens, '+=0', 'sequence');
         var inTl = this.tl;
         tlIn.add(done);
         tlIn.add(this.addListeners);
@@ -141,17 +141,15 @@ Number.prototype = {
     },
     animateOut: function(req, done) {
         var tweens = new Array();  
-        tweens.push(Tween.to(this.pager, 0.5, {opacity: 0}));
-        tweens.push(Tween.to(this.title, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
-        tweens.push(Tween.to(this.text, 0.5, {opacity:0, transform: 'translateY(-20px)'}));
-        
-        tlOut = new TimelineMax({paused: true});
+        //this.anims.reverse();
+        tweens.push(this.anims.reverse); // a voir MARCHE PAS !!!!!!!!!!!!!!!
+        tweens.push(Tween.to(this.pager, 0.2, {opacity: 0}));
+        tweens.push(Tween.to(this.title, 0.2, {opacity:0, transform: 'translateY(-20px)'}));
+        tweens.push(Tween.to(this.text, 0.2, {opacity:0, transform: 'translateY(-20px)'}));
 
-        tlOut.add(tweens);
-        tlOut.add(this.addListeners);
-        if(this.anims) {
-            tlOut.add(this.anims);
-        }
+
+        tlOut = new TimelineMax({paused: true});
+        tlOut.add(tweens, '+=0', 'start');
         tlOut.add(done);
         tlOut.play();
     },

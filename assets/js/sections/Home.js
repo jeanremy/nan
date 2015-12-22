@@ -13,7 +13,9 @@ Home.prototype = {
 
     init: function(req, done) {
 
-        this.el = require('./../../templates/home.html');
+        var currentRoute = req.route.length > 1 ? req.route: '/home';
+
+        this.el = require('./../../templates'+currentRoute+'.html');
         require('./../../sass/main.scss');
         require('./../../sass/partials/home.scss');
 
