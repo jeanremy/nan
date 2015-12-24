@@ -5,7 +5,8 @@ function Home() {}
 var Tween = require('gsap'),
     $ = require("jquery"),
     mousewheel = require('jquery-mousewheel'),
-    model = require('../models.js');
+    model = require('../models.js'),    
+    scrollListeners = require('../scrollListeners');
 
 Home.prototype = {
 
@@ -61,6 +62,8 @@ Home.prototype = {
     // in animateIn you'll animate in your hidden content that
     // was created in init
     animateIn: function(req, done) {
+        var scroll = new scrollListeners(req);
+        this.tl.add(scroll.addListeners);
         this.tl.add(done);
         this.tl.play();
         app.onclick = function() {

@@ -1,59 +1,13 @@
 var Tween = require('gsap'),
     $ = require("jquery"),
     mousewheel = require('jquery-mousewheel'),
-    animsvg = require('../drawsvg');
-    model = require('../models.js');
+    animsvg = require('../drawsvg'),
+    model = require('../models.js'),
+    scrollListeners = require('../scrollListeners');
 
 module.exports = Number;
 
-function Number() {
-
-    var _this = this;
-   
-
-    this.MouseWheelListener = function(e) {
-        var e = window.event || e; // old IE support
-        this.delta = e.wheelDelta || -e.detail;
-        // scroll down
-        if(this.delta < 0) { 
-            window.framework.go(model[_this.req.route].next);
-        }
-        //scrollUp
-        else {
-            window.framework.go(model[_this.req.route].prev);
-        }
-        window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
-        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
-
-        return false;
-    };
-
-    this.KeyPressListener = function(e) {
-        // scroll down
-        if(e.keyCode == '40') {
-            window.framework.go(model[_this.req.route].next);
-        }
-        //scrollUp
-        else if(e.keyCode == '38') {
-            window.framework.go(model[_this.req.route].prev);
-        }
-        else {return false;}
-        window.removeEventListener("mkeydown", _this.KeyPressListener, false);
-    };
-
-    this.addListeners = function() {
-        window.addEventListener("keydown", _this.KeyPressListener, false);
-        window.addEventListener("mousewheel", _this.MouseWheelListener, false);
-        window.addEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
-    };
-
-    this.removeListeners = function() {
-        window.addEventListener("keydown", _this.KeyPressListener, false);
-        window.removeEventListener("mousewheel", _this.MouseWheelListener, false);
-        window.removeEventListener("DOMMouseScroll", _this.MouseWheelListener, false);
-    };
-
-}
+function Number() {}
 
 Number.prototype = {
 
@@ -83,7 +37,6 @@ Number.prototype = {
         // -gérer les transitions en fonction de req
         // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
         // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
-        // -Voir pour mutualiser les listeners sur les différenst objets
         // -mettre un curseur différents sur partie haut/basse et click
 
         // on insère le contenu après la fin du animateOut 
@@ -109,7 +62,7 @@ Number.prototype = {
         tweens.push(Tween.fromTo(this.title, 0.2, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
         tweens.push(Tween.fromTo(this.text, 0.2, {opacity: 0, transform: 'translateY(-20px)'}, {opacity:1, transform: 'translateY(0)'}));
         if(this.anims) {
-            tweens.push(this.anims.play);
+            tweens.push(this.anims.play());
         }
         
 
@@ -130,19 +83,20 @@ Number.prototype = {
          //    );
          // }
         // On lance la timeline avec son callback
+        var scroll = new scrollListeners(req);
+        var inTl = this.tl;
         tlIn = new TimelineMax({paused: true});
         tlIn.add(Tween.to(this.barTransition, 0.6, {height: window.outerHeight, ease: Power3.easeIn}));
         tlIn.add(tweens, '+=0', 'sequence');
-        var inTl = this.tl;
+        tlIn.add(scroll.addListeners);
         tlIn.add(done);
-        tlIn.add(this.addListeners);
 
         tlIn.play();
     },
     animateOut: function(req, done) {
         var tweens = new Array();  
         //this.anims.reverse();
-        tweens.push(this.anims.reverse); // a voir MARCHE PAS !!!!!!!!!!!!!!!
+        tweens.push(this.anims.reverse());
         tweens.push(Tween.to(this.pager, 0.2, {opacity: 0}));
         tweens.push(Tween.to(this.title, 0.2, {opacity:0, transform: 'translateY(-20px)'}));
         tweens.push(Tween.to(this.text, 0.2, {opacity:0, transform: 'translateY(-20px)'}));

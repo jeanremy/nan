@@ -25,7 +25,7 @@ module.exports = {
 
             animsvg.hideSVGPaths();
 
-            tweens.push(Tween.to(paths, 1, {drawSVG: "0%"}, {drawSVG: "100%"}));
+            tweens.push(Tween.to(paths, 0.3, {drawSVG: "0%"}, {drawSVG: "100%"}));
             tl.add(tweens);
             return tl;
         },
