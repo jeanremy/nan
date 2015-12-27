@@ -35,8 +35,10 @@ Number.prototype = {
 
         // TODO:
         // -gérer les transitions en fonction de req
+        // - faire mes illus
         // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
         // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
+        // OPTS:
         // -mettre un curseur différents sur partie haut/basse et click
 
         // on insère le contenu après la fin du animateOut 
@@ -54,8 +56,6 @@ Number.prototype = {
         this.barTransition = document.getElementById('bar--transition');
 
         this.anims = model[ req.route ].anim();
-
-        animsvg.hideSVG();
 
         var tweens = new Array();  
         tweens.push(Tween.fromTo(this.pager, 0.2, {opacity: 0}, {opacity: 1}));

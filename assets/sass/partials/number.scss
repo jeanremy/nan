@@ -48,8 +48,6 @@
 			color: $secondary;
 			font-size: 35px;
 			line-height: 1.1em;
-			font-family: $serif;
-			font-style: italic;
 		}
 	}
 
@@ -81,11 +79,19 @@
 	/*------------------------------
 		animations
 	------------------------------*/
+	// Winner #1
+	#winner {
+		transform-origin: center center;
+	}
 	.key1 {
 		-webkit-animation: push 5s;
 		        animation: push 5s;
 		-webkit-animation-iteration-count: infinite;
 		        animation-iteration-count: infinite;
+	}
+
+	.bike {
+		//transition: stroke-dashoffset;
 	}
 
 

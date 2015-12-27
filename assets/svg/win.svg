@@ -1,0 +1,9 @@
+<svg version="1.1" id="winner" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="186.004px" height="186.004px" viewBox="0 0 186.004 186.004" enable-background="new 0 0 186.004 186.004"
+	 xml:space="preserve">
+<g class="win">
+	<circle fill="none" stroke="#B3B3B3" stroke-linejoin="round" stroke-miterlimit="10" cx="93.002" cy="93.002" r="92.502"/>
+	<polyline fill="none" stroke="#B3B3B3" stroke-linejoin="round" stroke-miterlimit="10" points="70.352,93.845 84.395,109.473 
+		126.081,68.27 	"/>
+</g>
+</svg>

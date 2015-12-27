@@ -8,7 +8,7 @@ module.exports = {
             "abbr": "Nantes - Angers - Nantes"
         },
         "desc": "[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l'IMIE d'Angers.",
-        "next": "/240"
+        "next": "/1560"
     },
 
     "/1560": {
@@ -19,13 +19,13 @@ module.exports = {
         "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.",
         "illu": "bike.svg",
         anim: function() {
-            var paths = document.querySelectorAll('path'),
+            var lines = document.querySelector('.bike'),
                 tweens = new Array(),
-                tl = new TimelineMax(); 
-
-            animsvg.hideSVGPaths();
-
-            tweens.push(Tween.to(paths, 0.3, {drawSVG: "0%"}, {drawSVG: "100%"}));
+                tl = new TimelineMax(),
+                length =  lines.getTotalLength();
+                console.log(lines, length);
+            lines.style.strokeDasharray = length + ' ' + length;
+            tweens.push(Tween.fromTo(lines, 3, {strokeDashoffset: length}, {strokeDashoffset: 0}));
             tl.add(tweens);
             return tl;
         },
@@ -43,15 +43,14 @@ module.exports = {
         "illu": "train.svg",
         "pager": "02",
         anim: function() {
-            var ellipses = document.querySelectorAll('ellipse, path, rect, line, text');
-            animsvg.hideSVG();
+            var ellipses = document.querySelectorAll('.step');
+            animsvg.hideSVG(ellipses);
             var tweens = new Array,
                 tl= new TimelineMax();
             for (var i = 0; i < ellipses.length; i++) {
                 tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
             };
             tl.add(tweens, '+=0', 'start', .1);
-            tl.add(function() {console.log('end of anim tl');})
             return tl;
         },
         "prev": "/1560",
@@ -112,8 +111,19 @@ module.exports = {
             "number": "2",
             "desc": "ans"
         },
-        "desc": "Deux années en contrat de professionnalisation chez Fly Designers.",
-        "illu": "bike.svg",
+        "desc": "Deux années en contrat de professionnalisation chez Fly Designers. Et quelques parties de Curvytron.",
+        "illu": "curvy.svg",
+         anim: function() {
+            var bonuses = document.querySelectorAll('.bonus');
+            animsvg.hideSVG(bonuses);
+            var tweens = new Array,
+                tl= new TimelineMax();
+            for (var i = 0; i < bonuses.length; i++) {
+                tweens.push(Tween.fromTo(bonuses[i], 0.5, {opacity: 0}, {opacity:1,  ease: Back.easeOut.config(1.7)}));
+            };
+            tl.add(tweens, '+=0', 'start', .5);
+            return tl;
+        },
         "pager": "05",
         "prev": "/6",
         "next": "/1"
@@ -125,7 +135,18 @@ module.exports = {
             "desc": "titre"
         },
         "desc": "de Concepteur - Développeur Informatique.",
-        "illu": "bike.svg",
+        "illu": "win.svg",
+        anim: function() {
+            var winner = document.querySelectorAll('.win');
+            animsvg.hideSVG(winner);
+            var tweens = new Array,
+                tl= new TimelineMax();
+            for (var i = 0; i < winner.length; i++) {
+                tweens.push(Tween.fromTo(winner[i], 0.5, {opacity: 0, transform: 'scale(0.8)'}, {opacity:1, transform: 'scale(0.95)', ease: Back.easeOut.config(1)}));
+            };
+            tl.add(tweens, '+=0', 'start', .5);
+            return tl;
+        },
         "pager": "06",
         "prev": "/2",
         "next": "/merci"
