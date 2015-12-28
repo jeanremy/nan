@@ -34,10 +34,8 @@ Number.prototype = {
     animateIn: function(req, done) {
 
         // TODO:
-        // -gérer les transitions en fonction de req
-        // - faire mes illus
         // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
-        // -Faire menu , donc faire une section number avec le menu, puis des sous sections?
+        // -Faire menu
         // OPTS:
         // -mettre un curseur différents sur partie haut/basse et click
 
@@ -109,7 +107,6 @@ Number.prototype = {
     },
 
     destroy: function(req, done) {
-        //  el.parentNode.removeChild(el);
         done();
     }
 

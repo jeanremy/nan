@@ -26,11 +26,14 @@ Home.prototype = {
         this.bars = document.querySelectorAll('.bar');
         this.text = document.querySelectorAll('.text');
         this.scroll = document.querySelector('.scroll');
+        this.barTransition = document.getElementById('bar--transition');
         this.tweens = new Array();
         this.texts = new Array();
         this.tl = new TimelineMax({paused: true});
 
+        this.tweens.push(Tween.to(this.barTransition, 0.3, {height: "14px"}));
         this.tweens.push(Tween.fromTo(this.bars[0], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
+        //this.tweens.push(Tween.to(this.barTransition, 0.3, {width: "50%"}));
         this.tweens.push(Tween.fromTo(this.bars[1], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
         this.tweens.push(Tween.fromTo(this.bars[2], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
         this.tweens.push(Tween.fromTo(this.bars[3], 0.3, {transform: 'scale(1,0)'}, {transform: 'scale(1,1)'}));
@@ -38,17 +41,13 @@ Home.prototype = {
         
         this.texts.push(Tween.fromTo(this.text[0], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
         this.texts.push(Tween.fromTo(this.text[1], 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
-        this.texts.push(Tween.fromTo(this.scroll, 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
-
+        if(this.scroll) {
+            this.texts.push(Tween.fromTo(this.scroll, 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
+        }
         this.tl
             .add(this.tweens, '+=0', 'sequence')
             .add(this.texts, '+=0', 'start', 0.2)
-            .add(done)
-            .add(callback);
-        function callback() {
-            var barTransition = document.getElementById('bar--transition');
-            Tween.to(barTransition, 0.5, {height: "14px"})
-        }
+            .add(done);
 
         this.tl.play();
 
@@ -65,11 +64,7 @@ Home.prototype = {
         var scroll = new scrollListeners(req);
         this.tl.add(scroll.addListeners);
         this.tl.add(done);
-        this.tl.play();
-        app.onclick = function() {
-            framework.go('/1560');
-        }
-        
+        this.tl.play();      
     },
 
     // in animateOut you'll animate out your content that

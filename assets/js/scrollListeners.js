@@ -13,11 +13,21 @@ function scrollListeners(req) {
         this.delta = e.wheelDelta || -e.detail;
         // scroll down
         if(this.delta < 0) { 
-            window.framework.go(model[req.route].next);
+            if(model[req.route].next) {
+                window.framework.go(model[req.route].next);
+            }
+            else {
+                return false;
+            }
         }
         //scrollUp
         else {
-            window.framework.go(model[req.route].prev);
+            if(model[req.route].prev) {
+                window.framework.go(model[req.route].prev);
+            }
+            else {
+                return false;
+            }
         }
         _this.removeListeners();
 
@@ -25,14 +35,23 @@ function scrollListeners(req) {
     };
 
     this.KeyPressListener = function(e) {
-    	console.log('top');
         // scroll down
         if(e.keyCode == '40') {
-            window.framework.go(model[req.route].next);
+            if(model[req.route].next) {
+                window.framework.go(model[req.route].next);
+            }
+            else {
+                return false;
+            }
         }
         //scrollUp
         else if(e.keyCode == '38') {
-            window.framework.go(model[req.route].prev);
+            if(model[req.route].prev) {
+                window.framework.go(model[req.route].prev);
+            }
+            else {
+                return false;
+            }
         }
         else {return false;}
         _this.removeListeners();
