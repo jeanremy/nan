@@ -75,7 +75,8 @@ section {
 }
 
 .nav {
-	//opacity: 0;
+	opacity: 0;
+	visibility: hidden;
 	position: absolute;
 	right: 30px;
 	top: 50%;
@@ -87,40 +88,39 @@ section {
 		a {
 			display: block;
 			text-decoration: none;
-			text-align: right;
+			text-align: left;
 			color: $grey3;
 			transition: color .3s ease;
 			position: relative;
 			span {
+				position: absolute;
+				top: 50%;
+				right: 30px;
 				opacity: 0;
-				display: inline-block;
-				transform: translate(10px, 0);
+				transform: translate(-20px, -50%);
 				transition: opacity .3s ease, transform .3s ease;
 			}
-			&:before {
+			&:after {
 				content: "";
 				width: 20px;
 				height: 1px;
-				display: block;
-				position: absolute;
-				top: 50%;
+				display: inline-block;
 				background-color: $grey3;
-				transform: scale(.6, .6) translate(0, -50%);
+				transform: scale(.6, .6);
 				transition: background-color .3s ease, transform .3s ease;
 				transform-origin: 100% 100%;
 
 			}
 			&.active,
-			&:hover,
-			&:focus {
+			&:hover {
 				color: $grey4;
 				span {
-					transform: translate(0, 0);
+					transform: translate(0, -50%);
 					opacity: 1;
 				}
-				&:before {
+				&:after {
 					background-color: $grey4;
-					transform: scale(1, .6) translate(-100%, -50%);
+					transform: scale(1, .6);
 				}
 			}
 		}

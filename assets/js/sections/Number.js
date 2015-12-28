@@ -52,6 +52,7 @@ Number.prototype = {
         this.halfRight = document.querySelector('.right');
         this.halfRight.innerHTML = this.svg;
         this.barTransition = document.getElementById('bar--transition');
+        this.menu = document.getElementById('nav');
 
         this.anims = model[ req.route ].anim();
 
@@ -62,6 +63,21 @@ Number.prototype = {
         if(this.anims) {
             tweens.push(this.anims.play());
         }
+        tweens.push(Tween.to(this.menu, 0.3, {opacity: 1, visibility: 'visible'}));
+
+        // set menu active
+        var menu = document.querySelectorAll('#nav li a');
+        Array.prototype.forEach.call(menu, function(el, i) {
+            console.log(el.getAttribute('href').slice(2));
+            if(el.getAttribute('href').slice(2) === req.route) {
+                console.log('ok');
+                el.setAttribute('class', 'active');
+            }
+            else {
+                el.setAttribute('class', '');
+            }
+        });
+
         
 
          // for(var x = 0; x<paths.length;x++){

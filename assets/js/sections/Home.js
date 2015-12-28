@@ -27,10 +27,12 @@ Home.prototype = {
         this.text = document.querySelectorAll('.text');
         this.scroll = document.querySelector('.scroll');
         this.barTransition = document.getElementById('bar--transition');
+        this.menu = document.getElementById('nav');
         this.tweens = new Array();
         this.texts = new Array();
         this.tl = new TimelineMax({paused: true});
 
+        this.tweens.push(Tween.to(this.menu, 0.3, {opacity: 0, visibility: 'hidden'}));
         this.tweens.push(Tween.to(this.barTransition, 0.3, {height: "14px"}));
         this.tweens.push(Tween.fromTo(this.bars[0], 0.3, {transform: 'scale(0,1)'}, {transform: 'scale(1,1)'}));
         //this.tweens.push(Tween.to(this.barTransition, 0.3, {width: "50%"}));
@@ -46,10 +48,10 @@ Home.prototype = {
         }
         this.tl
             .add(this.tweens, '+=0', 'sequence')
-            .add(this.texts, '+=0', 'start', 0.2)
-            .add(done);
+            .add(this.texts, '+=0', 'start', 0.2);
+        done();
 
-        this.tl.play();
+        //this.tl.play();
 
     },
 
@@ -80,7 +82,6 @@ Home.prototype = {
                 ease: Power3.easeIn
             }));
             tl.add(done);
-
         }
         this.tl.reverse();
 

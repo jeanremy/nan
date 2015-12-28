@@ -7,7 +7,7 @@ module.exports = {
             "label": "NaN",
             "abbr": "Nantes - Angers - Nantes"
         },
-        "desc": "[nän]: Nantes - Angers - Nantes a été mon trajet quotidien une semaine par mois durant deux ans, période à laquelle je passais le titre de Concepteur développeur Informatique suivi à l'IMIE d'Angers.",
+        "desc": "[Nantes - Angers - Nantes] Retour sur deux années d'aller-retours entre Nantes et la cité angevine.",
         "next": "/1560"
     },
 
@@ -16,7 +16,7 @@ module.exports = {
             "number": '1560',
             "desc": 'kilometres'
         },
-        "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.",
+        "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo. A raison d'une semaine par mois pendant deux ans.",
         "illu": "bike.svg",
         anim: function() {
             var lines = document.querySelector('.bike'),
@@ -24,8 +24,8 @@ module.exports = {
                 tl = new TimelineMax(),
                 length =  lines.getTotalLength();
                 console.log(lines, length);
-            lines.style.strokeDasharray = length + ' ' + length;
-            tweens.push(Tween.fromTo(lines, 3, {strokeDashoffset: length}, {strokeDashoffset: 0}));
+            lines.style.strokeDasharray = (length / 2) + ' ' + (length / 2);
+            tweens.push(Tween.fromTo(lines, 1, {strokeDashoffset: length/2}, {strokeDashoffset: 0}));
             tl.add(tweens);
             return tl;
         },
@@ -62,7 +62,7 @@ module.exports = {
             "number": "120",
             "desc": "thés"
         },
-        "desc": "Soit 60 € pour du Lipton Citron, quand même.",
+        "desc": "Un par jour, à 50 cts. Soit 60 € pour du Lipton Citron, quand même.",
         "illu": "cafe.svg",
         anim: function() {
 
@@ -121,7 +121,7 @@ module.exports = {
             for (var i = 0; i < bonuses.length; i++) {
                 tweens.push(Tween.fromTo(bonuses[i], 0.5, {opacity: 0}, {opacity:1,  ease: Back.easeOut.config(1.7)}));
             };
-            tl.add(tweens, '+=0', 'start', .5);
+            tl.add(tweens, '+=0', 'start', .1);
             return tl;
         },
         "pager": "05",
@@ -134,7 +134,7 @@ module.exports = {
             "number": "1",
             "desc": "titre"
         },
-        "desc": "de Concepteur - Développeur Informatique.",
+        "desc": "de Concepteur - Développeur Informatique, obtenu à l'IMIE.",
         "illu": "win.svg",
         anim: function() {
             var winner = document.querySelectorAll('.win');
@@ -156,7 +156,7 @@ module.exports = {
        "title": {
             "label": "Merci"
         },
-        "desc": "Merci à tout ceux qui m'ont aidé.",
+        "desc": "Merci à tout ceux qui m'ont aidé. Liste des gens",
         "prev": "/1"
     }
 };

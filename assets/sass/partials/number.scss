@@ -150,3 +150,39 @@
 }
 
 
+/*------------------------------
+	MEDIA QUERIES
+------------------------------*/
+@media screen and (max-width: 640px) {
+	.number {
+		flex-wrap: wrap;
+		.half {
+			width: 100%;
+			float: left;
+			height: 50%;
+			line-height: 100%;
+			padding: 45px;
+			text-align: center;
+			display: -webkit-flex;
+			display: -moz-flex;
+			display: -ms-flex;
+			display: -o-flex;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-align-items: center;
+			    -ms-flex-align: center;
+			        align-items: center;
+			-webkit-justify-content: center;
+			    -ms-flex-pack: center;
+			        justify-content: center;
+			position: relative;
+			overflow: hidden;
+		}
+	}
+	#bar--transition {
+		left: 0;
+		right: 0;
+		top: 50%;
+		height: 50%;
+	}
+}
