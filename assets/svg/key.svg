@@ -1,14 +1,20 @@
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="153.792px" height="129.095px" viewBox="4.708 1.655 153.792 129.095" enable-background="new 4.708 1.655 153.792 129.095"
+<svg version="1.1" id="key" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="153.792px" height="129.094px" viewBox="0 0 153.792 129.094" enable-background="new 0 0 153.792 129.094"
 	 xml:space="preserve">
-<path fill="none" stroke="#999999" stroke-miterlimit="10" d="M145.542,105.409c0,8.25-6.75,15-15,15H23.208c-8.25,0-15-6.75-15-15
-	V18.075c0-8.25,6.75-15,15-15h107.333c8.25,0,15,6.75,15,15V105.409z"/>
-<path fill="none" stroke="#999999" stroke-miterlimit="10" d="M155.667,113.75c0,8.25-6.75,15-15,15H33.334c-8.25,0-15-6.75-15-15
-	V26.417c0-8.25,6.75-15,15-15h107.333c8.25,0,15,6.75,15,15V113.75z"/>
 <g>
-	<polyline fill="none" stroke="#999999" stroke-miterlimit="10" points="88.371,41.665 69.872,28.926 88.371,41.665 69.872,54.402 	
-		"/>
-	<polyline fill="none" stroke="#999999" stroke-miterlimit="10" points="69.872,81.82 88.371,94.558 69.872,81.82 88.371,69.084 	
-		"/>
+	<g>
+		<path fill="none" stroke="#BCBCBC" stroke-miterlimit="10" d="M7.129,23.137c0-5.5,4.5-10,10-10h19.12c5.5,0,14.5,0,20,0h69.468
+			c5.5,0,10,4.5,10,10v75.452c0,5.5-4.5,10-10,10H17.129c-5.5,0-10-4.5-10-10V23.137z"/>
+	</g>
+	<g>
+		<path fill="none" stroke="#BCBCBC" stroke-miterlimit="10" d="M20.206,32.216c0-5.5,4.5-10,10-10h19.12c5.5,0,14.5,0,20,0h69.469
+			c5.5,0,10,4.5,10,10v75.453c0,5.5-4.5,10-10,10H30.206c-5.5,0-10-4.5-10-10V32.216z"/>
+	</g>
+	<g>
+		<polyline fill="none" stroke="#999999" stroke-miterlimit="10" points="80.673,49.786 62.174,37.047 80.673,49.786 62.174,62.523 
+					"/>
+		<polyline fill="none" stroke="#999999" stroke-miterlimit="10" points="62.174,71.942 80.673,84.68 62.174,71.942 80.673,59.205 
+					"/>
+	</g>
 </g>
 </svg>

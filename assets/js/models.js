@@ -114,7 +114,7 @@ module.exports = {
         "desc": "Deux années en contrat de professionnalisation chez Fly Designers.<br/> Et quelques parties de Curvytron.",
         "illu": "curvy.svg",
          anim: function() {
-            var bonuses = document.querySelectorAll('.bonus');
+            var bonuses = document.querySelectorAll('path, ellipse, polyline, circle');
             animsvg.hideSVG(bonuses);
             var tweens = new Array,
                 tl= new TimelineMax();
