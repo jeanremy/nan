@@ -7,7 +7,7 @@ module.exports = {
             "label": "NaN",
             "abbr": "Nantes - Angers - Nantes"
         },
-        "desc": "[Nantes - Angers - Nantes] Retour sur deux années d'aller-retours entre Nantes et la cité angevine.",
+        "desc": "[Nantes - Angers - Nantes] Retour sur deux années d'études entre Nantes et la cité angevine.",
         "next": "/1560"
     },
 
@@ -16,7 +16,7 @@ module.exports = {
             "number": '1560',
             "desc": 'kilometres'
         },
-        "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo. A raison d'une semaine par mois pendant deux ans.",
+        "desc": "Entre mon domicile et la gare puis entre la gare et le centre de formation, à vélo.<br/> A raison d'une semaine par mois pendant deux ans.",
         "illu": "bike.svg",
         anim: function() {
             var lines = document.querySelector('.bike'),
@@ -39,7 +39,7 @@ module.exports = {
             "number": "240",
             "desc": "trains"
         },
-        "desc": "TGV ou TER, au choix. Et pas beaucoup de retards.",
+        "desc": "TGV ou TER, au choix.<br/> Et pas beaucoup de retards.",
         "illu": "train.svg",
         "pager": "02",
         anim: function() {
@@ -62,7 +62,7 @@ module.exports = {
             "number": "120",
             "desc": "thés"
         },
-        "desc": "Un par jour, à 50 cts. Soit 60 € pour du Lipton Citron, quand même.",
+        "desc": "Un par jour, à 50 cts.<br/>Soit 60 € pour du Lipton Citron, quand même.",
         "illu": "cafe.svg",
         anim: function() {
 
@@ -87,10 +87,10 @@ module.exports = {
             "number": "6",
             "desc": "langages"
         },
-        "desc": "Java, PHP, MySQL, HTML, CSS, JavaScript. Et un peu de Photoshop.",
+        "desc": "Java, PHP, MySQL, HTML, CSS, JavaScript.<br/> Et un peu de Photoshop.",
         "illu": "key.svg",
         anim: function() {
-            var paths = document.querySelectorAll('path');
+            var paths = document.querySelectorAll('path, polyline');
             animsvg.hideSVG();
             var tweens = new Array,
                 tl= new TimelineMax;
@@ -111,7 +111,7 @@ module.exports = {
             "number": "2",
             "desc": "ans"
         },
-        "desc": "Deux années en contrat de professionnalisation chez Fly Designers. Et quelques parties de Curvytron.",
+        "desc": "Deux années en contrat de professionnalisation chez Fly Designers.<br/> Et quelques parties de Curvytron.",
         "illu": "curvy.svg",
          anim: function() {
             var bonuses = document.querySelectorAll('.bonus');

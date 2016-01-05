@@ -46,6 +46,7 @@ Home.prototype = {
         if(this.scroll) {
             this.texts.push(Tween.fromTo(this.scroll, 0.5, {opacity: '0', transform: 'translateY(-20px)'}, {opacity: '1', transform: 'translateY(0)'}));
         }
+       
         this.tl
             .add(this.tweens, '+=0', 'sequence')
             .add(this.texts, '+=0', 'start', 0.2);
@@ -66,6 +67,7 @@ Home.prototype = {
         var scroll = new scrollListeners(req);
         this.tl.add(scroll.addListeners);
         this.tl.add(done);
+
         this.tl.play();      
     },
 

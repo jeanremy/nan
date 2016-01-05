@@ -34,8 +34,9 @@ Number.prototype = {
     animateIn: function(req, done) {
 
         // TODO:
-        // -Faire un rAF au lieu de animate pour svg > fait en css, à voir, amélioration
-        // -Faire menu
+        // -Uniformiser les apparitions des lignes
+        // -Responsive
+        // -Changer les pictos curvy et 1 
         // OPTS:
         // -mettre un curseur différents sur partie haut/basse et click
 
