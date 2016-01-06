@@ -43,14 +43,21 @@ module.exports = {
         "illu": "train.svg",
         "pager": "02",
         anim: function() {
-            var ellipses = document.querySelectorAll('.step');
-            animsvg.hideSVG(ellipses);
+            var layout = document.querySelectorAll('.layout'),
+                letters = document.querySelectorAll('.letters path');
+            animsvg.hideSVG(layout);
+            animsvg.hideSVG(letters);
             var tweens = new Array,
+                tweens2 = new Array(),
                 tl= new TimelineMax();
-            for (var i = 0; i < ellipses.length; i++) {
-                tweens.push(Tween.fromTo(ellipses[i], 0.3, {opacity: 0, transform: 'translateY(-50px)'}, {opacity:1, transform: 'translateY(0)',  ease: Back.easeOut.config(1.7)}));
+            for (var i = 0; i < layout.length; i++) {
+                tweens.push(Tween.fromTo(layout[i], 0.3, {opacity: 0}, {opacity:1}));
             };
-            tl.add(tweens, '+=0', 'start', .1);
+            for (var i = 0; i < letters.length; i++) {
+                tweens2.push(Tween.fromTo(letters[i], 0.05, {opacity: 0, transform: 'translate(0, -20px)'}, {opacity:1, transform: 'translate(0, 0)', ease: Back.easeOut.config(1.7)}));
+            };
+            tl.add(tweens, '+=0');
+            tl.add(tweens2, '+=0', 'start', .025);
             return tl;
         },
         "prev": "/1560",
@@ -114,14 +121,10 @@ module.exports = {
         "desc": "Deux années en contrat de professionnalisation chez Fly Designers.<br/> Et quelques parties de Curvytron.",
         "illu": "curvy.svg",
          anim: function() {
-            var bonuses = document.querySelectorAll('path, ellipse, polyline, circle');
-            animsvg.hideSVG(bonuses);
-            var tweens = new Array,
-                tl= new TimelineMax();
-            for (var i = 0; i < bonuses.length; i++) {
-                tweens.push(Tween.fromTo(bonuses[i], 0.5, {opacity: 0}, {opacity:1,  ease: Back.easeOut.config(1.7)}));
-            };
-            tl.add(tweens, '+=0', 'start', .1);
+            var curvy = document.getElementById('curvy'),
+                tl = new TimelineMax();
+            
+            tl.add(Tween.fromTo(curvy, 0.5, {opacity: 0, rotation: -180}, {opacity:1, rotation: 0, ease: Back.easeOut.config(1.7)}));
             return tl;
         },
         "pager": "05",

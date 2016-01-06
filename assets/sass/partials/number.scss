@@ -94,6 +94,10 @@
 		//transition: stroke-dashoffset;
 	}
 
+	#curv {
+		transform-origin: center center;
+	}
+
 
 	@-webkit-keyframes push {
 		0% {
@@ -159,7 +163,7 @@
 		.half {
 			width: 100%;
 			float: left;
-			height: 50%;
+			height: 100%;
 			line-height: 100%;
 			padding: 45px;
 			text-align: center;
@@ -177,12 +181,9 @@
 			        justify-content: center;
 			position: relative;
 			overflow: hidden;
+			&.right {display: none;}
 		}
+
 	}
-	#bar--transition {
-		left: 0;
-		right: 0;
-		top: 50%;
-		height: 50%;
-	}
+	#bar--transition {display: none;}
 }
