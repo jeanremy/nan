@@ -140,12 +140,12 @@ module.exports = {
         "desc": "de Concepteur - Développeur Informatique, obtenu à l'IMIE.",
         "illu": "win.svg",
         anim: function() {
-            var winner = document.querySelectorAll('.win');
+            var winner = document.querySelectorAll('.fireworks');
             animsvg.hideSVG(winner);
             var tweens = new Array,
                 tl= new TimelineMax();
             for (var i = 0; i < winner.length; i++) {
-                tweens.push(Tween.fromTo(winner[i], 0.5, {opacity: 0, transform: 'scale(0.8)'}, {opacity:1, transform: 'scale(0.95)', ease: Back.easeOut.config(1)}));
+                tweens.push(Tween.fromTo(winner[i], 0.5, {opacity: 0}, {opacity:1, ease: Back.easeOut.config(1)}));
             };
             tl.add(tweens, '+=0', 'start', .5);
             return tl;
@@ -157,7 +157,7 @@ module.exports = {
 
     "/merci": {
        "title": {
-            "label": "Merci"
+            "label": "merci"
         },
         "desc": "Merci à tout ceux qui m'ont aidé. Liste des gens",
         "prev": "/1"
