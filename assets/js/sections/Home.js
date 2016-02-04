@@ -3,8 +3,6 @@ module.exports = Home;
 function Home() {}
 
 var Tween = require('gsap'),
-    $ = require("jquery"),
-    mousewheel = require('jquery-mousewheel'),
     model = require('../models.js'),    
     scrollListeners = require('../scrollListeners');
 

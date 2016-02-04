@@ -1,6 +1,4 @@
 var Tween = require('gsap'),
-    $ = require("jquery"),
-    mousewheel = require('jquery-mousewheel'),
     animsvg = require('../drawsvg'),
     model = require('../models.js'),
     scrollListeners = require('../scrollListeners');
@@ -33,12 +31,6 @@ Number.prototype = {
 
     animateIn: function(req, done) {
 
-        // TODO:
-        // -Uniformiser les apparitions des lignes
-        // -Responsive
-        // -Changer les pictos curvy et 1 
-        // OPTS:
-        // -mettre un curseur différents sur partie haut/basse et click
 
         // on insère le contenu après la fin du animateOut 
         // de la section précédente (overlap false dans framework)
